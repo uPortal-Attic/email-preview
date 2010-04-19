@@ -1,0 +1,20 @@
+.email-inbox-link {
+    font-weight: normal;
+}
+.email-inbox-link-unread {
+    font-weight: bold;
+}
+.email-portlet-table {
+    width: 99%;
+    border-collapse: collapse;
+    table-layout:fixed;
+}
+.email-portlet-table th, .email-portlet-table td {
+    border: 1px solid #CCC;
+}
+.email-portlet-table td div, .email-portlet-table td div a {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.unread { font-weight: bold; }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+
+        Licensed to Jasig under one or more contributor license
+        agreements. See the NOTICE file distributed with this work for
+        additional information regarding copyright ownership. Jasig
+        licenses this file to you under the Apache License, Version 2.0
+        (the "License"); you may not use this file except in compliance
+        with the License. You may obtain a copy of the License at:
+
+        http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+        applicable law or agreed to in writing, software distributed
+        under the License is distributed on an "AS IS" BASIS, WITHOUT
+        WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions
+        and limitations under the License.
+    -->
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
+    version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd">
+
+    <portlet>
+        <portlet-name>email-preview</portlet-name>
+        <display-name>Email Preview</display-name>
+        <portlet-class>org.springframework.web.portlet.DispatcherPortlet</portlet-class>
+
+        <init-param>
+            <name>contextClass</name>
+            <value>org.springframework.web.portlet.context.XmlPortletApplicationContext</value>
+        </init-param>
+
+        <init-param>
+            <name>contextConfigLocation</name>
+            <value>/WEB-INF/context/portlet/email-preview.xml</value>
+        </init-param>
+
+        <init-param>
+            <name>namespace</name>
+            <value>email-preview-portlet</value>
+        </init-param>
+
+        <init-param>
+            <name>viewRendererUrl</name>
+            <value>/WEB-INF/servlet/view</value>
+        </init-param>
+
+        <expiration-cache>0</expiration-cache>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+            <portlet-mode>config</portlet-mode>
+        </supports>
+        <supported-locale>en</supported-locale>
+        <portlet-info>
+            <title>Email preview</title>
+            <short-title>Email preview</short-title>
+            <keywords>Email, preview, Portlet</keywords>
+        </portlet-info>
+
+    </portlet>
+
+    <user-attribute>
+        <description>Username attribute name for uPortal user</description>
+        <name>user.login.id</name>
+    </user-attribute>
+
+    <user-attribute>
+        <description>Password attribute name for uPortal user</description>
+        <name>password</name>
+    </user-attribute>
+
+</portlet-app>
