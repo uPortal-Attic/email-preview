@@ -19,7 +19,7 @@
 
 --%>
 <jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
-<portlet:actionURL var="formUrl"/>
+<portlet:actionURL var="formUrl"><portlet:param name="action" value="updateConfiguration"/></portlet:actionURL>
 
 
 <form:form action="${ formUrl }" method="POST" commandName="form">

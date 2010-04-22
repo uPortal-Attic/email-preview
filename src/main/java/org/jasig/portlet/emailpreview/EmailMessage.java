@@ -20,6 +20,8 @@ package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
 
+import org.apache.commons.lang.time.FastDateFormat;
+
 /**
  * An entity abstraction for representing information
  * related to an email message.
@@ -33,6 +35,10 @@ public class EmailMessage {
 	private String subject;
 	private Date sentDate;
 	private boolean isUnread = false;
+	private boolean isAnswered = false;
+	private boolean isDeleted = false;
+	
+	private static final FastDateFormat df = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
 
 	/**
 	 * Returns the date the email message was sent.
@@ -49,6 +55,10 @@ public class EmailMessage {
 	 */
 	public void setSentDate(Date sentDate) {
 		this.sentDate = sentDate;
+	}
+	
+	public String getSentDateString() {
+	    return df.format(this.sentDate);
 	}
 
 	/**
@@ -86,6 +96,10 @@ public class EmailMessage {
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
+	
+	public String getSenderName() {
+	    return this.sender.split("\\s*<")[0];
+	}
 
     public boolean isUnread() {
         return isUnread;
@@ -94,5 +108,21 @@ public class EmailMessage {
     public void setUnread(boolean isUnread) {
         this.isUnread = isUnread;
     }
-	
+
+    public boolean isAnswered() {
+        return isAnswered;
+    }
+
+    public void setAnswered(boolean answered) {
+        this.isAnswered = answered;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+    
 }

@@ -72,6 +72,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
             List<EmailMessage> unreadMessages = getEmailMessages(inbox, messageCount);
             int totalMessageCount = getTotalEmailMessageCount(inbox);
             int unreadMessageCount = getUnreadEmailMessageCount(inbox);
+            
             if ( log.isDebugEnabled() ) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 int unreadMessageToDisplayCount = unreadMessages.size();
@@ -114,9 +115,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
 
         
     }
-
+    
     private Folder getUserInbox(MailStoreConfiguration storeConfig, Authenticator authenticator)
-    throws MessagingException {
+            throws MessagingException {
 
         // Initialize connection properties
         Properties mailProperties = new Properties();
@@ -158,11 +159,6 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         Folder inboxFolder = root.getFolder(storeConfig.getInboxFolderName());
 
         return inboxFolder;
-    }
-
-    private int getTotalEmailMessageCount(Folder inbox)
-            throws MessagingException {
-        return inbox.getMessageCount();
     }
 
     private List<EmailMessage> getEmailMessages(Folder mailFolder,
@@ -208,6 +204,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
             emailMessage.setSentDate(currentMessage.getSentDate());
             
             emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
+            emailMessage.setAnswered(currentMessage.isSet(Flag.ANSWERED));
+            emailMessage.setDeleted(currentMessage.isSet(Flag.DELETED));
 
             unreadEmails.add(emailMessage);
         }
@@ -217,6 +215,12 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         return unreadEmails;
 
     }
+
+    private int getTotalEmailMessageCount(Folder inbox)
+            throws MessagingException {
+        return inbox.getMessageCount();
+    }
+
 
     private int getUnreadEmailMessageCount(Folder inbox)
             throws MessagingException {

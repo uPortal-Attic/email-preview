@@ -8,7 +8,6 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.ReadOnlyException;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.impl.IMailStoreDao;
 import org.jasig.portlet.emailpreview.dao.impl.PortletPreferencesMailStoreDaoImpl;
 import org.junit.Before;
 import org.junit.Test;

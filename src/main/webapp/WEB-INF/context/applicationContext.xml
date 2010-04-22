@@ -30,12 +30,20 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao" />
     <context:annotation-config />
 
+    <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
+
     <util:list id="protocols">
         <value>imap</value>
         <value>imaps</value>
         <value>pop</value>
         <value>pops</value>
     </util:list>
+
+    <!-- 
+     | View resolvers, look for a named view bean before going to JSP resolution
+     +-->
+    <bean class="org.springframework.web.servlet.view.XmlViewResolver"
+            p:order="0" p:location="/WEB-INF/context/views.xml"/>
 
     <bean id="jspViewResolver"
         class="org.springframework.web.servlet.view.InternalResourceViewResolver"

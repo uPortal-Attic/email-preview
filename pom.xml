@@ -125,6 +125,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.jasig</groupId>
+                <artifactId>AjaxPortletSupport</artifactId>
+                <version>1.0.8</version> 
+            </dependency>
+            <dependency>
                 <groupId>org.jasig.resourceserver</groupId>
                 <artifactId>resource-server-content</artifactId>
                 <version>${resource-server.version}</version>
@@ -187,6 +192,10 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jasig</groupId>
+            <artifactId>AjaxPortletSupport</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jasig.resourceserver</groupId>

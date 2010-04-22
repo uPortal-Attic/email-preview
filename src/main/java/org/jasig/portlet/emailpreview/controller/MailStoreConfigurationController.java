@@ -10,7 +10,7 @@ import javax.portlet.PortletModeException;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.impl.IMailStoreDao;
+import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;

@@ -5,17 +5,23 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * @author Jen Bourey, jbourey@unicon.net
+ * @version $Revision$
+ */
 @Component
 public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
     
-    private static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
-    private static final String HOST_KEY = "host";
-    private static final String PORT_KEY = "port";
-    private static final String INBOX_NAME_KEY = "inboxName";
-    private static final String PROTOCOL_KEY = "protocol";
-    private static final String TIMEOUT_KEY = "timeout";
+    protected static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
+    protected static final String HOST_KEY = "host";
+    protected static final String PORT_KEY = "port";
+    protected static final String INBOX_NAME_KEY = "inboxName";
+    protected static final String PROTOCOL_KEY = "protocol";
+    protected static final String TIMEOUT_KEY = "timeout";
     
     /* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.impl.IMailStoreDao#getConfiguration(javax.portlet.PortletRequest)
