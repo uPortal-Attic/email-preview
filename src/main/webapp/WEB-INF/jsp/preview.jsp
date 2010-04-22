@@ -29,6 +29,9 @@
 <portlet:actionURL var="accountInfoUrl">
     <portlet:param name="action" value="accountSummary"/>
 </portlet:actionURL>
+<portlet:actionURL var="messageUrl">
+    <portlet:param name="action" value="emailMessage"/>
+</portlet:actionURL>
 
 <div id="${n}container" class="email-container">
 
@@ -59,6 +62,18 @@
             </tr>
         </table>
     </div>
+    
+    <div class="email-message" style="display:none">
+        <table cellpadding="0" cellspacing="0" class="message-headers">
+            <tr><td class="message-header-name">From</td><td class="subject"></td></tr>
+            <tr><td class="message-header-name">Subject</td><td class="sender"></td></tr>
+            <tr><td class="message-header-name">Date</td><td class="sentDate"></td></tr>
+        </table>
+        <hr/>
+        <div class="message-content">
+        </div>
+        <p><a class="return-link" href="javascript:;">Return to messages</a></p>
+    </div>
 
 </div>
 
@@ -80,6 +95,24 @@
             { id: "sender", selector: ".sender" },
             { id: "sentDate", selector: ".sentDate" }
         ];
+
+       var getMessage = function(num) {
+           $(".email-message").hide();
+           $(".email-list").hide();
+           $(".loading-message").show();
+           $.post("${ messageUrl }", { messageNum: num }, 
+                   function(data){
+                       var html = data.message.html ? data.message.content.content : "<pre>" + data.message.content.content + "</pre>";
+                       $(".message-content").html(html);
+                       $(".email-message .subject").html(data.message.subject);
+                       $(".email-message .sender").html(data.message.sender);
+                       $(".email-message .sentDate").html(data.message.sentDateString);
+                       $(".loading-message").hide();
+                       $(".email-message").show();
+                   }, 
+                   "json");
+               return false;
+       };
                        
        
        var getComponentTreeFromAccount = function(account) {
@@ -102,7 +135,15 @@
                           { type: "addClass", classes: classes }
                        ],
                        children: [
-                          { ID: "subject", value: message.subject },
+                          { 
+                              ID: "subject", value: message.subject,
+                              decorators: [
+                                  { attrs: { messageNum: message.messageNumber } },
+                                  { type: "jQuery", func: "click",
+                                      args: function(){ getMessage($(this).attr("messageNum")); }
+                                  }
+                              ]
+                          },
                           { ID: "sender", value: message.senderName },
                           { ID: "sentDate", value: message.sentDateString }
                        ]  
@@ -120,16 +161,20 @@
                    $(".email-list").hide();
                    $(".loading-message").show();
                    var tree = getComponentTreeFromAccount(data.accountInfo);
-                   fluid.selfRender($("#${n}container"), tree, { cutpoints: cutpoints });
+                   fluid.selfRender($("#${n}container .email-list"), tree, { cutpoints: cutpoints });
                    $(".loading-message").hide();
                    $(".email-list").show();
+                   $(".refresh-link").click(loadEmail);
+                   $(".return-link").click(function(){
+                       $(".email-message").hide();
+                       $(".email-list").show();
+                   });
                }, 
                "json");
            return false;
        };
                    
        $(document).ready(function(){
-           $(".refresh-link").click(loadEmail);
            loadEmail();
        }); 
     });

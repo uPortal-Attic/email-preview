@@ -18,6 +18,9 @@
  */
 package org.jasig.portlet.emailpreview.dao.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,18 +29,23 @@ import java.util.Properties;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.BodyPart;
 import javax.mail.FetchProfile;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Flags.Flag;
+import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountInfo;
 import org.jasig.portlet.emailpreview.EmailMessage;
+import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
@@ -96,14 +104,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
 
             return acountInfo;
 
-        } catch (MessagingException me) {
-
-            StringBuilder errorMsg = new StringBuilder(128);
-            errorMsg.append("An error occured while retrieving ");
-            errorMsg.append("email account information for user with username ");
-
-            log.error(errorMsg.toString(), me);
-
+        } catch (Exception me) {
+            log.error(me);
             throw new EmailPreviewException(me);
         } finally {
             if ( inbox != null ) {
@@ -162,7 +164,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
     }
 
     private List<EmailMessage> getEmailMessages(Folder mailFolder,
-            int messageCount) throws MessagingException {
+            int messageCount) throws MessagingException, IOException {
 
         int totalMessageCount = mailFolder.getMessageCount();
         int start = Math.max(1, totalMessageCount - (messageCount - 1));
@@ -192,27 +194,116 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
          */
         for (Message currentMessage : messages) {
 
-            EmailMessage emailMessage = new EmailMessage();
-
-            // Set sender address
-            Address[] addresses = currentMessage.getFrom();
-            String sender = addresses[0].toString();
-            emailMessage.setSender(sender);
-
-            // Set subject and sent date
-            emailMessage.setSubject(currentMessage.getSubject());
-            emailMessage.setSentDate(currentMessage.getSentDate());
-            
-            emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
-            emailMessage.setAnswered(currentMessage.isSet(Flag.ANSWERED));
-            emailMessage.setDeleted(currentMessage.isSet(Flag.DELETED));
-
+            EmailMessage emailMessage = wrapMessage(currentMessage, false);
             unreadEmails.add(emailMessage);
         }
 
         Collections.reverse(unreadEmails);
 
         return unreadEmails;
+
+    }
+    
+    public EmailMessage retrieveMessage(MailStoreConfiguration storeConfig, Authenticator auth, int messageNum) {
+        
+        Folder inbox = null;
+        try {
+
+            // Retrieve user's inbox
+            inbox = getUserInbox(storeConfig, auth);
+            inbox.open(Folder.READ_ONLY);
+
+            Message message = inbox.getMessage(messageNum);
+            EmailMessage emailMessage = wrapMessage(message, true);
+            
+            inbox.close(false);
+            
+            return emailMessage;
+        } catch (MessagingException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(false);
+                } catch ( Exception e ) {}
+            }
+        }
+        
+        return null;
+    }
+    
+    protected EmailMessage wrapMessage(Message currentMessage, boolean populateContent) throws MessagingException, IOException {
+        EmailMessage emailMessage = new EmailMessage();
+        emailMessage.setMessageNumber(currentMessage.getMessageNumber());
+
+        // Set sender address
+        Address[] addresses = currentMessage.getFrom();
+        String sender = addresses[0].toString();
+        emailMessage.setSender(sender);
+
+        // Set subject and sent date
+        emailMessage.setSubject(currentMessage.getSubject());
+        emailMessage.setSentDate(currentMessage.getSentDate());
+        
+        emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
+        emailMessage.setAnswered(currentMessage.isSet(Flag.ANSWERED));
+        emailMessage.setDeleted(currentMessage.isSet(Flag.DELETED));
+        
+        if (populateContent) {
+            Object content = currentMessage.getContent();
+            EmailMessageContent str = getContentString(content, currentMessage.getContentType());
+            emailMessage.setContent(str);
+        }
+
+        return emailMessage;
+    }
+    
+    protected EmailMessageContent getContentString(Object content, String mimeType) throws IOException, MessagingException {
+        
+        // if this content item is a String, simply return it.
+        if (content instanceof String) {
+            boolean isHtml = ("text/html".equals(mimeType.toLowerCase()));
+            return new EmailMessageContent((String) content, isHtml);
+        } 
+        
+        else if (content instanceof MimeMultipart) {
+            Multipart m = (Multipart) content;
+            int parts = m.getCount();
+            
+            // iterate backwards through the parts list
+            for (int i = parts-1; i >= 0; i--) {
+                EmailMessageContent result = null;
+                
+                BodyPart part = m.getBodyPart(i);
+                Object partContent = part.getContent();
+                String contentType = part.getContentType().toLowerCase();
+                boolean isHtml = ("text/html".equals(contentType));
+                log.debug("Examining Multipart " + i + " with type " + contentType + " and class " + partContent.getClass());
+                
+                if (partContent instanceof String) {
+                    result = new EmailMessageContent((String) partContent, isHtml);
+                } 
+                
+                else if (partContent instanceof InputStream && (contentType.startsWith("text/html"))) {
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy((InputStream) partContent, writer);
+                    result = new EmailMessageContent(writer.toString(), isHtml);
+                } 
+                
+                else if (partContent instanceof MimeMultipart) {
+                    result = getContentString(partContent, contentType);
+                }
+                
+                if (result != null) {
+                    return result;
+                }
+                
+            }
+        }
+        
+        return null;
 
     }
 

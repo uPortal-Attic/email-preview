@@ -17,6 +17,8 @@
     overflow: hidden;
 }
 
+.message-headers .message-header-name { font-weight: bold; color: #333; text-align: right; }
+
 .loading-message { height: 150px; background: url(/email-preview/images/loading.gif) no-repeat center center; }
 
 .flags-header { width: 16px; text-align: right; }

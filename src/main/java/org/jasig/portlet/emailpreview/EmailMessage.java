@@ -31,6 +31,7 @@ import org.apache.commons.lang.time.FastDateFormat;
  */
 public class EmailMessage {
 
+    private int messageNumber;
 	private String sender;
 	private String subject;
 	private Date sentDate;
@@ -38,9 +39,20 @@ public class EmailMessage {
 	private boolean isAnswered = false;
 	private boolean isDeleted = false;
 	
+	private EmailMessageContent content;
+	
 	private static final FastDateFormat df = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
 
-	/**
+	
+	public int getMessageNumber() {
+        return messageNumber;
+    }
+
+    public void setMessageNumber(int messageNumber) {
+        this.messageNumber = messageNumber;
+    }
+
+    /**
 	 * Returns the date the email message was sent.
 	 * @return The sent date of the email message as a <code>java.util.Date</code>.
 	 */
@@ -124,5 +136,13 @@ public class EmailMessage {
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    
+
+    public EmailMessageContent getContent() {
+        return content;
+    }
+
+    public void setContent(EmailMessageContent content) {
+        this.content = content;
+    }
+
 }
