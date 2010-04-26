@@ -27,37 +27,8 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao" />
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
-    <context:annotation-config />
-
-    <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
-
-    <util:list id="protocols">
-        <value>imap</value>
-        <value>imaps</value>
-        <value>pop</value>
-        <value>pops</value>
-    </util:list>
+    <bean id="testMailConfig" p:protocol="imap" p:host="localhost" p:port=""/>
     
-    <util:list id="linkServices">
-        <ref bean="simpleEmailLinkService"/>
-    </util:list>
-
-    <util:list id="authServices">
-        <ref bean="cachedPasswordAuthenticationService"/>
-    </util:list>
-
-    <!-- 
-     | View resolvers, look for a named view bean before going to JSP resolution
-     +-->
-    <bean class="org.springframework.web.servlet.view.XmlViewResolver"
-            p:order="0" p:location="/WEB-INF/context/views.xml"/>
-
-    <bean id="jspViewResolver"
-        class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-        p:order="10" p:cache="true"
-        p:viewClass="org.springframework.web.servlet.view.JstlView"
-        p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+    <bean id="emailAccountDao" class="org.jasig.portlet.emailpreview.dao.impl.EmailAccountDaoImpl"/>
 
 </beans>

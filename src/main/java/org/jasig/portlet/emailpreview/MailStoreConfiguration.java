@@ -19,11 +19,15 @@ public class MailStoreConfiguration {
     private String host;
     private int port;
     private String inboxFolderName;
-
+    
     private int timeout;
     private int connectionTimeout;
     
-    private Map<String, String> properties = new HashMap<String, String>();
+    private String linkServiceKey;
+    private String authenticationServiceKey;
+    
+    private Map<String, String> additionalProperties = new HashMap<String, String>();
+    private Map<String, String> javaMailProperties = new HashMap<String, String>();
     
     public String getProtocol() {
         return protocol;
@@ -73,12 +77,38 @@ public class MailStoreConfiguration {
         this.connectionTimeout = connectionTimeout;
     }
 
-    public Map<String, String> getProperties() {
-        return properties;
+    public Map<String, String> getJavaMailProperties() {
+        return javaMailProperties;
     }
 
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
+    public void setJavaMailProperties(Map<String, String> properties) {
+        this.javaMailProperties = properties;
+    }
+    
+    public Map<String, String> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Map<String, String> additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+    
+    
+
+    public String getLinkServiceKey() {
+        return linkServiceKey;
+    }
+
+    public void setLinkServiceKey(String linkServiceKey) {
+        this.linkServiceKey = linkServiceKey;
+    }
+
+    public String getAuthenticationServiceKey() {
+        return authenticationServiceKey;
+    }
+
+    public void setAuthenticationServiceKey(String authenticationServiceKey) {
+        this.authenticationServiceKey = authenticationServiceKey;
     }
 
     /**
@@ -102,7 +132,10 @@ public class MailStoreConfiguration {
             .append(this.inboxFolderName, owner.getInboxFolderName())
             .append(this.timeout, owner.getTimeout())
             .append(this.connectionTimeout, owner.getConnectionTimeout())
-            .append(this.properties, owner.getProperties())
+            .append(this.linkServiceKey, owner.getLinkServiceKey())
+            .append(this.authenticationServiceKey, owner.getAuthenticationServiceKey())
+            .append(this.additionalProperties, owner.getAdditionalProperties())
+            .append(this.javaMailProperties, owner.getJavaMailProperties())
             .isEquals();
     }
 
@@ -118,7 +151,10 @@ public class MailStoreConfiguration {
             .append(this.inboxFolderName)
             .append(this.timeout)
             .append(this.connectionTimeout)
-            .append(this.properties)
+            .append(this.linkServiceKey)
+            .append(this.authenticationServiceKey)
+            .append(this.additionalProperties)
+            .append(this.javaMailProperties)
             .toHashCode();
     }
 
@@ -131,7 +167,10 @@ public class MailStoreConfiguration {
             .append("inbox", this.inboxFolderName)
             .append("timeout", this.timeout)
             .append("connectionTimeout", this.connectionTimeout)
-            .append("properties", this.properties)
+            .append("linkServiceKey", this.linkServiceKey)
+            .append("authenticationServiceKey", this.authenticationServiceKey)
+            .append("Additional properties", this.additionalProperties)
+            .append("Java Mail properties", this.javaMailProperties)
             .toString();
     }
 

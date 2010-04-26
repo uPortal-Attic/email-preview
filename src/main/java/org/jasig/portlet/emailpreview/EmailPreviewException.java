@@ -24,7 +24,7 @@ package org.jasig.portlet.emailpreview;
  * @author Andreas Christoforides
  *
  */
-public class EmailPreviewException extends Exception {
+public class EmailPreviewException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

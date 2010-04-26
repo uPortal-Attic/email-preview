@@ -102,7 +102,7 @@
            $(".loading-message").show();
            $.post("${ messageUrl }", { messageNum: num }, 
                    function(data){
-                       var html = data.message.html ? data.message.content.content : "<pre>" + data.message.content.content + "</pre>";
+                       var html = data.message.html ? data.message.content.contentString : "<pre>" + data.message.content.contentString + "</pre>";
                        $(".message-content").html(html);
                        $(".email-message .subject").html(data.message.subject);
                        $(".email-message .sender").html(data.message.sender);

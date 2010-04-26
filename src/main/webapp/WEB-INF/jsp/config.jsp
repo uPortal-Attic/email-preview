@@ -47,6 +47,22 @@
         <form:label path="connectionTimeout">Connection Timeout:</form:label>
         <form:input path="connectionTimeout"/>
     </p>
+    <p>
+        <form:label path="linkServiceKey">Link Service:</form:label>
+        <form:select path="linkServiceKey">
+            <c:forEach items="${ linkServices }" var="service">
+                <form:option value="${ service.key }"/>
+            </c:forEach>
+        </form:select>
+    </p>
+    <p>
+        <form:label path="authenticationServiceKey">Authentication Service:</form:label>
+        <form:select path="authenticationServiceKey">
+            <c:forEach items="${ authServices }" var="service">
+                <form:option value="${ service.key }"/>
+            </c:forEach>
+        </form:select>
+    </p>
     <div class="buttons">
         <input type="submit" class="button primary" value="Save"/>
     </div>

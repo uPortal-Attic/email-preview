@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  * inbox.
  *
  * @author Andreas Christoforides
- *
+ * @version $Revision$
  */
 @Component
 public class EmailAccountDaoImpl implements IEmailAccountDao {
@@ -126,6 +126,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         mailProperties.put("mail.store.protocol", storeConfig.getProtocol());
         mailProperties.put("mail.host", storeConfig.getHost());
         mailProperties.put("mail.port", storeConfig.getPort());
+        mailProperties.put("mail.debug", true);
 
         String protocolPropertyPrefix = "mail." + storeConfig.getProtocol() + ".";
 
@@ -143,7 +144,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         }
 
         // add each additional property
-        for (Map.Entry<String, String> property : storeConfig.getProperties().entrySet()) {
+        for (Map.Entry<String, String> property : storeConfig.getJavaMailProperties().entrySet()) {
             mailProperties.put(property.getKey(), property.getValue());
         }
 

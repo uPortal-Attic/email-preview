@@ -27,6 +27,7 @@ import org.apache.commons.lang.time.FastDateFormat;
  * related to an email message.
  *
  * @author Andreas Christoforides
+ * @author Jen Bourey, jbourey@unicon.net
  * @version $Revision$
  */
 public class EmailMessage {

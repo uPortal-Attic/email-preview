@@ -3,6 +3,9 @@ package org.jasig.portlet.emailpreview.dao;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ReadOnlyException;
@@ -27,6 +30,12 @@ public class PortletPreferencesMailStoreDaoImplTest {
     private String inboxName = "INBOX";
     private int timeout = -1;
     private int connectionTimeout = -1;
+    private String inboxUrl = "http://mail.google.com";
+    private String mailDebug = "true";
+    private String linkServiceKey = "default";
+    private String authServiceKey = "cachedPassword";
+    
+    private Map<String, String> preferenceMap;
     
     @Before
     public void setUp() {
@@ -39,16 +48,27 @@ public class PortletPreferencesMailStoreDaoImplTest {
         configuration.setPort(993);
         configuration.setProtocol("imaps");
         configuration.setInboxFolderName("INBOX");
+        configuration.setLinkServiceKey(linkServiceKey);
+        configuration.setAuthenticationServiceKey(authServiceKey);
         configuration.setTimeout(-1);
         configuration.setConnectionTimeout(-1);
+        configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
+        configuration.getJavaMailProperties().put("mail.debug", mailDebug);
+        
+        preferenceMap = new HashMap<String, String>();
+        preferenceMap.put("inboxUrl", inboxUrl);
+        preferenceMap.put("mail.debug", mailDebug);
         
         when(request.getPreferences()).thenReturn(preferences);
         when(preferences.getValue("host", null)).thenReturn(host);
         when(preferences.getValue("protocol", null)).thenReturn(protocol);
         when(preferences.getValue("inboxName", null)).thenReturn(inboxName);
+        when(preferences.getValue("linkServiceKey", null)).thenReturn(linkServiceKey);
+        when(preferences.getValue("authenticationServiceKey", null)).thenReturn(authServiceKey);
         when(preferences.getValue("port", "25")).thenReturn(String.valueOf(port));
         when(preferences.getValue("timeout", "-1")).thenReturn(String.valueOf(timeout));
         when(preferences.getValue("connectionTimeout", "-1")).thenReturn(String.valueOf(connectionTimeout));
+        when(preferences.getMap()).thenReturn(preferenceMap);
         
     }
     
@@ -68,6 +88,8 @@ public class PortletPreferencesMailStoreDaoImplTest {
         verify(preferences).setValue("port", String.valueOf(port));
         verify(preferences).setValue("timeout", String.valueOf(timeout));
         verify(preferences).setValue("connectionTimeout", String.valueOf(connectionTimeout));
+        verify(preferences).setValue("inboxUrl", inboxUrl);
+        verify(preferences).setValue("mail.debug", mailDebug);
     }
 
 }

@@ -1,5 +1,6 @@
 package org.jasig.portlet.emailpreview.controller;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -11,6 +12,10 @@ import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
+import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
@@ -39,6 +44,20 @@ public class MailStoreConfigurationController {
     @Required
     public void setProtocols(List<String> protocols) {
         this.protocols = protocols;
+    }
+    
+    private ILinkServiceRegistry linkServiceRegistry;
+    
+    @Autowired(required = true)
+    public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
+        this.linkServiceRegistry = linkServiceRegistry;
+    }
+
+    private IAuthenticationServiceRegistry authServiceRegistry;
+    
+    @Autowired(required = true)
+    public void setAuthServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
+        this.authServiceRegistry = authServiceRegistry;
     }
 
     @RequestMapping
@@ -72,6 +91,16 @@ public class MailStoreConfigurationController {
     @ModelAttribute("protocols")
     public List<String> getProtocols() {
         return this.protocols;
+    }
+    
+    @ModelAttribute("linkServices")
+    public Collection<IEmailLinkService> getLinkServices() {
+        return this.linkServiceRegistry.getServices();
+    }
+    
+    @ModelAttribute("authServices")
+    public Collection<IAuthenticationService> getAuthServices() {
+        return this.authServiceRegistry.getServices();
     }
 
 }
