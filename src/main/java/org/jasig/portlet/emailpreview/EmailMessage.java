@@ -58,7 +58,7 @@ public class EmailMessage {
 	 * @return The sent date of the email message as a <code>java.util.Date</code>.
 	 */
 	public Date getSentDate() {
-		return this.sentDate;
+		return new Date(this.sentDate.getTime());
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class EmailMessage {
 	 * @param sentDate The sent date of the email message.
 	 */
 	public void setSentDate(Date sentDate) {
-		this.sentDate = sentDate;
+		this.sentDate = new Date(sentDate.getTime());
 	}
 	
 	public String getSentDateString() {

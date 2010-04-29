@@ -49,6 +49,15 @@ import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
+import org.owasp.validator.html.AntiSamy;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.PolicyException;
+import org.owasp.validator.html.ScanException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,14 +69,49 @@ import org.springframework.stereotype.Component;
  * @version $Revision$
  */
 @Component
-public class EmailAccountDaoImpl implements IEmailAccountDao {
+public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, ApplicationContextAware {
 
     protected final Log log = LogFactory.getLog(getClass());
+    
+    private Policy policy;
+
+    private ApplicationContext ctx;
+    
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext ctx)
+                    throws BeansException {
+            this.ctx = ctx;
+    }
+    
+    private String filePath = "classpath:antisamy.xml";
+
+    /**
+     * Set the file path to the Anti-samy policy file to be used for cleaning
+     * strings.
+     * 
+     * @param path
+     */
+    public void setSecurityFile(String path) {
+            this.filePath = path;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception {
+        InputStream stream = ctx.getResource(filePath).getInputStream();
+        policy = Policy.getInstance(stream);
+    }
+
     
 	/* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
      */
-    public AccountInfo retrieveEmailAccountInfo (MailStoreConfiguration storeConfig, Authenticator auth, int messageCount)
+    public AccountInfo retrieveEmailAccountInfo (MailStoreConfiguration storeConfig, Authenticator auth, int start, int messageCount)
     throws EmailPreviewException {
 
         Folder inbox = null;
@@ -77,7 +121,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
             inbox = getUserInbox(storeConfig, auth);
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
-            List<EmailMessage> unreadMessages = getEmailMessages(inbox, messageCount);
+            List<EmailMessage> unreadMessages = getEmailMessages(inbox, start, messageCount);
             int totalMessageCount = getTotalEmailMessageCount(inbox);
             int unreadMessageCount = getUnreadEmailMessageCount(inbox);
             
@@ -105,7 +149,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
             return acountInfo;
 
         } catch (Exception me) {
-            log.error(me);
+            log.error("Exception encountered while retrieving account info", me);
             throw new EmailPreviewException(me);
         } finally {
             if ( inbox != null ) {
@@ -164,13 +208,14 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         return inboxFolder;
     }
 
-    private List<EmailMessage> getEmailMessages(Folder mailFolder,
-            int messageCount) throws MessagingException, IOException {
+    protected List<EmailMessage> getEmailMessages(Folder mailFolder, int pageStart,
+            int messageCount) throws MessagingException, IOException, ScanException, PolicyException {
 
         int totalMessageCount = mailFolder.getMessageCount();
-        int start = Math.max(1, totalMessageCount - (messageCount - 1));
+        int start = Math.max(1, totalMessageCount - pageStart - (messageCount - 1));
+        int end = Math.max(totalMessageCount - pageStart, 1);
 
-        Message[] messages = mailFolder.getMessages(start, totalMessageCount);
+        Message[] messages = mailFolder.getMessages(start, end);
 
         long startTime = System.currentTimeMillis();
 
@@ -221,9 +266,13 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
             
             return emailMessage;
         } catch (MessagingException e) {
-            log.error(e);
+            log.error("Messaging exception while retrieving individual message", e);
         } catch (IOException e) {
-            log.error(e);
+            log.error("IO exception while retrieving individual message", e);
+        } catch (ScanException e) {
+            log.error("AntiSamy scanning exception while retrieving individual message", e);
+        } catch (PolicyException e) {
+            log.error("AntiSamy policy exception while retrieving individual message", e);
         } finally {
             if ( inbox != null ) {
                 try {
@@ -235,7 +284,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         return null;
     }
     
-    protected EmailMessage wrapMessage(Message currentMessage, boolean populateContent) throws MessagingException, IOException {
+    protected EmailMessage wrapMessage(Message currentMessage, boolean populateContent) throws MessagingException, IOException, ScanException, PolicyException {
         EmailMessage emailMessage = new EmailMessage();
         emailMessage.setMessageNumber(currentMessage.getMessageNumber());
 
@@ -245,7 +294,10 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         emailMessage.setSender(sender);
 
         // Set subject and sent date
-        emailMessage.setSubject(currentMessage.getSubject());
+        String subject = currentMessage.getSubject();
+        AntiSamy as = new AntiSamy();
+        CleanResults cr = as.scan(subject, policy);
+        emailMessage.setSubject(cr.getCleanHTML());
         emailMessage.setSentDate(currentMessage.getSentDate());
         
         emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
@@ -254,8 +306,10 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         
         if (populateContent) {
             Object content = currentMessage.getContent();
-            EmailMessageContent str = getContentString(content, currentMessage.getContentType());
-            emailMessage.setContent(str);
+            EmailMessageContent body = getContentString(content, currentMessage.getContentType());
+            cr = as.scan(body.getContentString(), policy);
+            body.setContentString(cr.getCleanHTML());
+            emailMessage.setContent(body);
         }
 
         return emailMessage;
@@ -265,8 +319,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         
         // if this content item is a String, simply return it.
         if (content instanceof String) {
-            boolean isHtml = ("text/html".equals(mimeType.toLowerCase()));
-            return new EmailMessageContent((String) content, isHtml);
+            return new EmailMessageContent((String) content, isHtml(mimeType));
         } 
         
         else if (content instanceof MimeMultipart) {
@@ -279,8 +332,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
                 
                 BodyPart part = m.getBodyPart(i);
                 Object partContent = part.getContent();
-                String contentType = part.getContentType().toLowerCase();
-                boolean isHtml = ("text/html".equals(contentType));
+                String contentType = part.getContentType();
+                boolean isHtml = isHtml(contentType);
                 log.debug("Examining Multipart " + i + " with type " + contentType + " and class " + partContent.getClass());
                 
                 if (partContent instanceof String) {
@@ -307,14 +360,52 @@ public class EmailAccountDaoImpl implements IEmailAccountDao {
         return null;
 
     }
+    
+    /**
+     * Determine if the supplied MIME type represents HTML content.  This 
+     * implementation assumes that the inclusion of the string "text/html"
+     * in a mime-type indicates HTML content.
+     * 
+     * @param mimeType
+     * @return
+     */
+    protected boolean isHtml(String mimeType) {
+        
+        // if the mime-type is null, assume the content is not HTML
+        if (mimeType == null) {
+            return false;
+        }
+        
+        // otherwise, check for the presence of the string "text/html"
+        mimeType = mimeType.trim().toLowerCase();
+        if (mimeType.contains("text/html")) {
+            return true;
+        }
+        
+        return false;
+    }
 
-    private int getTotalEmailMessageCount(Folder inbox)
+    /**
+     * Get the total number of email messages in the supplied folder.
+     * 
+     * @param inbox
+     * @return
+     * @throws MessagingException
+     */
+    protected int getTotalEmailMessageCount(Folder inbox)
             throws MessagingException {
         return inbox.getMessageCount();
     }
 
 
-    private int getUnreadEmailMessageCount(Folder inbox)
+    /**
+     * Get the total number of unread email messages in the supplied folder.
+     * 
+     * @param inbox
+     * @return
+     * @throws MessagingException
+     */
+    protected int getUnreadEmailMessageCount(Folder inbox)
             throws MessagingException {
         return inbox.getUnreadMessageCount();
     }

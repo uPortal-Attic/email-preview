@@ -22,7 +22,9 @@
 
 <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
 <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
-<script src="<rs:resourceURL value="/rs/fluid/1.1.2/js/fluid-all-1.1.2.min.js"/>" type="text/javascript"></script>
+<script src="<rs:resourceURL value="/rs/fluid/1.1.2/js/fluid-all-1.1.2.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
@@ -44,29 +46,57 @@
             Inbox (<span class="unread-message-count"></span>)
             | <a class="refresh-link" href="javascript:;">Refresh</a>
         </p>
-    
-        <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
-            <tr>
-                <th class="flags-header">&nbsp;</th>
-                <th>Subject</th>
-                <th>Sender</th>
-                <th>Date Sent</th>
-            </tr>
-            <tr class="email-row">
-                <td class="flags">
-                    <span class="answered-span">&nbsp;</span>
-                </td>
-                <td class="subject"></td>
-                <td class="sender"></td>
-                <td class="sentDate"></td>
-            </tr>
-        </table>
+        
+        <div class="fl-pager">
+            
+            <div class="flc-pager-top">
+                <ul id="pager-top" class="fl-pager-ui">
+                    <li class="flc-pager-previous"><a href="javascript:;">&lt; prev</a></li>
+                    <li>
+                        <ul class="fl-pager-links flc-pager-links" style="margin:0; display:inline">
+                            <li class="flc-pager-pageLink"><a href="javascript:;">1</a></li>
+                            <li class="flc-pager-pageLink-disabled">2</li>
+                            <li class="flc-pager-pageLink-skip">...</li>
+                            <li class="flc-pager-pageLink"><a href="javascript:;">3</a></li>
+                        </ul>
+                    </li>
+                    <li class="flc-pager-next"><a href="javascript:;">next &gt;</a></li>
+                    <li>
+                        <span class="flc-pager-summary">page</span>
+                        <span> <select class="pager-page-size flc-pager-page-size">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select></span> per page
+                    </li>
+                </ul>
+            </div>
+        
+            <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
+                <tr>
+                    <th class="flags-header">&nbsp;</th>
+                    <th>Subject</th>
+                    <th>Sender</th>
+                    <th>Date Sent</th>
+                </tr>
+                <tr rsf:id="row:" class="email-row">
+                    <td rsf:id="flags" class="flags">
+                        <span class="answered-span">&nbsp;</span>
+                    </td>
+                    <td rsf:id="subject" class="subject"></td>
+                    <td rsf:id="sender" class="sender"></td>
+                    <td rsf:id="sentDate" class="sentDate"></td>
+                </tr>
+            </table>
+        </div>
+        
     </div>
     
     <div class="email-message" style="display:none">
         <table cellpadding="0" cellspacing="0" class="message-headers">
-            <tr><td class="message-header-name">From</td><td class="subject"></td></tr>
-            <tr><td class="message-header-name">Subject</td><td class="sender"></td></tr>
+            <tr><td class="message-header-name">From</td><td class="sender"></td></tr>
+            <tr><td class="message-header-name">Subject</td><td class="subject"></td></tr>
             <tr><td class="message-header-name">Date</td><td class="sentDate"></td></tr>
         </table>
         <hr/>
@@ -87,95 +117,14 @@
     ${n}.jQuery(function(){
        var $ = ${n}.jQuery;
        var fluid = ${n}.fluid;
-
-       var cutpoints = [
-            { id: "unreadMessageCount", selector: ".unread-message-count" },
-            { id: "emailRow:", selector: ".email-row" },
-            { id: "subject", selector: ".subject" },
-            { id: "sender", selector: ".sender" },
-            { id: "sentDate", selector: ".sentDate" }
-        ];
-
-       var getMessage = function(num) {
-           $(".email-message").hide();
-           $(".email-list").hide();
-           $(".loading-message").show();
-           $.post("${ messageUrl }", { messageNum: num }, 
-                   function(data){
-                       var html = data.message.html ? data.message.content.contentString : "<pre>" + data.message.content.contentString + "</pre>";
-                       $(".message-content").html(html);
-                       $(".email-message .subject").html(data.message.subject);
-                       $(".email-message .sender").html(data.message.sender);
-                       $(".email-message .sentDate").html(data.message.sentDateString);
-                       $(".loading-message").hide();
-                       $(".email-message").show();
-                   }, 
-                   "json");
-               return false;
-       };
-                       
-       
-       var getComponentTreeFromAccount = function(account) {
-           var tree = { children: [] };
-
-           tree.children.push(
-               { ID: "unreadMessageCount",  value: account.unreadMessageCount + (account.unreadMessageCount == 1 ? " new message" : " new messages") }
-           );
-
-           $(account.messages).each(function(idx, message){
-               var classes = "";
-               if (idx % 2 == 0) classes += " portlet-section-alternate";
-               if (message.unread) classes += " unread";
-               if (message.answered) classes += " answered";
-               if (message.deleted) classes += " deleted";
-               
-               tree.children.push(
-                   { ID: "emailRow:",
-                       decorators: [
-                          { type: "addClass", classes: classes }
-                       ],
-                       children: [
-                          { 
-                              ID: "subject", value: message.subject,
-                              decorators: [
-                                  { attrs: { messageNum: message.messageNumber } },
-                                  { type: "jQuery", func: "click",
-                                      args: function(){ getMessage($(this).attr("messageNum")); }
-                                  }
-                              ]
-                          },
-                          { ID: "sender", value: message.senderName },
-                          { ID: "sentDate", value: message.sentDateString }
-                       ]  
-                   }
-               );
-           });
-
-           return tree;
-
-       };
-
-       var loadEmail = function() {
-           $.get("${ accountInfoUrl }", { }, 
-               function(data){
-                   $(".email-list").hide();
-                   $(".loading-message").show();
-                   var tree = getComponentTreeFromAccount(data.accountInfo);
-                   fluid.selfRender($("#${n}container .email-list"), tree, { cutpoints: cutpoints });
-                   $(".loading-message").hide();
-                   $(".email-list").show();
-                   $(".refresh-link").click(loadEmail);
-                   $(".return-link").click(function(){
-                       $(".email-message").hide();
-                       $(".email-list").show();
-                   });
-               }, 
-               "json");
-           return false;
-       };
                    
        $(document).ready(function(){
-           loadEmail();
+           jasig.EmailBrowser("#${n}container", 
+               {
+                   accountInfoUrl: "${ accountInfoUrl }",
+                   messageUrl: "${ messageUrl }"
+               }
+           );
        }); 
     });
 
