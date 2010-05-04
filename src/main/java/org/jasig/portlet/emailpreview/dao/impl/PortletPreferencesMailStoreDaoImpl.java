@@ -99,12 +99,12 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
          */
 
         @SuppressWarnings("unchecked")
-        Map<String, String> preferenceMap = preferences.getMap();
-        for (Map.Entry<String, String> entry : preferenceMap.entrySet()) {
+        Map<String, String[]> preferenceMap = preferences.getMap();
+        for (Map.Entry<String, String[]> entry : preferenceMap.entrySet()) {
             
             String key = entry.getKey();
-            if (!RESERVED_PROPERTIES.contains(key)) {
-                String value = entry.getValue();
+            if (!RESERVED_PROPERTIES.contains(key) && entry.getValue().length > 0) {
+                String value = entry.getValue()[0];
 
                 if (key.startsWith("mail.")) {
                     config.getJavaMailProperties().put(key, value);

@@ -204,6 +204,7 @@ var jasig = jasig || {};
 
         that.locate("refreshLink").click(that.refresh);
         that.locate("returnLink").click(function(){ showEmailList(that); });
+        that.locate("inboxLink").attr("href", account.inboxUrl);
 
         showEmailList(that);
 
@@ -220,7 +221,8 @@ var jasig = jasig || {};
             emailList: ".email-list",
             emailMessage: ".email-message",
             loadingMessage: ".loading-message",
-            unreadMessageCount: ".unread-message-count"
+            unreadMessageCount: ".unread-message-count",
+            inboxLink: ".inbox-link"
         }
     });
 

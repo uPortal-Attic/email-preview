@@ -18,13 +18,17 @@
  */
 package org.jasig.portlet.emailpreview.service.auth;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +41,7 @@ public class CachedPasswordAuthenticationServiceImpl implements
         IAuthenticationService {
     
     private static final String KEY = "cachedPassword";
+    protected static final String USERNAME_SUFFIX_KEY = "usernameSuffix";
     
     private String usernameKey = "user.login.id";
     private String passwordKey = "password";
@@ -53,6 +58,11 @@ public class CachedPasswordAuthenticationServiceImpl implements
         String username = userInfo.get(usernameKey);
         String password = userInfo.get(passwordKey);
         
+        String usernameSuffix = config.getAdditionalProperties().get(USERNAME_SUFFIX_KEY);
+        if (!StringUtils.isBlank(usernameSuffix)) {
+            username = username.concat(usernameSuffix);
+        }
+        
         return new SimplePasswordAuthenticator(username, password);
     }
 
@@ -62,6 +72,25 @@ public class CachedPasswordAuthenticationServiceImpl implements
      */
     public String getKey() {
         return KEY;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.jasig.portlet.emailpreview.service.auth.IAuthenticationService#getAdminConfigurationParameters()
+     */
+    public List<ConfigurationParameter> getAdminConfigurationParameters() {
+        ConfigurationParameter param = new ConfigurationParameter();
+        param.setKey(USERNAME_SUFFIX_KEY);
+        param.setLabel("Username Suffix");
+        return Collections.<ConfigurationParameter>singletonList(param);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.jasig.portlet.emailpreview.service.auth.IAuthenticationService#getUserConfigurationParameters()
+     */
+    public List<ConfigurationParameter> getUserConfigurationParameters() {
+        return Collections.<ConfigurationParameter>emptyList();
     }
 
 }

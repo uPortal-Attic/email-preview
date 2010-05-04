@@ -43,7 +43,8 @@
 
     <div class="email-list" style="display:none;">
         <p>
-            Inbox (<span class="unread-message-count"></span>)
+            <a class="inbox-link" href="" target="_blank">Inbox</a> 
+            (<span class="unread-message-count"></span>)
             | <a class="refresh-link" href="javascript:;">Refresh</a>
         </p>
         

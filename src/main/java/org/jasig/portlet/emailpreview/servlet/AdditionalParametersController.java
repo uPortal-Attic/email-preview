@@ -1,0 +1,91 @@
+package org.jasig.portlet.emailpreview.servlet;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
+import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+/**
+ * 
+ * @author Jen Bourey, jbourey@unicon.net
+ * @version $Revision$
+ */
+@Controller
+@RequestMapping("/ajax/parameters")
+public class AdditionalParametersController {
+
+    protected final Log log = LogFactory.getLog(getClass());
+
+    private ILinkServiceRegistry linkServiceRegistry;
+
+    @Autowired(required = true)
+    public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
+        this.linkServiceRegistry = linkServiceRegistry;
+    }
+
+    private IAuthenticationServiceRegistry authServiceRegistry;
+
+    @Autowired(required = true)
+    public void setAuthenticationServiceRegistry(
+            IAuthenticationServiceRegistry authServiceRegistry) {
+        this.authServiceRegistry = authServiceRegistry;
+    }
+
+    /**
+     * Get a representation of the administrative parameters for a mail store.
+     * 
+     * @param request
+     * @param response
+     * @param linkServiceKey
+     * @param authServiceKey
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView getParameters(@RequestParam("linkService") String linkServiceKey,
+            @RequestParam("authService") String authServiceKey) {
+
+        try {
+
+            Map<String, Object> model = new HashMap<String, Object>();
+
+            // get administrative configuration parameters for the configured
+            // authentication service
+            final IAuthenticationService authService = authServiceRegistry
+                    .getAuthenticationService(authServiceKey);
+            if (authService != null) {
+                final List<ConfigurationParameter> authParams = authService
+                        .getAdminConfigurationParameters();
+                model.put("authParams", authParams);
+            }
+
+            // get administrative configuration parameters for the configured
+            // link service
+            final IEmailLinkService linkService = linkServiceRegistry
+                    .getEmailLinkService(linkServiceKey);
+            if (linkService != null) {
+                final List<ConfigurationParameter> linkParams = linkService
+                        .getAdminConfigurationParameters();
+                model.put("linkParams", linkParams);
+            }
+
+            return new ModelAndView("jsonView", model);
+
+        } catch (Exception ex) {
+            log.error("Error encountered attempting to retrieve parameter definitions", ex);
+            return null;
+        }
+    }
+
+}

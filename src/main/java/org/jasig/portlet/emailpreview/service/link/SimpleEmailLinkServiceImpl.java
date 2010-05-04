@@ -18,9 +18,13 @@
  */
 package org.jasig.portlet.emailpreview.service.link;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,6 +52,19 @@ public class SimpleEmailLinkServiceImpl implements IEmailLinkService {
      */
     public String getInboxUrl(PortletRequest request, MailStoreConfiguration configuration) {
         return configuration.getAdditionalProperties().get(INBOX_URL_PROPERTY);
+    }
+
+    @Override
+    public List<ConfigurationParameter> getAdminConfigurationParameters() {
+        ConfigurationParameter param = new ConfigurationParameter();
+        param.setKey(INBOX_URL_PROPERTY);
+        param.setLabel("Webmail inbox URL");
+        return Collections.singletonList(param);
+    }
+
+    @Override
+    public List<ConfigurationParameter> getUserConfigurationParameters() {
+        return Collections.<ConfigurationParameter>emptyList();
     }
 
 }

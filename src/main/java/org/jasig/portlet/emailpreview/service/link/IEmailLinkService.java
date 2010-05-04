@@ -18,9 +18,12 @@
  */
 package org.jasig.portlet.emailpreview.service.link;
 
+import java.util.List;
+
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
 /**
  * IEmailLinkService provides links to an external webmail client.
@@ -49,5 +52,9 @@ public interface IEmailLinkService {
      * @return
      */
     public String getInboxUrl(PortletRequest request, MailStoreConfiguration config);
+
+    public List<ConfigurationParameter> getAdminConfigurationParameters();
+    
+    public List<ConfigurationParameter> getUserConfigurationParameters();
 
 }

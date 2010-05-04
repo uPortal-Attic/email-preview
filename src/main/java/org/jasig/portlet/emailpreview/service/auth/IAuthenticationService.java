@@ -18,10 +18,13 @@
  */
 package org.jasig.portlet.emailpreview.service.auth;
 
+import java.util.List;
+
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
 public interface IAuthenticationService {
 
@@ -40,5 +43,9 @@ public interface IAuthenticationService {
      * @return
      */
     public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config);
+    
+    public List<ConfigurationParameter> getAdminConfigurationParameters();
+    
+    public List<ConfigurationParameter> getUserConfigurationParameters();
 
 }

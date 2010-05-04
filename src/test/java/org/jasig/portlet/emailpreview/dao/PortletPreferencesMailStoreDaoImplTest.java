@@ -53,7 +53,7 @@ public class PortletPreferencesMailStoreDaoImplTest {
     private String linkServiceKey = "default";
     private String authServiceKey = "cachedPassword";
     
-    private Map<String, String> preferenceMap;
+    private Map<String, String[]> preferenceMap;
     
     @Before
     public void setUp() {
@@ -73,9 +73,9 @@ public class PortletPreferencesMailStoreDaoImplTest {
         configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
         configuration.getJavaMailProperties().put("mail.debug", mailDebug);
         
-        preferenceMap = new HashMap<String, String>();
-        preferenceMap.put("inboxUrl", inboxUrl);
-        preferenceMap.put("mail.debug", mailDebug);
+        preferenceMap = new HashMap<String, String[]>();
+        preferenceMap.put("inboxUrl", new String[]{ inboxUrl });
+        preferenceMap.put("mail.debug", new String[]{ mailDebug });
         
         when(request.getPreferences()).thenReturn(preferences);
         when(preferences.getValue("host", null)).thenReturn(host);
