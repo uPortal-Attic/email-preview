@@ -63,6 +63,7 @@
       <ovrd>N</ovrd> 
     </parameter>
   </parameters>
+    
   <portletPreferences>
     <portletPreference> 
       <name>port</name>  
@@ -100,6 +101,20 @@
       </values> 
     </portletPreference>
     <portletPreference> 
+      <name>usernameSuffix</name>  
+      <read-only>false</read-only>  
+      <values>
+        <value></value>
+      </values> 
+    </portletPreference>
+    <portletPreference> 
+      <name>inboxUrl</name>  
+      <read-only>false</read-only>  
+      <values>
+        <value>http://mail.google.com</value>
+      </values> 
+    </portletPreference>
+    <portletPreference> 
       <name>linkServiceKey</name>  
       <read-only>false</read-only>  
       <values>
@@ -120,5 +135,6 @@
         <value>INBOX</value>
       </values> 
     </portletPreference>
+    
   </portletPreferences>
 </channel-definition>
