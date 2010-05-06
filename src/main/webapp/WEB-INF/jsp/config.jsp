@@ -175,6 +175,8 @@
     ${n}.jQuery(function(){
        var $ = ${n}.jQuery;
        var fluid = ${n}.fluid;
+       fluid = null;
+       fluid_1_1 = null;
 
        var getTree = function(parameters) {
        };

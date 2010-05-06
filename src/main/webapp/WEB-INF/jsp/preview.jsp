@@ -114,6 +114,7 @@
     ${n}.jQuery = jQuery.noConflict(true);
     ${n}.fluid = fluid;
     fluid = null;
+    fluid_1_1 = null;
 
     ${n}.jQuery(function(){
        var $ = ${n}.jQuery;
