@@ -30,8 +30,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * @author Jen Bourey, jbourey@unicon.net
+ * @version $Revision$
+ */
 @Controller
-@RequestMapping("/ajax/json")
+@RequestMapping("/json")
 public class JsonResponseController {
 
         @Autowired(required=true)

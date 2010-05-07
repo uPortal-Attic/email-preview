@@ -69,12 +69,7 @@
         
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
-        <url-pattern>/ajax/json</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>spring</servlet-name>
-        <url-pattern>/ajax/parameters</url-pattern>
+        <url-pattern>/ajax/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

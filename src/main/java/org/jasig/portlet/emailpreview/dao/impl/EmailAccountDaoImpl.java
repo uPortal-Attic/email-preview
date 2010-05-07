@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.FetchProfile;
@@ -41,6 +42,7 @@ import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountInfo;
@@ -49,6 +51,7 @@ import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
+import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
@@ -148,9 +151,18 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
             return acountInfo;
 
-        } catch (Exception me) {
+        } catch (MessagingException me) {
             log.error("Exception encountered while retrieving account info", me);
             throw new EmailPreviewException(me);
+        } catch (IOException e) {
+            log.error("Exception encountered while retrieving account info", e);
+            throw new EmailPreviewException(e);
+        } catch (ScanException e) {
+            log.error("Exception encountered while retrieving account info", e);
+            throw new EmailPreviewException(e);
+        } catch (PolicyException e) {
+            log.error("Exception encountered while retrieving account info", e);
+            throw new EmailPreviewException(e);
         } finally {
             if ( inbox != null ) {
                 try {
@@ -165,47 +177,51 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
     private Folder getUserInbox(MailStoreConfiguration storeConfig, Authenticator authenticator)
             throws MessagingException {
 
-        // Initialize connection properties
-        Properties mailProperties = new Properties();
-        mailProperties.put("mail.store.protocol", storeConfig.getProtocol());
-        mailProperties.put("mail.host", storeConfig.getHost());
-        mailProperties.put("mail.port", storeConfig.getPort());
-        mailProperties.put("mail.debug", true);
+        try {
+            // Initialize connection properties
+            Properties mailProperties = new Properties();
+            mailProperties.put("mail.store.protocol", storeConfig.getProtocol());
+            mailProperties.put("mail.host", storeConfig.getHost());
+            mailProperties.put("mail.port", storeConfig.getPort());
+            mailProperties.put("mail.debug", true);
 
-        String protocolPropertyPrefix = "mail." + storeConfig.getProtocol() + ".";
+            String protocolPropertyPrefix = "mail." + storeConfig.getProtocol() + ".";
 
-        // Set connection timeout property
-        int connectionTimeout = storeConfig.getConnectionTimeout();
-        if (connectionTimeout >= 0) {
-            mailProperties.put(protocolPropertyPrefix +
-                    "connectiontimeout", connectionTimeout);
+            // Set connection timeout property
+            int connectionTimeout = storeConfig.getConnectionTimeout();
+            if (connectionTimeout >= 0) {
+                mailProperties.put(protocolPropertyPrefix +
+                        "connectiontimeout", connectionTimeout);
+            }
+            
+            // Set timeout property
+            int timeout = storeConfig.getTimeout();
+            if (timeout >= 0) {
+                mailProperties.put(protocolPropertyPrefix + "timeout", timeout);
+            }
+
+            // add each additional property
+            for (Map.Entry<String, String> property : storeConfig.getJavaMailProperties().entrySet()) {
+                mailProperties.put(property.getKey(), property.getValue());
+            }
+
+            // Connect/authenticate to the configured store
+            Session session = Session.getInstance(mailProperties, authenticator);
+            Store store = session.getStore();
+            store.connect();
+
+            if (log.isDebugEnabled()) {
+                log.debug("Mail store created");
+            }
+
+            // Retrieve user's inbox folder
+            Folder root = store.getDefaultFolder();
+            Folder inboxFolder = root.getFolder(storeConfig.getInboxFolderName());
+
+            return inboxFolder;
+        } catch (AuthenticationFailedException e) {
+            throw new MailAuthenticationException();
         }
-        
-        // Set timeout property
-        int timeout = storeConfig.getTimeout();
-        if (timeout >= 0) {
-            mailProperties.put(protocolPropertyPrefix + "timeout", timeout);
-        }
-
-        // add each additional property
-        for (Map.Entry<String, String> property : storeConfig.getJavaMailProperties().entrySet()) {
-            mailProperties.put(property.getKey(), property.getValue());
-        }
-
-        // Connect/authenticate to the configured store
-        Session session = Session.getInstance(mailProperties, authenticator);
-        Store store = session.getStore();
-        store.connect();
-
-        if (log.isDebugEnabled()) {
-            log.debug("Mail store created");
-        }
-
-        // Retrieve user's inbox folder
-        Folder root = store.getDefaultFolder();
-        Folder inboxFolder = root.getFolder(storeConfig.getInboxFolderName());
-
-        return inboxFolder;
     }
 
     protected List<EmailMessage> getEmailMessages(Folder mailFolder, int pageStart,
@@ -295,9 +311,12 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
         // Set subject and sent date
         String subject = currentMessage.getSubject();
-        AntiSamy as = new AntiSamy();
-        CleanResults cr = as.scan(subject, policy);
-        emailMessage.setSubject(cr.getCleanHTML());
+        if (!StringUtils.isBlank(subject)) {
+            AntiSamy as = new AntiSamy();
+            CleanResults cr = as.scan(subject, policy);
+            subject = cr.getCleanHTML();
+        }
+        emailMessage.setSubject(subject);
         emailMessage.setSentDate(currentMessage.getSentDate());
         
         emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
@@ -307,8 +326,13 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         if (populateContent) {
             Object content = currentMessage.getContent();
             EmailMessageContent body = getContentString(content, currentMessage.getContentType());
-            cr = as.scan(body.getContentString(), policy);
-            body.setContentString(cr.getCleanHTML());
+            String contentString = body.getContentString();
+            if (!StringUtils.isBlank(contentString)) {
+                AntiSamy as = new AntiSamy();
+                CleanResults cr = as.scan(contentString, policy);
+                subject = cr.getCleanHTML();
+            }
+            body.setContentString(contentString);
             emailMessage.setContent(body);
         }
 

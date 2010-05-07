@@ -1,8 +1,12 @@
 package org.jasig.portlet.emailpreview.servlet;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @version $Revision$
  */
 @Controller
-@RequestMapping("/ajax/parameters")
+@RequestMapping("/parameters")
 public class AdditionalParametersController {
 
     protected final Log log = LogFactory.getLog(getClass());
@@ -51,10 +55,13 @@ public class AdditionalParametersController {
      * @param response
      * @param linkServiceKey
      * @param authServiceKey
+     * @throws IOException 
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getParameters(@RequestParam("linkService") String linkServiceKey,
-            @RequestParam("authService") String authServiceKey) {
+    public ModelAndView getParameters(HttpServletRequest request, 
+            HttpServletResponse response,
+            @RequestParam("linkService") String linkServiceKey,
+            @RequestParam("authService") String authServiceKey) throws IOException {
 
         try {
 
@@ -84,6 +91,7 @@ public class AdditionalParametersController {
 
         } catch (Exception ex) {
             log.error("Error encountered attempting to retrieve parameter definitions", ex);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;
         }
     }

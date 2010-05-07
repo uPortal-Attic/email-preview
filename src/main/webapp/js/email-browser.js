@@ -45,6 +45,10 @@ var jasig = jasig || {};
      * Retrieve batched email from the server
      */
     var getEmail = function(that, start, size, sortKey, sortDir) {
+        if (that.cache[start] && that.cache[start][size]) {
+            return that.cache[start][size];
+        }
+        
         var account;
         $.ajax({
             url: that.options.accountInfoUrl,
@@ -52,9 +56,14 @@ var jasig = jasig || {};
             data: { pageStart: start, numberOfMessages: size },
             type: 'POST',
             dataType: "json",
-            success: function(data) { account = data; }
+            success: function(data) { account = data; },
+            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
-        return account.accountInfo.messages;
+        var messages = account.accountInfo.messages;
+        that.cache[start] = that.cache[start] || [];
+        that.cache[start][size] = messages;
+        
+        return messages;
     };
      
     var getEmailFunction = function(that) {
@@ -71,7 +80,8 @@ var jasig = jasig || {};
             data: { messageNum: messageNum },
             type: 'POST',
             dataType: "json",
-            success: function(data) { message = data.message; }
+            success: function(data) { message = data.message; },
+            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
         return message;
     };
@@ -81,30 +91,49 @@ var jasig = jasig || {};
         $.ajax({
             url: that.options.accountInfoUrl,
             async: false,
-            data: { pageStart: 1, numberOfMessages: 1 },
+            data: { pageStart: 0, numberOfMessages: 20 },
             type: 'POST',
             dataType: "json",
-            success: function(data) { account = data; }
+            success: function(data) { account = data; },
+            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
+        var messages = account.accountInfo.messages;
+        that.cache[0] = that.cache[1] || [];
+        that.cache[0][20] = messages;
         return account;
     };
      
     var showEmailList = function(that) {
         that.locate("loadingMessage").hide();
         that.locate("emailMessage").hide();
+        that.locate("errorMessage").hide();
         that.locate("emailList").show();
     };
      
     var showLoadingMessage = function(that) {
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
+        that.locate("errorMessage").hide();
         that.locate("loadingMessage").show();
     };
      
     var showEmailMessage = function(that) {
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
+        that.locate("errorMessage").hide();
         that.locate("emailMessage").show();
+    };
+    
+    var showErrorMessage = function(that, code) {
+        var message;
+        if (code == 401) message = "Failed to authenticate to mail store";
+        else if (code == 504) message = "Failed to authenticate to mail store";
+        else message = "Unknown error connecting to mail store";
+        
+        that.locate("loadingMessage").hide();
+        that.locate("emailList").hide();
+        that.locate("emailMessage").hide();
+        that.locate("errorMessage").html(message).show();
     };
 
     var getClasses = function(idx, message) {
@@ -120,6 +149,8 @@ var jasig = jasig || {};
         
         var that = fluid.initView("jasig.EmailBrowser", container, options);
 
+        that.cache = [];
+        
         that.refresh = function() {
             // TODO
         };
@@ -127,6 +158,7 @@ var jasig = jasig || {};
         showLoadingMessage(that);
         
         var account = getAccount(that);
+        if (!account) { return that; }
         that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " new messages" : " new message"));
         
         var options = {
@@ -221,6 +253,7 @@ var jasig = jasig || {};
             emailList: ".email-list",
             emailMessage: ".email-message",
             loadingMessage: ".loading-message",
+            errorMessage: ".error-message",
             unreadMessageCount: ".unread-message-count",
             inboxLink: ".inbox-link"
         }

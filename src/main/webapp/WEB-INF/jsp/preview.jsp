@@ -41,6 +41,9 @@
         
     </div>
 
+    <div class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
+    </div>
+
     <div class="email-list" style="display:none;">
         <p>
             <a class="inbox-link" href="" target="_blank">Inbox</a> 

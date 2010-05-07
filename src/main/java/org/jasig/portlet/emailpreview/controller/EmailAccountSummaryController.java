@@ -18,12 +18,14 @@
  */
 package org.jasig.portlet.emailpreview.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.Authenticator;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,10 +33,13 @@ import org.jasig.portlet.emailpreview.AccountInfo;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
+import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
 import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
+import org.jasig.portlet.emailpreview.servlet.HttpErrorResponseController;
 import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -91,7 +96,7 @@ public class EmailAccountSummaryController {
     @RequestMapping(params = "action=accountSummary")
     public void getAccountSummary(ActionRequest request, ActionResponse response, 
             @RequestParam("pageStart") int pageStart, 
-            @RequestParam("numberOfMessages") int numberOfMessages) {
+            @RequestParam("numberOfMessages") int numberOfMessages) throws IOException {
 
         // Define view and generate model
         Map<String, Object> model = new HashMap<String, Object>();
@@ -117,7 +122,17 @@ public class EmailAccountSummaryController {
             
             ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
             
+        } catch (MailAuthenticationException ex) {
+            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
+            log.error("Error encountered attempting to retrieve account information", ex);
+        } catch (MailTimeoutException ex) {
+            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
+            log.error("Error encountered attempting to retrieve account information", ex);
         } catch (Exception ex) {
+            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, 500);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
             log.error("Error encountered attempting to retrieve account information", ex);
         }
         
