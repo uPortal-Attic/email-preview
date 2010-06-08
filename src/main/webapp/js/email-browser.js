@@ -167,7 +167,7 @@ var jasig = jasig || {};
                    { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
                             return {
-                                value: "\${*.subject}",
+                                markup: "<a href=\"javascript:;\">\${*.subject}</a>",
                                 decorators: [
                                     { attrs: { messageNum: '\${*.messageNumber}' } },
                                     { type: "jQuery", func: "click",
