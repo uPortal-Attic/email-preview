@@ -159,7 +159,7 @@ var jasig = jasig || {};
         
         var account = getAccount(that);
         if (!account) { return that; }
-        that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " new messages" : " new message"));
+        that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
         
         var options = {
             pagerOptions: {
