@@ -38,6 +38,11 @@
     <portlet:param name="action" value="emailMessage"/>
 </portlet:actionURL>
 
+<c:if test="${ showConfigLink }">
+    <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
+    <p style="text-align: right;"><a href="${ configUrl }">Configure portlet</a></p>
+</c:if>
+
 <div id="${n}container" class="email-container">
 
     <div class="loading-message">

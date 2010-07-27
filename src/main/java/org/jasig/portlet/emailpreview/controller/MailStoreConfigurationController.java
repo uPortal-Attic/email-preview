@@ -30,6 +30,9 @@ import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.PortletRequest;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
@@ -44,6 +47,7 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 
@@ -53,6 +57,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("CONFIG")
 public class MailStoreConfigurationController {
+    
+    protected final Log log = LogFactory.getLog(getClass());
 
     private IMailStoreDao mailStoreDao;
     
@@ -91,35 +97,32 @@ public class MailStoreConfigurationController {
     @RequestMapping(params = "action=updateConfiguration")
     public void saveAccountConfiguration(ActionRequest request,
             ActionResponse response,
-            @ModelAttribute("form") MailStoreConfigurationForm form)
+            @ModelAttribute("form") MailStoreConfigurationForm form,
+            @RequestParam(value="save", required=false) String save)
             throws PortletModeException {
         
-        MailStoreConfiguration config = new MailStoreConfiguration();
-        config.setHost(form.getHost());
-        config.setPort(form.getPort());
-        config.setProtocol(form.getProtocol());
-        config.setInboxFolderName(form.getInboxFolderName());
-        config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
-        config.setLinkServiceKey(form.getLinkServiceKey());
-        config.setConnectionTimeout(form.getConnectionTimeout());
-        config.setTimeout(form.getTimeout());
-        
-        for (Map.Entry<String, Attribute> entry : form.getJavaMailProperties().entrySet()) {
-            config.getJavaMailProperties().put(entry.getKey(), entry.getValue().getValue());
+        if (StringUtils.isNotBlank(save)) {
+            MailStoreConfiguration config = new MailStoreConfiguration();
+            config.setHost(form.getHost());
+            config.setPort(form.getPort());
+            config.setProtocol(form.getProtocol());
+            config.setInboxFolderName(form.getInboxFolderName());
+            config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
+            config.setLinkServiceKey(form.getLinkServiceKey());
+            config.setConnectionTimeout(form.getConnectionTimeout());
+            config.setTimeout(form.getTimeout());
+            
+            for (Map.Entry<String, Attribute> entry : form.getJavaMailProperties().entrySet()) {
+                config.getJavaMailProperties().put(entry.getKey(), entry.getValue().getValue());
+            }
+            
+            for (Map.Entry<String, Attribute> entry : form.getAdditionalProperties().entrySet()) {
+                config.getAdditionalProperties().put(entry.getKey(), entry.getValue().getValue());
+            }
+            
+            log.debug("Saving new mail store configuration: {" + config.toString() + "}");
+            mailStoreDao.saveConfiguration(request, config);
         }
-        
-        for (Map.Entry<String, Attribute> entry : form.getAdditionalProperties().entrySet()) {
-            config.getAdditionalProperties().put(entry.getKey(), entry.getValue().getValue());
-        }
-        
-        mailStoreDao.saveConfiguration(request, config);
-        
-        response.setPortletMode(PortletMode.VIEW);
-    }
-    
-    @RequestMapping(params = "action=cancelConfiguration")
-    public void cancelAccountConfiguration(ActionRequest request,
-            ActionResponse response) throws PortletModeException {
         
         response.setPortletMode(PortletMode.VIEW);
     }

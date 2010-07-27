@@ -71,7 +71,26 @@
                 <name>includeJQuery</name>
                 <value>true</value>
             </preference>
+
+            <!-- 
+                Set showConfigLink to true to display a link to CONFIG mode.
+                
+                This setting should be set to "true" for Liferay and false for 
+                uPortal.
+            -->
+            <preference>
+                <name>showConfigLink</name>
+                <value>false</value>
+            </preference>
         </portlet-preferences>
+        
+        <security-role-ref>
+            <role-name>admin</role-name>
+            <description>
+                Administrators allowed to modify the portlet's shared mail
+                store configuration. 
+            </description>
+        </security-role-ref>
 
     </portlet>
 

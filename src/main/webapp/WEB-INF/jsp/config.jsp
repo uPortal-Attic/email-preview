@@ -160,7 +160,8 @@
             </div>
 
             <div class="buttons">
-                <input type="submit" class="button primary" value="Save"/>
+                <input type="submit" class="button primary" name="save" value="Save"/>
+                <input type="submit" class="button secondary" name="cancel" value="Cancel"/>
             </div>
             
         </form:form>
