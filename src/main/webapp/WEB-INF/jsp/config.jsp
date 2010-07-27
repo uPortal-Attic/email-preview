@@ -20,7 +20,10 @@
 --%>
 <jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
 
-<script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
+<c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
+<c:if test="${ includeJQuery }">
+    <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
+</c:if>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
@@ -168,7 +171,7 @@
 <script type="text/javascript">
 
     var ${n} = {};
-    ${n}.jQuery = jQuery.noConflict(true);
+    ${n}.jQuery = jQuery<c:if test="${ includeJQuery }">.noConflict(true)</c:if>;
     ${n}.fluid = fluid;
     fluid = null;
     

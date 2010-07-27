@@ -20,8 +20,11 @@
 --%>
 <jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
 
-<script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
-<script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
+<c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
+<c:if test="${ includeJQuery }">
+    <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
+</c:if>
 <script src="<rs:resourceURL value="/rs/fluid/1.1.2/js/fluid-all-1.1.2.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
@@ -114,7 +117,7 @@
 <script type="text/javascript">
 
     var ${n} = {};
-    ${n}.jQuery = jQuery.noConflict(true);
+    ${n}.jQuery = jQuery<c:if test="${ includeJQuery }">.noConflict(true)</c:if>;
     ${n}.fluid = fluid;
     fluid = null;
     fluid_1_1 = null;

@@ -39,12 +39,6 @@
       <ovrd>N</ovrd> 
     </parameter>
     <parameter> 
-      <name>highlight</name>  
-      <value>false</value>  
-      <description></description>  
-      <ovrd>N</ovrd> 
-    </parameter>
-    <parameter> 
       <name>portletName</name>  
       <value>email-preview</value>  
       <description></description>  
@@ -56,15 +50,16 @@
       <description></description>  
       <ovrd>N</ovrd> 
     </parameter>
-    <parameter> 
-      <name>alternate</name>  
-      <value>false</value>  
-      <description></description>  
-      <ovrd>N</ovrd> 
-    </parameter>
   </parameters>
     
   <portletPreferences>
+    <portletPreference> 
+      <name>includeJQuery</name>  
+      <read-only>true</read-only>  
+      <values>
+        <value>true</value>
+      </values> 
+    </portletPreference>
     <portletPreference> 
       <name>port</name>  
       <read-only>false</read-only>  
@@ -97,7 +92,7 @@
       <name>connectionTimeout</name>  
       <read-only>false</read-only>  
       <values>
-        <value>-1</value>
+        <value>1</value>
       </values> 
     </portletPreference>
     <portletPreference> 
@@ -125,7 +120,7 @@
       <name>timeout</name>  
       <read-only>false</read-only>  
       <values>
-        <value>-1</value>
+        <value>1</value>
       </values> 
     </portletPreference>
     <portletPreference> 
