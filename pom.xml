@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.jasig.parent</groupId>
@@ -14,12 +13,12 @@
 
     <name>Email Preview Portlet</name>
     <description>Read-only email portlet.</description>
-    <version>0.1-M1-SNAPSHOT</version>
+    <version>0.1-M1</version>
 
     <scm>
-        <connection>scm:svn:https://source.jasig.org/portlets/email-preview/trunk</connection>
-        <developerConnection>scm:svn:https://source.jasig.org/portlets/email-preview/trunk</developerConnection>
-        <url>http://developer.jasig.org/source/browse/jasigsvn/portlets/email-preview/trunk</url>
+        <connection>scm:svn:https://source.jasig.org/portlets/email-preview/tags/email-preview-0.1-M1</connection>
+        <developerConnection>scm:svn:https://source.jasig.org/portlets/email-preview/tags/email-preview-0.1-M1</developerConnection>
+        <url>http://developer.jasig.org/source/browse/jasigsvn/portlets/email-preview/tags/email-preview-0.1-M1</url>
     </scm>
 
     <properties>
