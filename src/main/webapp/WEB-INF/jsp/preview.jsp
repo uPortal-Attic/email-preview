@@ -127,18 +127,17 @@
     fluid = null;
     fluid_1_1 = null;
 
-    ${n}.jQuery(function(){
+    ${n}.jQuery(function() {
        var $ = ${n}.jQuery;
        var fluid = ${n}.fluid;
-                   
-       $(document).ready(function(){
-           jasig.EmailBrowser("#${n}container", 
-               {
-                   accountInfoUrl: "${ accountInfoUrl }",
-                   messageUrl: "${ messageUrl }"
-               }
-           );
-       }); 
+
+       jasig.EmailBrowser("#${n}container", 
+           {
+               accountInfoUrl: "${ accountInfoUrl }",
+               messageUrl: "${ messageUrl }"
+           }
+       );
+
     });
 
 </script>
