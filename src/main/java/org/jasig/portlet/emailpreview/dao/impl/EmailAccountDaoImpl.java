@@ -63,6 +63,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.PartialCacheKey;
+
 /**
  * A Data Access Object (DAO) for retrieving email account information.
  * Currently all the information retrieved is related to the user's
@@ -114,7 +118,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 	/* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
      */
-    public AccountInfo retrieveEmailAccountInfo (MailStoreConfiguration storeConfig, Authenticator auth, int start, int messageCount)
+    @Cacheable(cacheName="inboxCache", keyGenerator = @KeyGenerator(name="StringCacheKeyGenerator"))
+    public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey MailStoreConfiguration storeConfig, 
+            Authenticator auth, @PartialCacheKey int start, @PartialCacheKey int messageCount)
     throws EmailPreviewException {
 
         Folder inbox = null;
