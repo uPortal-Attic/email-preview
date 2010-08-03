@@ -147,13 +147,13 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             inbox = getUserInbox(storeConfig, auth);
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
-            List<EmailMessage> unreadMessages = getEmailMessages(inbox, start, messageCount);
+            List<EmailMessage> messages = getEmailMessages(inbox, start, messageCount);
             int totalMessageCount = getTotalEmailMessageCount(inbox);
             int unreadMessageCount = getUnreadEmailMessageCount(inbox);
             
             if ( log.isDebugEnabled() ) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                int unreadMessageToDisplayCount = unreadMessages.size();
+                int unreadMessageToDisplayCount = messages.size();
                 log.debug("Finished looking up email messages. Inbox size: " + totalMessageCount + 
                         " Unread message count: " + unreadMessageToDisplayCount + 
                         " Total elapsed time: " + elapsedTime + "ms " +
@@ -164,7 +164,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             
             // Initialize account information with information retrieved from inbox
             AccountInfo acountInfo = new AccountInfo();
-            acountInfo.setMessages(unreadMessages);
+            acountInfo.setMessages(messages);
             acountInfo.setUnreadMessageCount(unreadMessageCount);
             acountInfo.setTotalMessageCount(totalMessageCount);
 
@@ -269,7 +269,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                     + (System.currentTimeMillis() - startTime));
         }
 
-        List<EmailMessage> unreadEmails = new LinkedList<EmailMessage>();
+        List<EmailMessage> emails = new LinkedList<EmailMessage>();
 
         /*
          * Retrieving maxUnreadMessages and the unread message count. Not using
@@ -280,12 +280,12 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         for (Message currentMessage : messages) {
 
             EmailMessage emailMessage = wrapMessage(currentMessage, false);
-            unreadEmails.add(emailMessage);
+            emails.add(emailMessage);
         }
 
-        Collections.reverse(unreadEmails);
+        Collections.reverse(emails);
 
-        return unreadEmails;
+        return emails;
 
     }
     
