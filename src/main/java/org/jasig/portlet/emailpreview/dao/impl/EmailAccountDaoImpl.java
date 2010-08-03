@@ -66,6 +66,8 @@ import org.springframework.stereotype.Component;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * A Data Access Object (DAO) for retrieving email account information.
@@ -114,11 +116,26 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         policy = Policy.getInstance(stream);
     }
 
+    @TriggersRemove(cacheName="inboxCache", 
+        keyGenerator = @KeyGenerator(
+            name="StringCacheKeyGenerator",
+            properties = @Property( name="includeMethod", value="false" )
+        )
+    )
+    public void clearCache(MailStoreConfiguration storeConfig, int start, int maxMessages) {
+        // Nothing to do here;  all the work is in the annotations.
+    }
+
     
 	/* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
      */
-    @Cacheable(cacheName="inboxCache", keyGenerator = @KeyGenerator(name="StringCacheKeyGenerator"))
+    @Cacheable(cacheName="inboxCache", 
+        keyGenerator = @KeyGenerator(
+            name="StringCacheKeyGenerator",
+            properties = @Property( name="includeMethod", value="false" )
+        )
+    )
     public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey MailStoreConfiguration storeConfig, 
             Authenticator auth, @PartialCacheKey int start, @PartialCacheKey int messageCount)
     throws EmailPreviewException {

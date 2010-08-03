@@ -97,7 +97,7 @@ var unicon = unicon || {};
 	    };
 
 	    that.refreshView = function() {
-	    	var data = that.options.dataFunction();
+	    	var data = that.options.dataFunction(0, Math.min(that.options.batchSize, length));
 	        // re-copy the list of items into the pager model and update
 	        // the expected number of list items
 	        fluid.clear(that.pager.options.dataModel);

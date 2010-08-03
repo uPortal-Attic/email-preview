@@ -56,7 +56,7 @@
         <p>
             <a class="inbox-link" href="" target="_blank">Inbox</a> 
             (<span class="unread-message-count"></span>)
-            | <a class="refresh-link" href="javascript:;">Refresh</a>
+            | <a class="refresh-link email-refresh-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> Refresh</a>
         </p>
         
         <div class="fl-pager">

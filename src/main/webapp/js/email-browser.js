@@ -40,6 +40,10 @@ var jasig = jasig || {};
         
         return false;
     };
+    
+    // If true, will drop the cache entry (if present) 
+    // for this user on the next call to the server
+    var clearCache = "false";
                     
     /**
      * Retrieve batched email from the server
@@ -53,10 +57,13 @@ var jasig = jasig || {};
         $.ajax({
             url: that.options.accountInfoUrl,
             async: false,
-            data: { pageStart: start, numberOfMessages: size },
+            data: { pageStart: start, numberOfMessages: size, forceRefresh: clearCache },
             type: 'POST',
             dataType: "json",
-            success: function(data) { account = data; },
+            success: function(data) { 
+                clearCache = "false";
+                account = data; 
+            },
             error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
         var messages = account.accountInfo.messages;
@@ -150,10 +157,6 @@ var jasig = jasig || {};
         var that = fluid.initView("jasig.EmailBrowser", container, options);
 
         that.cache = [];
-        
-        that.refresh = function() {
-            // TODO
-        };
 
         showLoadingMessage(that);
         
@@ -233,6 +236,14 @@ var jasig = jasig || {};
         };
         
         that.pager = unicon.batchedpager(that.locate("emailList"), options);
+
+        that.refresh = function() {
+            showLoadingMessage(that);
+            clearCache = "true";  // Server-side cache
+            that.cache = [];      // Client-side cache
+            that.pager.refreshView();
+            showEmailList(that);
+        };
 
         that.locate("refreshLink").click(that.refresh);
         that.locate("returnLink").click(function(){ showEmailList(that); });

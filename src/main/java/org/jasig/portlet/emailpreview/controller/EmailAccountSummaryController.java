@@ -113,6 +113,11 @@ public class EmailAccountSummaryController {
             
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
             Authenticator auth = authService.getAuthenticator(request, config);
+            
+            // Check if this is a refresh call;  clear cache if it is
+            if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
+                accountDao.clearCache(config, pageStart, numberOfMessages);
+            }
     
             // Get current user's account information
             AccountInfo accountInfo =

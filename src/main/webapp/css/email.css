@@ -22,6 +22,12 @@
 .email-inbox-link-unread {
     font-weight: bold;
 }
+.email-refresh-link {
+    text-decoration: none;
+}
+.email-refresh-link:hover {
+    text-decoration: underline;
+}
 .email-portlet-table {
     width: 99%;
     border-collapse: collapse;

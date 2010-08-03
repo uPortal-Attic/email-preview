@@ -33,6 +33,8 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
  * @version $Revision$
  */
 public interface IEmailAccountDao {
+    
+    public void clearCache(MailStoreConfiguration storeConfig, int start, int maxMessages);
 
     /**
      * Retrieve a list of recent email from the mail store, as well as a 
