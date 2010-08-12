@@ -243,7 +243,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
             return inboxFolder;
         } catch (AuthenticationFailedException e) {
-            throw new MailAuthenticationException();
+            throw new MailAuthenticationException(e);
         }
     }
 
