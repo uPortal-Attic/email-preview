@@ -122,7 +122,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             properties = @Property( name="includeMethod", value="false" )
         )
     )
-    public void clearCache(MailStoreConfiguration storeConfig, int start, int maxMessages) {
+    public void clearCache(String username) {
         // Nothing to do here;  all the work is in the annotations.
     }
 
@@ -130,15 +130,19 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 	/* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
      */
-    @Cacheable(cacheName="inboxCache", 
+    @Cacheable(cacheName="inboxCache", selfPopulating=true,
         keyGenerator = @KeyGenerator(
             name="StringCacheKeyGenerator",
             properties = @Property( name="includeMethod", value="false" )
         )
     )
-    public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey MailStoreConfiguration storeConfig, 
-            Authenticator auth, @PartialCacheKey int start, @PartialCacheKey int messageCount)
+    public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey String username, 
+            MailStoreConfiguration storeConfig, Authenticator auth, int start, int messageCount)
     throws EmailPreviewException {
+        
+        if (username == null) {
+            throw new MailAuthenticationException();
+        }
 
         Folder inbox = null;
         try {

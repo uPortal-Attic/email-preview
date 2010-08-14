@@ -101,6 +101,7 @@ public class EmailAccountSummaryController {
         // Define view and generate model
         Map<String, Object> model = new HashMap<String, Object>();
 
+        String username = request.getRemoteUser();
         try {
             
             MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
@@ -116,12 +117,12 @@ public class EmailAccountSummaryController {
             
             // Check if this is a refresh call;  clear cache if it is
             if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
-                accountDao.clearCache(config, pageStart, numberOfMessages);
+                accountDao.clearCache(username);
             }
     
             // Get current user's account information
-            AccountInfo accountInfo =
-                    accountDao.retrieveEmailAccountInfo(config, auth, pageStart, numberOfMessages);
+            AccountInfo accountInfo = accountDao.retrieveEmailAccountInfo(username, 
+                                    config, auth, pageStart, numberOfMessages);
             
             model.put("accountInfo", accountInfo);
             
@@ -140,8 +141,7 @@ public class EmailAccountSummaryController {
             ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
             log.error("Error encountered attempting to retrieve account information", ex);
         }
-        
-    }
 
+    }
     
 }

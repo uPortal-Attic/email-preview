@@ -34,19 +34,22 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
  */
 public interface IEmailAccountDao {
     
-    public void clearCache(MailStoreConfiguration storeConfig, int start, int maxMessages);
+    public void clearCache(String username);
 
     /**
      * Retrieve a list of recent email from the mail store, as well as a 
      * summary of the email account's current state. 
      * 
+     * @param username
      * @param storeConfig
      * @param auth
+     * @param start
      * @param maxMessages
      * @return
-     * @throws EmailPreviewException
+     * @throws MailAuthenticationException When authentication with the mail server fails
+     * @throws EmailPreviewException On other errors
      */
-    public AccountInfo retrieveEmailAccountInfo(
+    public AccountInfo retrieveEmailAccountInfo(String username,
             MailStoreConfiguration storeConfig, Authenticator auth, int start,
             int maxMessages) throws EmailPreviewException;
     
