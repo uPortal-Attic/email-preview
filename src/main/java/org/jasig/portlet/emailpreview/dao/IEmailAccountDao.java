@@ -34,7 +34,7 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
  */
 public interface IEmailAccountDao {
     
-    public void clearCache(String username);
+    public void clearCache(String username, String mailAccount);
 
     /**
      * Retrieve a list of recent email from the mail store, as well as a 
@@ -49,7 +49,7 @@ public interface IEmailAccountDao {
      * @throws MailAuthenticationException When authentication with the mail server fails
      * @throws EmailPreviewException On other errors
      */
-    public AccountInfo retrieveEmailAccountInfo(String username,
+    public AccountInfo retrieveEmailAccountInfo(String username, String mailAccount,
             MailStoreConfiguration storeConfig, Authenticator auth, int start,
             int maxMessages) throws EmailPreviewException;
     

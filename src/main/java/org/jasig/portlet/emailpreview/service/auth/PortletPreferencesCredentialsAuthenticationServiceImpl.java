@@ -20,50 +20,68 @@ package org.jasig.portlet.emailpreview.service.auth;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.springframework.stereotype.Component;
 
-public class PortletPreferencesCredentialsAuthenticationServiceImpl implements
-        IAuthenticationService {
+@Component("portletPreferencesCredentialsAuthenticationService")
+public class PortletPreferencesCredentialsAuthenticationServiceImpl implements IAuthenticationService {
     
-    protected static final String KEY = "portletPreferences";
-    protected static final String USERNAME_KEY = "username";
-    protected static final String PASSWORD_KEY = "password";
+    public static final String KEY = "portletPreferences";
     
     private final List<ConfigurationParameter> userParameters;
+    private Map<String,ConfigurationParameter> configParams;
     
     public PortletPreferencesCredentialsAuthenticationServiceImpl() {
         List<ConfigurationParameter> params = new ArrayList<ConfigurationParameter>();
         
         ConfigurationParameter usernameParam = new ConfigurationParameter();
-        usernameParam.setKey(USERNAME_KEY);
+        usernameParam.setKey(MailPreferences.MAIL_ACCOUNT.getKey());
         usernameParam.setLabel("Inbox folder name");
-        usernameParam.setRequiresEncryption(true);
+        usernameParam.setEncryptionRequired(true);
         params.add(usernameParam);
 
         ConfigurationParameter passwordParam = new ConfigurationParameter();
-        passwordParam.setKey(PASSWORD_KEY);
+        passwordParam.setKey(MailPreferences.PASSWORD.getKey());
         passwordParam.setLabel("Inbox folder name");
-        passwordParam.setRequiresEncryption(true);
+        passwordParam.setEncryptionRequired(true);
         params.add(passwordParam);
         
-        this.userParameters = params;
+        this.userParameters = Collections.unmodifiableList(params);
 
+        Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
+        for (ConfigurationParameter param : userParameters) {
+            m.put(param.getKey(), param);
+        }
+        this.configParams = Collections.unmodifiableMap(m);
+
+    }
+
+    @Override
+    public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
+        return configParams;
     }
 
     public Authenticator getAuthenticator(PortletRequest request,
             MailStoreConfiguration config) {
         
-        String username = config.getAdditionalProperties().get(USERNAME_KEY);
-        String password = config.getAdditionalProperties().get(PASSWORD_KEY);
+        String username = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+        String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
         
         return new SimplePasswordAuthenticator(username, password);
+    }
+    
+    public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
+        return config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
     }
 
     public String getKey() {

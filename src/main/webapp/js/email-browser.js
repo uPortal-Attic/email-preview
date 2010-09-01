@@ -101,12 +101,14 @@ var jasig = jasig || {};
             data: { pageStart: 0, numberOfMessages: 20 },
             type: 'POST',
             dataType: "json",
-            success: function(data) { account = data; },
+            success: function(data) { 
+                account = data; 
+                var messages = account.accountInfo.messages;
+                that.cache[0] = that.cache[1] || [];
+                that.cache[0][20] = messages;
+            },
             error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
-        var messages = account.accountInfo.messages;
-        that.cache[0] = that.cache[1] || [];
-        that.cache[0][20] = messages;
         return account;
     };
      
@@ -131,16 +133,29 @@ var jasig = jasig || {};
         that.locate("emailMessage").show();
     };
     
+    var errorHandlers = {
+        401: function(that) {
+            var msg = "Failed to authenticate to mail store";
+            that.locate("errorText").html(msg);
+            that.locate("errorMessage").show();
+        },
+        504: function(that) {
+            var msg = "Mail store connection failed:  Gateway Timeout";
+            that.locate("errorText").html(msg);
+            that.locate("errorMessage").show();
+        },
+        'default': function(that) {
+            var msg = "Unknown error connecting to mail store";
+            that.locate("errorText").html(msg);
+            that.locate("errorMessage").show();
+        }
+    }
     var showErrorMessage = function(that, code) {
-        var message;
-        if (code == 401) message = "Failed to authenticate to mail store";
-        else if (code == 504) message = "Failed to authenticate to mail store";
-        else message = "Unknown error connecting to mail store";
-        
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
-        that.locate("errorMessage").html(message).show();
+        var handler = errorHandlers[code] || errorHandlers['default'];
+        handler(that);
     };
 
     var getClasses = function(idx, message) {
@@ -265,6 +280,7 @@ var jasig = jasig || {};
             emailMessage: ".email-message",
             loadingMessage: ".loading-message",
             errorMessage: ".error-message",
+            errorText: ".error-message #error-text",
             unreadMessageCount: ".unread-message-count",
             inboxLink: ".inbox-link"
         }

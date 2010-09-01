@@ -129,23 +129,28 @@
     
             <div class="portlet-section" role="region">
                 <h3 class="portlet-section-header" role="heading">Authentication</h3>
+                <p>Choose at least one Authentication Service.  Enabling more than one service is supported, but is uncommon and may be confusing to users.</p>
                 <div class="portlet-section-body">
+                    <!--
                     <form:label path="authenticationServiceKey">Authentication Service:</form:label>
                     <form:select path="authenticationServiceKey" cssClass="auth-service-input">
                         <c:forEach items="${ authServices }" var="service">
                             <form:option value="${ service.key }"/>
                         </c:forEach>
                     </form:select>
+                    -->
                     
+                <c:forEach items="${authServices}" var="auth">
+                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/>
                     <table class="auth-service-parameters">
                         <thead>
                             <tr>
-                                <th>Preference Name</th>
+                                <th><c:out value="${auth.key}"/> Parameter</th>
                                 <th>Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${ serviceParameters.authParameters }" var="parameter">
+                            <c:forEach items="${auth.adminConfigurationParameters}" var="parameter">
                                 <c:set var="path" value="additionalProperties['${ parameter.key }'].value"/>
                                 <tr class="parameter-row">
                                     <td class="preference-name">
@@ -156,6 +161,7 @@
                             </c:forEach>
                         </tbody>
                     </table>
+                </c:forEach>
                     
                 </div>
             </div>

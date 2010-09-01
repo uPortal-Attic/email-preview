@@ -18,7 +18,9 @@
  */
 package org.jasig.portlet.emailpreview;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -43,10 +45,11 @@ public class MailStoreConfiguration {
     
     private String linkServiceKey;
     private String authenticationServiceKey;
+    private List<String> allowableAuthenticationServiceKeys;
     
     private Map<String, String> additionalProperties = new HashMap<String, String>();
     private Map<String, String> javaMailProperties = new HashMap<String, String>();
-    
+
     public String getProtocol() {
         return protocol;
     }
@@ -110,8 +113,6 @@ public class MailStoreConfiguration {
     public void setAdditionalProperties(Map<String, String> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
-    
 
     public String getLinkServiceKey() {
         return linkServiceKey;
@@ -127,6 +128,14 @@ public class MailStoreConfiguration {
 
     public void setAuthenticationServiceKey(String authenticationServiceKey) {
         this.authenticationServiceKey = authenticationServiceKey;
+    }
+
+    public List<String> getAllowableAuthenticationServiceKeys() {
+        return allowableAuthenticationServiceKeys;
+    }
+
+    public void setAllowableAuthenticationServiceKeys(List<String> allowableAuthenticationServiceKeys) {
+        this.allowableAuthenticationServiceKeys = Collections.unmodifiableList(allowableAuthenticationServiceKeys);
     }
 
     /**
@@ -152,6 +161,7 @@ public class MailStoreConfiguration {
             .append(this.connectionTimeout, owner.getConnectionTimeout())
             .append(this.linkServiceKey, owner.getLinkServiceKey())
             .append(this.authenticationServiceKey, owner.getAuthenticationServiceKey())
+            .append(this.allowableAuthenticationServiceKeys, owner.getAllowableAuthenticationServiceKeys())
             .append(this.additionalProperties, owner.getAdditionalProperties())
             .append(this.javaMailProperties, owner.getJavaMailProperties())
             .isEquals();
@@ -171,6 +181,7 @@ public class MailStoreConfiguration {
             .append(this.connectionTimeout)
             .append(this.linkServiceKey)
             .append(this.authenticationServiceKey)
+            .append(this.allowableAuthenticationServiceKeys)
             .append(this.additionalProperties)
             .append(this.javaMailProperties)
             .toHashCode();
@@ -187,6 +198,7 @@ public class MailStoreConfiguration {
             .append("connectionTimeout", this.connectionTimeout)
             .append("linkServiceKey", this.linkServiceKey)
             .append("authenticationServiceKey", this.authenticationServiceKey)
+            .append("allowableAuthenticationServiceKeys", this.allowableAuthenticationServiceKeys)
             .append("Additional properties", this.additionalProperties)
             .append("Java Mail properties", this.javaMailProperties)
             .toString();

@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview.service.auth;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
@@ -34,7 +35,7 @@ public interface IAuthenticationService {
      * 
      * @return
      */
-    public String getKey();
+    String getKey();
 
     /**
      * 
@@ -42,10 +43,14 @@ public interface IAuthenticationService {
      * @param config
      * @return
      */
-    public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config);
+    Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config);
     
-    public List<ConfigurationParameter> getAdminConfigurationParameters();
+    String getMailAccountName(PortletRequest request, MailStoreConfiguration config);
+
+    List<ConfigurationParameter> getAdminConfigurationParameters();
     
-    public List<ConfigurationParameter> getUserConfigurationParameters();
+    List<ConfigurationParameter> getUserConfigurationParameters();
+    
+    Map<String,ConfigurationParameter> getConfigurationParametersMap();
 
 }

@@ -114,15 +114,17 @@ public class EmailAccountSummaryController {
             
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
             Authenticator auth = authService.getAuthenticator(request, config);
+            String mailAccountName = authService.getMailAccountName(request, config);
             
             // Check if this is a refresh call;  clear cache if it is
             if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
-                accountDao.clearCache(username);
+                accountDao.clearCache(username, mailAccountName);
             }
     
             // Get current user's account information
             AccountInfo accountInfo = accountDao.retrieveEmailAccountInfo(username, 
-                                    config, auth, pageStart, numberOfMessages);
+                                        mailAccountName, config, auth, pageStart, 
+                                        numberOfMessages);
             
             model.put("accountInfo", accountInfo);
             

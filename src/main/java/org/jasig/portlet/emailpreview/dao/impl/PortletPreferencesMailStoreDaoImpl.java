@@ -19,6 +19,8 @@
 package org.jasig.portlet.emailpreview.dao.impl;
 
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,11 @@ import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
+import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,19 +45,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
     
-    protected static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
-    protected static final String HOST_KEY = "host";
-    protected static final String PORT_KEY = "port";
-    protected static final String INBOX_NAME_KEY = "inboxName";
-    protected static final String PROTOCOL_KEY = "protocol";
-    protected static final String TIMEOUT_KEY = "timeout";
-    protected static final String LINK_SERVICE_KEY = "linkServiceKey";
-    protected static final String AUTHENTICATION_SERVICE_KEY = "authenticationServiceKey";
-    
-    protected static final List<String> RESERVED_PROPERTIES = Arrays
-            .asList(new String[] { HOST_KEY, PORT_KEY, INBOX_NAME_KEY,
-                    PROTOCOL_KEY, TIMEOUT_KEY, CONNECTION_TIMEOUT_KEY, 
-                    LINK_SERVICE_KEY, AUTHENTICATION_SERVICE_KEY });    
+    private IAuthenticationServiceRegistry authServiceRegistry;
+    private IStringEncryptionService stringEncryptionService;
+
+    protected static final List<String> RESERVED_PROPERTIES = Arrays.asList(
+                new String[] { 
+                    MailPreferences.HOST.getKey(), MailPreferences.PORT.getKey(), 
+                    MailPreferences.INBOX_NAME.getKey(), MailPreferences.PROTOCOL.getKey(), 
+                    MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
+                    MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
+                    MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey()
+                });    
     
     /* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.impl.IMailStoreDao#getConfiguration(javax.portlet.PortletRequest)
@@ -60,29 +65,32 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
         PortletPreferences preferences = request.getPreferences();
         
         MailStoreConfiguration config = new MailStoreConfiguration();
-        config.setHost(preferences.getValue(HOST_KEY, null));
-        config.setInboxFolderName(preferences.getValue(INBOX_NAME_KEY, null));
-        config.setProtocol(preferences.getValue(PROTOCOL_KEY, null));
-        config.setLinkServiceKey(preferences.getValue(LINK_SERVICE_KEY, null));
-        config.setAuthenticationServiceKey(preferences.getValue(AUTHENTICATION_SERVICE_KEY, null));
+        config.setHost(preferences.getValue(MailPreferences.HOST.getKey(), null));
+        config.setInboxFolderName(preferences.getValue(MailPreferences.INBOX_NAME.getKey(), null));
+        config.setProtocol(preferences.getValue(MailPreferences.PROTOCOL.getKey(), null));
+        config.setLinkServiceKey(preferences.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), null));
+        config.setAuthenticationServiceKey(preferences.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
+        String[] authServiceKeys = preferences.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
+        config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
         
         // set the port number
         try {
-            int port = Integer.parseInt(preferences.getValue(PORT_KEY, "25"));
+            int port = Integer.parseInt(preferences.getValue(MailPreferences.PORT.getKey(), "25"));
             config.setPort(port);
         } catch (NumberFormatException e) {
         }
 
         // set the connection timeout
         try {
-            int connectionTimeout = Integer.parseInt(preferences.getValue(CONNECTION_TIMEOUT_KEY, "-1"));
+            int connectionTimeout = Integer.parseInt(preferences.getValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), "-1"));
             config.setConnectionTimeout(connectionTimeout);
         } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
         }
 
         // set the timeout
         try {
-            int timeout = Integer.parseInt(preferences.getValue(TIMEOUT_KEY, "-1"));
+            int timeout = Integer.parseInt(preferences.getValue(MailPreferences.TIMEOUT.getKey(), "-1"));
             config.setTimeout(timeout);
         } catch (NumberFormatException e) {
         }
@@ -94,10 +102,15 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
          * arbitrary properties map as appropriate.
          * 
          * This code assumes that all java mail properties begin with
-         * "mail." and does now allow administrators to define arbitary
+         * "mail." and does now allow administrators to define arbitrary
          * properties beginning with that string.
          */
-
+        Map<String,ConfigurationParameter> allParams = config.getAuthenticationServiceKey() != null 
+                            ? authServiceRegistry
+                                    .getAuthenticationService(config.getAuthenticationServiceKey())
+                                    .getConfigurationParametersMap()
+                            : new HashMap<String,ConfigurationParameter>();
+        
         @SuppressWarnings("unchecked")
         Map<String, String[]> preferenceMap = preferences.getMap();
         for (Map.Entry<String, String[]> entry : preferenceMap.entrySet()) {
@@ -109,47 +122,113 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
                 if (key.startsWith("mail.")) {
                     config.getJavaMailProperties().put(key, value);
                 } else {
+                    // AuthN properties may require encryption
+                    ConfigurationParameter param = allParams.get(key);
+                    if (param != null && param.isEncryptionRequired()) {
+                        value = stringEncryptionService.decrypt(value);
+                    }
                     config.getAdditionalProperties().put(key, value);
                 }
             }
             
         }
 
-
         return config;
     }
+    
+    public boolean isReadOnly(PortletRequest req, MailPreferences mp) {
+        PortletPreferences prefs = req.getPreferences();
+        return prefs.isReadOnly(mp.getKey());
+    }
+
     
     /* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.impl.IMailStoreDao#saveConfiguration(javax.portlet.ActionRequest, org.jasig.portlet.emailpreview.MailStoreConfiguration)
      */
+    @SuppressWarnings("unchecked")
     public void saveConfiguration(ActionRequest request, MailStoreConfiguration config) {
         
-        PortletPreferences preferences = request.getPreferences();
+        PortletPreferences prefs = request.getPreferences();
         
         try {
             
-            for (Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet()) {
-                preferences.setValue(entry.getKey(), entry.getValue());
+            // Start with a clean slate
+            for (Enumeration<String> prefNames = prefs.getNames(); prefNames.hasMoreElements();) {
+                String name = prefNames.nextElement();
+                if (!prefs.isReadOnly(name)) {
+                    prefs.reset(name);
+                }
             }
             
+            // Reserved Properties
+            if (!prefs.isReadOnly(MailPreferences.HOST.getKey())) {
+                prefs.setValue(MailPreferences.HOST.getKey(), config.getHost());
+            }
+            if (!prefs.isReadOnly(MailPreferences.PROTOCOL.getKey())) {
+                prefs.setValue(MailPreferences.PROTOCOL.getKey(), config.getProtocol());
+            }
+            if (!prefs.isReadOnly(MailPreferences.INBOX_NAME.getKey())) {
+                prefs.setValue(MailPreferences.INBOX_NAME.getKey(), config.getInboxFolderName());
+            }
+            if (!prefs.isReadOnly(MailPreferences.PORT.getKey())) {
+                prefs.setValue(MailPreferences.PORT.getKey(), String.valueOf(config.getPort()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.CONNECTION_TIMEOUT.getKey())) {
+                prefs.setValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), String.valueOf(config.getConnectionTimeout()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.TIMEOUT.getKey())) {
+                prefs.setValue(MailPreferences.TIMEOUT.getKey(), String.valueOf(config.getTimeout()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.LINK_SERVICE_KEY.getKey())) {
+                prefs.setValue(MailPreferences.LINK_SERVICE_KEY.getKey(), String.valueOf(config.getLinkServiceKey()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey())) {
+                prefs.setValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), config.getAuthenticationServiceKey());
+            }
+            if (!prefs.isReadOnly(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey())) {
+                prefs.setValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), config.getAllowableAuthenticationServiceKeys().toArray(new String[0]));
+            }
+
+            // JavaMail properties
             for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
-                preferences.setValue(entry.getKey(), entry.getValue());
+                if (!prefs.isReadOnly(entry.getKey())) {
+                    prefs.setValue(entry.getKey(), entry.getValue());
+                }
             }
-            
-            preferences.setValue(HOST_KEY, config.getHost());
-            preferences.setValue(PROTOCOL_KEY, config.getProtocol());
-            preferences.setValue(INBOX_NAME_KEY, config.getInboxFolderName());
-            preferences.setValue(PORT_KEY, String.valueOf(config.getPort()));
-            preferences.setValue(CONNECTION_TIMEOUT_KEY, String.valueOf(config.getConnectionTimeout()));
-            preferences.setValue(TIMEOUT_KEY, String.valueOf(config.getTimeout()));
-            preferences.setValue(LINK_SERVICE_KEY, String.valueOf(config.getLinkServiceKey()));
-            preferences.setValue(AUTHENTICATION_SERVICE_KEY, String.valueOf(config.getAuthenticationServiceKey()));
-            
-            preferences.store();
+
+            // Additional properties (authN, etc.)
+            Map<String,ConfigurationParameter> allParams = config.getAuthenticationServiceKey() != null 
+                            ? authServiceRegistry
+                                    .getAuthenticationService(config.getAuthenticationServiceKey())
+                                    .getConfigurationParametersMap()
+                            : new HashMap<String,ConfigurationParameter>();
+            for (Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet()) {
+                if (!prefs.isReadOnly(entry.getKey())) {
+                    String value = entry.getValue();
+                    ConfigurationParameter param = allParams.get(entry.getKey());
+                    if (param != null && param.isEncryptionRequired()) {
+                        value = stringEncryptionService.encrypt(value);
+                    }
+                    prefs.setValue(entry.getKey(), value);
+                }
+            }
+
+            prefs.store();
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to store configuration", e);
         }
         
+    }
+
+    @Autowired(required = true)
+    public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
+        this.authServiceRegistry = authServiceRegistry;
+    }
+
+    @Autowired(required = true)
+    public void setStringEncryptionService(IStringEncryptionService stringEncryptionService) {
+        this.stringEncryptionService = stringEncryptionService;
     }
 
 }

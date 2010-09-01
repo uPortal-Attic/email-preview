@@ -72,6 +72,7 @@
 
     <util:list id="authServices">
         <ref bean="cachedPasswordAuthenticationService"/>
+        <ref bean="portletPreferencesCredentialsAuthenticationService"/>
     </util:list>
 
     <!-- 
@@ -85,5 +86,30 @@
         p:order="10" p:cache="true"
         p:viewClass="org.springframework.web.servlet.view.JstlView"
         p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
+
+    <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
+        <property name="stringEncryptor">
+            <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+                
+                <!-- Before using the string encryption service you must
+                    first set a password
+                <property name="password" value="changeMe!"/> -->
+                
+                <!-- 
+                    Example BouncyCastle-powered AES encryption
+                    
+                    To use AES encryption, uncomment the following section, add
+                    the unrestricted JCE provider files to your JVM, and add 
+                    the JVM-version-appropriate BouncyCastle dependency to uPortal
+                -->
+                <!--
+                <property name="algorithm" value="PBEWITHSHA256AND128BITAES-CBC-BC"/>
+                <property name="provider">
+                    <bean class="org.bouncycastle.jce.provider.BouncyCastleProvider"/>
+                </property>
+                -->
+            </bean>
+        </property>
+    </bean>
 
 </beans>

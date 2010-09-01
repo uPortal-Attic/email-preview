@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview.service.auth;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import javax.portlet.PortletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.springframework.stereotype.Component;
 
@@ -37,14 +39,29 @@ import org.springframework.stereotype.Component;
  * @version $Revision$
  */
 @Component("cachedPasswordAuthenticationService")
-public class CachedPasswordAuthenticationServiceImpl implements
-        IAuthenticationService {
+public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationService {
     
     private static final String KEY = "cachedPassword";
-    protected static final String USERNAME_SUFFIX_KEY = "usernameSuffix";
+    private static final String USERNAME_ATTRIBUTE = "user.login.id";
+    private static final String PASSWORD_ATTRIBUTE = "password";
     
-    private String usernameKey = "user.login.id";
-    private String passwordKey = "password";
+    private Map<String,ConfigurationParameter> configParams;
+    
+    public CachedPasswordAuthenticationServiceImpl() {
+        Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
+        for (ConfigurationParameter param : getAdminConfigurationParameters()) {
+            m.put(param.getKey(), param);
+        }
+        for (ConfigurationParameter param : getUserConfigurationParameters()) {
+            m.put(param.getKey(), param);
+        }
+        this.configParams = Collections.unmodifiableMap(m);
+    }
+
+    @Override
+    public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
+        return configParams;
+    }
 
     /*
      * (non-Javadoc)
@@ -55,15 +72,19 @@ public class CachedPasswordAuthenticationServiceImpl implements
         
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
-        String username = userInfo.get(usernameKey);
-        String password = userInfo.get(passwordKey);
+        String username = userInfo.get(USERNAME_ATTRIBUTE);
+        String password = userInfo.get(PASSWORD_ATTRIBUTE);
         
-        String usernameSuffix = config.getAdditionalProperties().get(USERNAME_SUFFIX_KEY);
+        String usernameSuffix = config.getAdditionalProperties().get(MailPreferences.USERNAME_SUFFIX.getKey());
         if (!StringUtils.isBlank(usernameSuffix)) {
             username = username.concat(usernameSuffix);
         }
         
         return new SimplePasswordAuthenticator(username, password);
+    }
+
+    public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
+        return config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
     }
 
     /*
@@ -80,7 +101,7 @@ public class CachedPasswordAuthenticationServiceImpl implements
      */
     public List<ConfigurationParameter> getAdminConfigurationParameters() {
         ConfigurationParameter param = new ConfigurationParameter();
-        param.setKey(USERNAME_SUFFIX_KEY);
+        param.setKey(MailPreferences.USERNAME_SUFFIX.getKey());
         param.setLabel("Username Suffix");
         return Collections.<ConfigurationParameter>singletonList(param);
     }

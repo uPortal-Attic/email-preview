@@ -1,11 +1,21 @@
 package org.jasig.portlet.emailpreview.mvc;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.LazyMap;
+import javax.portlet.PortletRequest;
 
-public class MailStoreConfigurationForm {
+import org.apache.commons.collections.map.LazyMap;
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+
+public class MailStoreConfigurationForm implements Serializable {
+
+    public static final String UNCHANGED_SECURE_VALUE = "uNch@ng3d.S3cur3!"; 
+    private static final long serialVersionUID = 1L;
 
     private String protocol;
     private String host;
@@ -17,6 +27,7 @@ public class MailStoreConfigurationForm {
 
     private String linkServiceKey;
     private String authenticationServiceKey;
+    private List<String> allowableAuthenticationServiceKeys = Collections.emptyList();
 
     @SuppressWarnings("unchecked")
     private Map<String, Attribute> additionalProperties = LazyMap.decorate(
@@ -25,6 +36,45 @@ public class MailStoreConfigurationForm {
     @SuppressWarnings("unchecked")
     private Map<String, Attribute> javaMailProperties = LazyMap.decorate(
             new HashMap<String, Attribute>(), new AttributeFactory());
+
+    public static MailStoreConfigurationForm create(IMailStoreDao mailStoreDao, PortletRequest req) {
+        
+        MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+
+        MailStoreConfigurationForm form = new MailStoreConfigurationForm();
+        form.setHost(config.getHost());
+        form.setPort(config.getPort());
+        form.setProtocol(config.getProtocol());
+        form.setInboxFolderName(config.getInboxFolderName());
+        form.setAuthenticationServiceKey(config.getAuthenticationServiceKey());
+        form.setAllowableAuthenticationServiceKeys(config.getAllowableAuthenticationServiceKeys());
+        form.setLinkServiceKey(config.getLinkServiceKey());
+        form.setConnectionTimeout(config.getConnectionTimeout());
+        form.setTimeout(config.getTimeout());
+        
+        for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
+            form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
+        }
+        
+        for (Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet()) {
+            form.getAdditionalProperties().put(entry.getKey(), new Attribute(entry.getValue()));
+        }
+        
+        return form;
+
+    }
+
+    public List<String> getAllowableAuthenticationServiceKeys() {
+        return allowableAuthenticationServiceKeys;
+    }
+
+    public void setAllowableAuthenticationServiceKeys(List<String> allowableAuthenticationServiceKeys) {
+        if (allowableAuthenticationServiceKeys != null) {
+            this.allowableAuthenticationServiceKeys = Collections.unmodifiableList(allowableAuthenticationServiceKeys);
+        } else {
+            this.allowableAuthenticationServiceKeys = Collections.emptyList();
+        }
+    }
 
     public String getProtocol() {
         return protocol;

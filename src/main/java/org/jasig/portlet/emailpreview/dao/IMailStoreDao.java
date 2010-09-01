@@ -38,14 +38,22 @@ public interface IMailStoreDao {
      * @param request
      * @return
      */
-    public MailStoreConfiguration getConfiguration(PortletRequest request);
+    MailStoreConfiguration getConfiguration(PortletRequest request);
+    
+    /**
+     * 
+     * 
+     * @param req
+     * @param mp
+     * @return
+     */
+    boolean isReadOnly(PortletRequest req, MailPreferences mp);
 
     /**
      * 
      * @param request
      * @param configuration
      */
-    public void saveConfiguration(ActionRequest request,
-            MailStoreConfiguration configuration);
+    void saveConfiguration(ActionRequest request, MailStoreConfiguration configuration);
 
 }

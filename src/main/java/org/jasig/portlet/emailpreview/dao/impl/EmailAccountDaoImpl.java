@@ -122,7 +122,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             properties = @Property( name="includeMethod", value="false" )
         )
     )
-    public void clearCache(String username) {
+    public void clearCache(String username, String mailAccount) {
         // Nothing to do here;  all the work is in the annotations.
     }
 
@@ -137,8 +137,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         )
     )
     public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey String username, 
-            MailStoreConfiguration storeConfig, Authenticator auth, int start, int messageCount)
-    throws EmailPreviewException {
+            @PartialCacheKey String mailAccount, MailStoreConfiguration storeConfig, 
+            Authenticator auth, int start, int messageCount) throws EmailPreviewException {
         
         if (username == null) {
             throw new MailAuthenticationException();

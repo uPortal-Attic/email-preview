@@ -34,11 +34,11 @@ public class ConfigurationParameter {
         this.defaultValue = defaultValue;
     }
 
-    public boolean isRequiresEncryption() {
+    public boolean isEncryptionRequired() {
         return requiresEncryption;
     }
 
-    public void setRequiresEncryption(boolean requiresEncryption) {
+    public void setEncryptionRequired(boolean requiresEncryption) {
         this.requiresEncryption = requiresEncryption;
     }
 

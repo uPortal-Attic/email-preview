@@ -38,7 +38,7 @@
     <portlet:param name="action" value="emailMessage"/>
 </portlet:actionURL>
 
-<c:if test="${ showConfigLink }">
+<c:if test="${showConfigLink}">
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
     <p style="text-align: right;"><a href="${ configUrl }">Configure portlet</a></p>
 </c:if>
@@ -50,6 +50,10 @@
     </div>
 
     <div class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
+        <p id="error-text"></p>
+        <c:if test="${supportsEdit}">
+            <p>Click <a href="<portlet:renderURL portletMode="EDIT"/>">here</a> to change your mail preferences.</p>
+        </c:if>
     </div>
 
     <div class="email-list" style="display:none;">

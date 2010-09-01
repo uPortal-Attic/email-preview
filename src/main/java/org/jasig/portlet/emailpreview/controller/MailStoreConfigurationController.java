@@ -18,6 +18,7 @@
  */
 package org.jasig.portlet.emailpreview.controller;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +108,16 @@ public class MailStoreConfigurationController {
             config.setPort(form.getPort());
             config.setProtocol(form.getProtocol());
             config.setInboxFolderName(form.getInboxFolderName());
-            config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
+            List<String> allowableAuthKeys = form.getAllowableAuthenticationServiceKeys();
+            // A bit of a work-around:  default the serviceKey in 
+            // use to the first allowable one.  Users must select 
+            // another service if desired, and to do so the preference 
+            // must be marked "user editable."
+            String authService = allowableAuthKeys.size() != 0
+                                        ? allowableAuthKeys.get(0)
+                                        : null;
+            config.setAuthenticationServiceKey(authService);
+            config.setAllowableAuthenticationServiceKeys(allowableAuthKeys);
             config.setLinkServiceKey(form.getLinkServiceKey());
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());
@@ -128,31 +138,15 @@ public class MailStoreConfigurationController {
     }
     
     @ModelAttribute("form")
-    public MailStoreConfigurationForm getConfigurationForm(PortletRequest request) {
-
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
-        
-        MailStoreConfigurationForm form = new MailStoreConfigurationForm();
-        form.setHost(config.getHost());
-        form.setPort(config.getPort());
-        form.setProtocol(config.getProtocol());
-        form.setInboxFolderName(config.getInboxFolderName());
-        form.setAuthenticationServiceKey(config.getAuthenticationServiceKey());
-        form.setLinkServiceKey(config.getLinkServiceKey());
-        form.setConnectionTimeout(config.getConnectionTimeout());
-        form.setTimeout(config.getTimeout());
-        
-        for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
-            form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
-        }
-        
-        for (Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet()) {
-            form.getAdditionalProperties().put(entry.getKey(), new Attribute(entry.getValue()));
-        }
-        
-        return form;
+    public MailStoreConfigurationForm getConfigurationForm(PortletRequest req) {
+        return MailStoreConfigurationForm.create(mailStoreDao, req);
     }
     
+    @ModelAttribute("authServices")
+    public List<IAuthenticationService> getAvailableAuthServices() {
+        return new ArrayList<IAuthenticationService>(authServiceRegistry.getServices());
+    }
+
     @ModelAttribute("serviceParameters")
     public Map<String, List<ConfigurationParameter>> getServiceParameters(PortletRequest request) {
         Map<String, List<ConfigurationParameter>> parameters = new HashMap<String, List<ConfigurationParameter>>();
@@ -162,11 +156,6 @@ public class MailStoreConfigurationController {
         IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
         if (linkService != null) {
             parameters.put("linkParameters", linkService.getAdminConfigurationParameters());
-        }
-        
-        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-        if (authService != null) {
-            parameters.put("authParameters", authService.getAdminConfigurationParameters());
         }
 
         return parameters;

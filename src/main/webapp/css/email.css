@@ -52,3 +52,23 @@
 .answered-span { display:none; }
 .answered .answered-span { display:inline; background: url(/email-preview/images/answered.png) no-repeat; padding-left: 16px; text-align: right; }
 .deleted { text-decoration: line-through; }
+
+/* CSS for email preferences */
+#plt-email-form {padding:0px; maring:0px;}
+#plt-email-form .disabled {border: 1px solid #ddd; color:#aaa; background:#f3f3f3;}
+#plt-email-form label {display:block; padding:5px;}
+#plt-email-form .help {font-weight:bold; cursor:pointer; margin-top:20px; padding:0 0 0 17px; background: transparent url(../images/help.png) 0 4px no-repeat;}
+#plt-email-form .help span {display:none; font-weight:normal;}
+#plt-email-form .plt-email-input-error {display:none; padding:5px; background:#ebf2f5; border:2px solid #bdbdbd; margin:5px 0; font-weight:bold; color:#2f4954;}
+#plt-email-form #plt-email-input-email.plt-email-input-error-highlight,#plt-email-form #plt-email-input-email.plt-email-input-error-highlight:focus {background:#cde6ff;}
+#plt-email-form #plt-email-input-password.plt-email-input-error-highlight,#plt-email-form #plt-email-input-password.plt-email-input-error-highlight:focus {background:#cde6ff;}
+#plt-email-form #plt-email-input-incoming.plt-email-input-error-highlight,#plt-email-form #plt-email-input-incoming.plt-email-input-error-highlight:focus {background:#cde6ff;}
+#plt-email-form #plt-email-input-port.plt-email-input-error-highlight,#plt-email-form #plt-email-input-port.plt-email-input-error-highlight:focus {background:#cde6ff;}
+#plt-email-form #plt-email-input-email:focus {background:#efefef;}
+#plt-email-form #plt-email-input-port:focus {background:#efefef;}
+#plt-email-form #plt-email-input-password:focus {background:#efefef;}
+#plt-email-form #plt-email-input-incoming:focus {background:#efefef;}
+#plt-email-submission-error {display:none; padding:8px; background:#fff09e; border:2px solid #edd23b; margin:5px 0; font-weight:bold; color:#5f5101;}
+#plt-email-form .fieldset {border:0px; padding:0 0 20px 0; display:block;}
+#plt-email-form .fieldset legend {display:none;}
+#plt-email-form .plt-email-fieldset-authparams {display:none;}

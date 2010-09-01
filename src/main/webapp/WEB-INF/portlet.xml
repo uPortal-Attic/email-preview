@@ -48,6 +48,7 @@
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>view</portlet-mode>
+            <portlet-mode>edit</portlet-mode>
             <portlet-mode>config</portlet-mode>
         </supports>
         <supported-locale>en</supported-locale>
@@ -85,11 +86,8 @@
         </portlet-preferences>
         
         <security-role-ref>
-            <role-name>admin</role-name>
-            <description>
-                Administrators allowed to modify the portlet's shared mail
-                store configuration. 
-            </description>
+            <role-name>Portal_Administrators</role-name>
+            <role-link>local.2</role-link>
         </security-role-ref>
 
     </portlet>

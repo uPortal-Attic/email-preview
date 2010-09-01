@@ -18,8 +18,10 @@
  */
 package org.jasig.portlet.emailpreview.controller;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -49,6 +51,8 @@ public class EmailSummaryController {
 	@RequestMapping
 	public ModelAndView showEmail(RenderRequest request, RenderResponse response) throws Exception {
 	    
+	    Map<String,Object> model = new HashMap<String,Object>(); 
+	    
 	    // first check to see if the portlet is configured to display a link
 	    // to config mode
 	    PortletPreferences preferences = request.getPreferences();
@@ -59,9 +63,12 @@ public class EmailSummaryController {
 	    if (showConfigLink) {
 	        showConfigLink = request.isUserInRole(this.adminRoleName);
 	    }
+	    model.put("showConfigLink", showConfigLink);
 	    
-        return new ModelAndView("preview", Collections.singletonMap(
-                "showConfigLink", showConfigLink));
+        boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
+        model.put("supportsEdit", supportsEdit);
+	    
+        return new ModelAndView("preview", model);
 	}
 
 }

@@ -21,6 +21,7 @@ package org.jasig.portlet.emailpreview.dao;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class PortletPreferencesMailStoreDaoImplTest {
         configuration.setProtocol("imaps");
         configuration.setInboxFolderName("INBOX");
         configuration.setLinkServiceKey(linkServiceKey);
-        configuration.setAuthenticationServiceKey(authServiceKey);
+        configuration.setAllowableAuthenticationServiceKeys(Arrays.asList(new String[] {authServiceKey}));
         configuration.setTimeout(-1);
         configuration.setConnectionTimeout(-1);
         configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
