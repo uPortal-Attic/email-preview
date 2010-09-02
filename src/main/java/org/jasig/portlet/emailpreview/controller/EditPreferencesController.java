@@ -81,7 +81,17 @@ public final class EditPreferencesController {
         // AuthN info
         Map<String,IAuthenticationService> authServices = new HashMap<String,IAuthenticationService>();
         for (String key : config.getAllowableAuthenticationServiceKeys()) {
-            authServices.put(key, authServiceRegistry.getAuthenticationService(key));
+            IAuthenticationService auth = authServiceRegistry.getAuthenticationService(key);
+            if (auth != null) {
+                authServices.put(key, auth);
+            } else {
+                // Unknown authN service;  bad data
+                if (log.isWarnEnabled()) {
+                    log.warn("Portlet specified an allowable Authentication " +
+                            "Service that is unknown to the registry:  '" + 
+                            key + "'");
+                }
+            }
         }
         model.put("authenticationServices", authServices);
         if (form.getAdditionalProperties().containsKey(MailPreferences.PASSWORD.getKey())) {

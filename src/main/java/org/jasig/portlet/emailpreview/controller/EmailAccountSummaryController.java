@@ -113,6 +113,12 @@ public class EmailAccountSummaryController {
             }
             
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+            if (authService == null) {
+                String msg = "Unrecognized authentication service:  " 
+                                + config.getAuthenticationServiceKey();
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
             Authenticator auth = authService.getAuthenticator(request, config);
             String mailAccountName = authService.getMailAccountName(request, config);
             

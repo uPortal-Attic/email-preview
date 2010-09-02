@@ -19,8 +19,8 @@
 package org.jasig.portlet.emailpreview.dao.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +33,7 @@ import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -105,11 +106,14 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
          * "mail." and does now allow administrators to define arbitrary
          * properties beginning with that string.
          */
-        Map<String,ConfigurationParameter> allParams = config.getAuthenticationServiceKey() != null 
-                            ? authServiceRegistry
-                                    .getAuthenticationService(config.getAuthenticationServiceKey())
-                                    .getConfigurationParametersMap()
-                            : new HashMap<String,ConfigurationParameter>();
+        Map<String,ConfigurationParameter> allParams = Collections.emptyMap();  // default
+        String authKey = config.getAuthenticationServiceKey();
+        IAuthenticationService authServ = authKey != null 
+                            ? authServiceRegistry.getAuthenticationService(authKey)
+                            : null;  // need Elvis operator ?:
+        if (authServ != null) {
+            allParams = authServ.getConfigurationParametersMap();
+        }
         
         @SuppressWarnings("unchecked")
         Map<String, String[]> preferenceMap = preferences.getMap();
@@ -197,11 +201,14 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
             }
 
             // Additional properties (authN, etc.)
-            Map<String,ConfigurationParameter> allParams = config.getAuthenticationServiceKey() != null 
-                            ? authServiceRegistry
-                                    .getAuthenticationService(config.getAuthenticationServiceKey())
-                                    .getConfigurationParametersMap()
-                            : new HashMap<String,ConfigurationParameter>();
+            Map<String,ConfigurationParameter> allParams = Collections.emptyMap();  // default
+            String authKey = config.getAuthenticationServiceKey();
+            IAuthenticationService authServ = authKey != null 
+                                ? authServiceRegistry.getAuthenticationService(authKey)
+                                : null;  // need Elvis operator ?:
+            if (authServ != null) {
+                allParams = authServ.getConfigurationParametersMap();
+            }
             for (Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet()) {
                 if (!prefs.isReadOnly(entry.getKey())) {
                     String value = entry.getValue();

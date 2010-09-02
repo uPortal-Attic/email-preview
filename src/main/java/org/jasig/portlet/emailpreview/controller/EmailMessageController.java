@@ -89,6 +89,12 @@ public class EmailMessageController {
             MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
 
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+            if (authService == null) {
+                String msg = "Unrecognized authentication service:  " 
+                                + config.getAuthenticationServiceKey();
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
             Authenticator auth = authService.getAuthenticator(request, config);
 
             // Get current user's account information
