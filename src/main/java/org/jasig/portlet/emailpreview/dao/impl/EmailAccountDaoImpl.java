@@ -258,7 +258,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         int start = Math.max(1, totalMessageCount - pageStart - (messageCount - 1));
         int end = Math.max(totalMessageCount - pageStart, 1);
 
-        Message[] messages = mailFolder.getMessages(start, end);
+        Message[] messages = totalMessageCount != 0 
+                                ? mailFolder.getMessages(start, end)
+                                : new Message[0];
 
         long startTime = System.currentTimeMillis();
 
