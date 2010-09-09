@@ -18,9 +18,12 @@
  */
 package org.jasig.portlet.emailpreview.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
@@ -40,6 +43,7 @@ import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.auth.PortletPreferencesCredentialsAuthenticationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
@@ -54,6 +58,7 @@ public final class EditPreferencesController {
     private IMailStoreDao mailStoreDao;
     IEmailAccountDao emailAccountDao;
     private IAuthenticationServiceRegistry authServiceRegistry;
+    private List<String> protocols;
     private final Log log = LogFactory.getLog(getClass());
 
     @RequestMapping
@@ -77,6 +82,9 @@ public final class EditPreferencesController {
         model.put("disableHost", mailStoreDao.isReadOnly(req, MailPreferences.HOST));
         model.put("disablePort", mailStoreDao.isReadOnly(req, MailPreferences.PORT));
         model.put("disableAuthService", mailStoreDao.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY));
+        
+        // Available protocols
+        model.put("protocols", protocols);
 
         // AuthN info
         Map<String,IAuthenticationService> authServices = new HashMap<String,IAuthenticationService>();
@@ -120,6 +128,10 @@ public final class EditPreferencesController {
             protocol = protocol != null ? protocol.trim() : "";
             if (log.isDebugEnabled()) {
                 log.debug("Receieved the following user input for Protocol:  '" + protocol + "'");
+            }
+            if (!protocols.contains(protocol)) {
+                // User must have hacked a HttpRequest
+                throw new RuntimeException("Unsupported protocol:  " + protocol);
             }
             form.setProtocol(protocol);
             if (protocol.length() == 0 && err == null) {
@@ -262,6 +274,12 @@ public final class EditPreferencesController {
     @Autowired(required = true)
     public void setMailStoreDao(IMailStoreDao mailStoreDao) {
         this.mailStoreDao = mailStoreDao;
+    }
+
+    @Resource(name="protocols")
+    @Required
+    public void setProtocols(List<String> protocols) {
+        this.protocols = Collections.unmodifiableList(protocols);
     }
 
 }

@@ -62,8 +62,8 @@
     <util:list id="protocols">
         <value>imap</value>
         <value>imaps</value>
-        <value>pop</value>
-        <value>pops</value>
+        <value>pop3</value>
+        <value>pop3s</value>
     </util:list>
     
     <util:list id="linkServices">

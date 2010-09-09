@@ -42,8 +42,9 @@
     <div class="fieldset plt-email-fieldset-settings">
         <label>Server Protocol
             <select name="protocol" id="plt-email-input-protocol" title="Type of email server, either IMAP or IMAPS">
-                <option<c:if test="${form.protocol eq 'imap'}"> selected="selected"</c:if> value="imap">IMAP</option>
-                <option<c:if test="${form.protocol eq 'imaps'}"> selected="selected"</c:if> value="imaps">IMAPS</option>
+                <c:forEach items="${protocols}" var="protocol">
+                    <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
+                </c:forEach>
             </select>
         </label>
         <label>Server Name
