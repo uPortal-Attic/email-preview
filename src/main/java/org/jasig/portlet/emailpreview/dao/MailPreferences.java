@@ -18,14 +18,14 @@ public enum MailPreferences {
     LINK_SERVICE_KEY("linkServiceKey"),
     AUTHENTICATION_SERVICE_KEY("authenticationServiceKey"),
     ALLOWABLE_AUTHENTICATION_SERVICE_KEYS("allowableAuthenticationServiceKeys"),
+    USERNAME_SUFFIX("usernameSuffix"),
 
     /*
      * Optional settings used by some auth services 
      */
     
     MAIL_ACCOUNT("username"),
-    PASSWORD("password"),
-    USERNAME_SUFFIX("usernameSuffix");
+    PASSWORD("password");
 
     /*
      * Implementation 

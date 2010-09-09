@@ -72,7 +72,7 @@
         <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth">
             <label>Email Address
                 <input type="text" name="username" id="plt-email-input-email" title="Input the email address you are trying to access." value="<c:out value="${form.additionalProperties.username}"/>"/>
-                <span class="plt-email-address-suffix"><c:out value="${form.additionalProperties.usernameSuffix}"/></span>
+                <span class="plt-email-address-suffix"><c:out value="${form.usernameSuffix}"/></span>
             </label>
             <label>Password
                 <input type="password" name="ppauth_password" id="plt-email-input-password" title="Input the password asscociated with the email address" value="<c:out value="${unchangedPassword}"/>"/>

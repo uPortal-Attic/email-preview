@@ -55,7 +55,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
                     MailPreferences.INBOX_NAME.getKey(), MailPreferences.PROTOCOL.getKey(), 
                     MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
                     MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
-                    MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey()
+                    MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey()
                 });    
     
     /* (non-Javadoc)
@@ -73,6 +73,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
         config.setAuthenticationServiceKey(preferences.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
         String[] authServiceKeys = preferences.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
+        config.setUsernameSuffix(preferences.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
         
         // set the port number
         try {
@@ -191,6 +192,9 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
             }
             if (!prefs.isReadOnly(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey())) {
                 prefs.setValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), config.getAllowableAuthenticationServiceKeys().toArray(new String[0]));
+            }
+            if (!prefs.isReadOnly(MailPreferences.USERNAME_SUFFIX.getKey())) {
+                prefs.setValue(MailPreferences.USERNAME_SUFFIX.getKey(), config.getUsernameSuffix());
             }
 
             // JavaMail properties

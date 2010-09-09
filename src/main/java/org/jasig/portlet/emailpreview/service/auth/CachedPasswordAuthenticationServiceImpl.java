@@ -29,7 +29,6 @@ import javax.portlet.PortletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
-import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.springframework.stereotype.Component;
 
@@ -67,24 +66,29 @@ public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationS
      * (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.service.IAuthenticationService#getAuthenticator(javax.portlet.PortletRequest, org.jasig.portlet.emailpreview.MailStoreConfiguration)
      */
-    public Authenticator getAuthenticator(PortletRequest request,
-            MailStoreConfiguration config) {
+    public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
         
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
-        String username = userInfo.get(USERNAME_ATTRIBUTE);
         String password = userInfo.get(PASSWORD_ATTRIBUTE);
+
+        return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
+
+    }
+
+    public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
+        String username = userInfo.get(USERNAME_ATTRIBUTE);
         
-        String usernameSuffix = config.getAdditionalProperties().get(MailPreferences.USERNAME_SUFFIX.getKey());
+        String usernameSuffix = config.getUsernameSuffix();
         if (!StringUtils.isBlank(usernameSuffix)) {
             username = username.concat(usernameSuffix);
         }
         
-        return new SimplePasswordAuthenticator(username, password);
-    }
+        return username;
 
-    public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
-        return config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
     }
 
     /*
@@ -100,10 +104,7 @@ public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationS
      * @see org.jasig.portlet.emailpreview.service.auth.IAuthenticationService#getAdminConfigurationParameters()
      */
     public List<ConfigurationParameter> getAdminConfigurationParameters() {
-        ConfigurationParameter param = new ConfigurationParameter();
-        param.setKey(MailPreferences.USERNAME_SUFFIX.getKey());
-        param.setLabel("Username Suffix");
-        return Collections.<ConfigurationParameter>singletonList(param);
+        return Collections.<ConfigurationParameter>emptyList();
     }
 
     /*

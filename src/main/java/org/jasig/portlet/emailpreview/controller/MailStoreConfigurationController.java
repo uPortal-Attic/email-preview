@@ -118,6 +118,7 @@ public class MailStoreConfigurationController {
                                         : null;
             config.setAuthenticationServiceKey(authService);
             config.setAllowableAuthenticationServiceKeys(allowableAuthKeys);
+            config.setUsernameSuffix(form.getUsernameSuffix());
             config.setLinkServiceKey(form.getLinkServiceKey());
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());

@@ -88,6 +88,12 @@
                                 </td>
                                 <td class="value"><form:input path="connectionTimeout"/></td>
                             </tr>
+                            <tr>
+                                <td class="preference-name">
+                                    <form:label path="usernameSuffix">Username Suffix:</form:label>
+                                </td>
+                                <td class="value"><form:input path="usernameSuffix"/></td>
+                            </tr>
                         </tbody>
                     </table>
 

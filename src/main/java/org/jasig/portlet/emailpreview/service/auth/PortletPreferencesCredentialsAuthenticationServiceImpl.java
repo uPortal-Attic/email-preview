@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
@@ -71,17 +72,18 @@ public class PortletPreferencesCredentialsAuthenticationServiceImpl implements I
         return configParams;
     }
 
-    public Authenticator getAuthenticator(PortletRequest request,
-            MailStoreConfiguration config) {
-        
-        String username = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+    public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
-        
-        return new SimplePasswordAuthenticator(username, password);
+        return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
     }
     
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
-        return config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+        String username = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+        String usernameSuffix = config.getUsernameSuffix();
+        if (!StringUtils.isBlank(usernameSuffix)) {
+            username = username.concat(usernameSuffix);
+        }
+        return username;
     }
 
     public String getKey() {

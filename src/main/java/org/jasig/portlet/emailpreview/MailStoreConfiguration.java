@@ -46,10 +46,11 @@ public class MailStoreConfiguration {
     private String linkServiceKey;
     private String authenticationServiceKey;
     private List<String> allowableAuthenticationServiceKeys;
+    private String usernameSuffix;
     
     private Map<String, String> additionalProperties = new HashMap<String, String>();
     private Map<String, String> javaMailProperties = new HashMap<String, String>();
-
+    
     public String getProtocol() {
         return protocol;
     }
@@ -137,6 +138,14 @@ public class MailStoreConfiguration {
     public void setAllowableAuthenticationServiceKeys(List<String> allowableAuthenticationServiceKeys) {
         this.allowableAuthenticationServiceKeys = Collections.unmodifiableList(allowableAuthenticationServiceKeys);
     }
+    
+    public String getUsernameSuffix() {
+        return usernameSuffix;
+    }
+
+    public void setUsernameSuffix(String usernameSuffix) {
+        this.usernameSuffix = usernameSuffix;
+    }
 
     /**
      * @see java.lang.Object#equals(Object)
@@ -162,6 +171,7 @@ public class MailStoreConfiguration {
             .append(this.linkServiceKey, owner.getLinkServiceKey())
             .append(this.authenticationServiceKey, owner.getAuthenticationServiceKey())
             .append(this.allowableAuthenticationServiceKeys, owner.getAllowableAuthenticationServiceKeys())
+            .append(this.usernameSuffix, owner.getUsernameSuffix())
             .append(this.additionalProperties, owner.getAdditionalProperties())
             .append(this.javaMailProperties, owner.getJavaMailProperties())
             .isEquals();
@@ -182,6 +192,7 @@ public class MailStoreConfiguration {
             .append(this.linkServiceKey)
             .append(this.authenticationServiceKey)
             .append(this.allowableAuthenticationServiceKeys)
+            .append(this.usernameSuffix)
             .append(this.additionalProperties)
             .append(this.javaMailProperties)
             .toHashCode();
@@ -199,6 +210,7 @@ public class MailStoreConfiguration {
             .append("linkServiceKey", this.linkServiceKey)
             .append("authenticationServiceKey", this.authenticationServiceKey)
             .append("allowableAuthenticationServiceKeys", this.allowableAuthenticationServiceKeys)
+            .append("usernameSuffix", this.usernameSuffix)
             .append("Additional properties", this.additionalProperties)
             .append("Java Mail properties", this.javaMailProperties)
             .toString();

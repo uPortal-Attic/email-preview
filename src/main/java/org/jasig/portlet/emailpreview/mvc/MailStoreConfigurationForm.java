@@ -28,6 +28,7 @@ public class MailStoreConfigurationForm implements Serializable {
     private String linkServiceKey;
     private String authenticationServiceKey;
     private List<String> allowableAuthenticationServiceKeys = Collections.emptyList();
+    private String usernameSuffix;
 
     @SuppressWarnings("unchecked")
     private Map<String, Attribute> additionalProperties = LazyMap.decorate(
@@ -48,6 +49,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setInboxFolderName(config.getInboxFolderName());
         form.setAuthenticationServiceKey(config.getAuthenticationServiceKey());
         form.setAllowableAuthenticationServiceKeys(config.getAllowableAuthenticationServiceKeys());
+        form.setUsernameSuffix(config.getUsernameSuffix());
         form.setLinkServiceKey(config.getLinkServiceKey());
         form.setConnectionTimeout(config.getConnectionTimeout());
         form.setTimeout(config.getTimeout());
@@ -74,6 +76,14 @@ public class MailStoreConfigurationForm implements Serializable {
         } else {
             this.allowableAuthenticationServiceKeys = Collections.emptyList();
         }
+    }
+
+    public String getUsernameSuffix() {
+        return usernameSuffix;
+    }
+
+    public void setUsernameSuffix(String usernameSuffix) {
+        this.usernameSuffix = usernameSuffix;
     }
 
     public String getProtocol() {
