@@ -25,7 +25,7 @@
     <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
 </c:if>
-<script src="<rs:resourceURL value="/rs/fluid/1.1.2/js/fluid-all-1.1.2.js"/>" type="text/javascript"></script>
+<script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
