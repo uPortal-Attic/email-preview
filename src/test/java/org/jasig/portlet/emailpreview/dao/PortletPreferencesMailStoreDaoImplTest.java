@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,10 @@ import javax.portlet.ReadOnlyException;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.impl.PortletPreferencesMailStoreDaoImpl;
+import org.jasig.portlet.emailpreview.service.auth.AuthenticationServiceRegistryImpl;
+import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationServiceImpl;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -41,7 +46,7 @@ public class PortletPreferencesMailStoreDaoImplTest {
     private @Mock PortletPreferences preferences;
     private @Mock ActionRequest request;
     private MailStoreConfiguration configuration;
-    private IMailStoreDao mailStoreDao;
+    private PortletPreferencesMailStoreDaoImpl mailStoreDao;
     
     private String host = "imap.gmail.com";
     private int port = 993;
@@ -53,6 +58,7 @@ public class PortletPreferencesMailStoreDaoImplTest {
     private String mailDebug = "true";
     private String linkServiceKey = "default";
     private String authServiceKey = "cachedPassword";
+    private String[] allowableAuthServiceKeys = new String[] {"cachedPassword"};
     
     private Map<String, String[]> preferenceMap;
     
@@ -61,6 +67,10 @@ public class PortletPreferencesMailStoreDaoImplTest {
         MockitoAnnotations.initMocks(this);
 
         mailStoreDao = new PortletPreferencesMailStoreDaoImpl();
+        IAuthenticationService authServ = new CachedPasswordAuthenticationServiceImpl();
+        IAuthenticationServiceRegistry authServiceRegistry = new AuthenticationServiceRegistryImpl();
+        authServiceRegistry.registerService(authServ);
+        mailStoreDao.setAuthenticationServiceRegistry(authServiceRegistry);
         
         configuration = new MailStoreConfiguration();
         configuration.setHost("imap.gmail.com");
@@ -69,6 +79,7 @@ public class PortletPreferencesMailStoreDaoImplTest {
         configuration.setInboxFolderName("INBOX");
         configuration.setLinkServiceKey(linkServiceKey);
         configuration.setAllowableAuthenticationServiceKeys(Arrays.asList(new String[] {authServiceKey}));
+        configuration.setAuthenticationServiceKey(authServiceKey);
         configuration.setTimeout(-1);
         configuration.setConnectionTimeout(-1);
         configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
@@ -79,12 +90,17 @@ public class PortletPreferencesMailStoreDaoImplTest {
         preferenceMap.put("mail.debug", new String[]{ mailDebug });
         
         when(request.getPreferences()).thenReturn(preferences);
+        when(preferences.getNames()).thenReturn(new Enumeration<String>() {
+            public boolean hasMoreElements() { return false; }
+            public String nextElement() { return null; }
+        });
         when(preferences.getValue("host", null)).thenReturn(host);
+        when(preferences.getValue("port", "25")).thenReturn(String.valueOf(port));
         when(preferences.getValue("protocol", null)).thenReturn(protocol);
         when(preferences.getValue("inboxName", null)).thenReturn(inboxName);
         when(preferences.getValue("linkServiceKey", null)).thenReturn(linkServiceKey);
+        when(preferences.getValues("allowableAuthenticationServiceKeys", new String[0])).thenReturn(allowableAuthServiceKeys);
         when(preferences.getValue("authenticationServiceKey", null)).thenReturn(authServiceKey);
-        when(preferences.getValue("port", "25")).thenReturn(String.valueOf(port));
         when(preferences.getValue("timeout", "-1")).thenReturn(String.valueOf(timeout));
         when(preferences.getValue("connectionTimeout", "-1")).thenReturn(String.valueOf(connectionTimeout));
         when(preferences.getMap()).thenReturn(preferenceMap);
