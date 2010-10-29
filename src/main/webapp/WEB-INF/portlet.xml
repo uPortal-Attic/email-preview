@@ -83,6 +83,15 @@
                 <name>showConfigLink</name>
                 <value>false</value>
             </preference>
+ 
+            <!-- 
+                Indicates whether users are permitted to delete messages on the 
+                mail server using this portlet.
+            -->
+            <preference>
+                <name>allowDelete</name>
+                <value>true</value>
+            </preference>
         </portlet-preferences>
         
         <security-role-ref>

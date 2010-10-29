@@ -20,6 +20,11 @@ package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
 
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Flags.Flag;
+
 import org.apache.commons.lang.time.FastDateFormat;
 
 /**
@@ -28,50 +33,88 @@ import org.apache.commons.lang.time.FastDateFormat;
  *
  * @author Andreas Christoforides
  * @author Jen Bourey, jbourey@unicon.net
+ * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
-public class EmailMessage {
+public final class EmailMessage {
 
-    private int messageNumber;
-	private String sender;
-	private String subject;
-	private Date sentDate;
-	private boolean isUnread = false;
-	private boolean isAnswered = false;
-	private boolean isDeleted = false;
-	
-	private EmailMessageContent content;
-	
-	private static final FastDateFormat df = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
+    private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
+    
+    private final Message message;
+    private final Long uid;
+    private final String sender;  // Evaluate in constructor to detect errors early
+    private final String subject;  // Passed in separately AntiSamy treatment 
+    private final Date sentDate;  // Evaluate in constructor to detect errors early
+    private final boolean unread;  // Evaluate in constructor to detect errors early
+    private final boolean answered;  // Evaluate in constructor to detect errors early
+    private final boolean deleted;  // Evaluate in constructor to detect errors early
+    private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
 
+	/*
+	 * Public API.
+	 */
+	
+    /**
+     * Creates a new {@link EmailMessage} based on the specified 
+     * <code>Message</code> with content of <code>null</code>.
+     */
+    public EmailMessage(Message message, Long uid, String subject) throws MessagingException {
+        this(message, uid, subject, null);
+    }
+
+    /**
+     * Creates a new {@link EmailMessage} based on the specified 
+     * <code>Message</code> and {@link EmailMessageContent}.
+     */
+    public EmailMessage(Message message, Long uid, String subject, EmailMessageContent content) throws MessagingException {
+	    
+	    // Assertions.
+	    if (message == null) {
+	        String msg = "Argument 'message' cannot be null";
+	        throw new IllegalArgumentException(msg);
+	    }
+	    // NB:  Argument 'uid' may be null
+	    
+	    // Instance Members.
+        this.message = message;
+        this.uid = uid;
+        Address[] addr = message.getFrom();
+        this.sender = (addr != null && addr.length != 0) 
+                                ? addr[0].toString() 
+                                : null;
+        this.subject = subject;
+        this.sentDate = message.getSentDate();
+        this.unread = !message.isSet(Flag.SEEN);
+        this.answered = message.isSet(Flag.ANSWERED);
+        this.deleted = message.isSet(Flag.DELETED);
+        this.content = content;
+	    
+	}
 	
 	public int getMessageNumber() {
-        return messageNumber;
+        return message.getMessageNumber();
     }
 
-    public void setMessageNumber(int messageNumber) {
-        this.messageNumber = messageNumber;
-    }
-
+	/**
+	 * Returns the UID of the message as set by the Folder or <code>null</code> 
+	 * if the Folder does not implement UIDFolder. 
+	 * 
+	 * @return The UID provided by the Folder for this message or null
+	 */
+	public long getUid() {
+	    return uid;
+	}
+	
     /**
 	 * Returns the date the email message was sent.
 	 * @return The sent date of the email message as a <code>java.util.Date</code>.
 	 */
 	public Date getSentDate() {
-		return new Date(this.sentDate.getTime());
+		return new Date(sentDate.getTime());
 	}
 
-	/**
-	 * Sets the date the email message was sent.
-	 *
-	 * @param sentDate The sent date of the email message.
-	 */
-	public void setSentDate(Date sentDate) {
-		this.sentDate = new Date(sentDate.getTime());
-	}
-	
 	public String getSentDateString() {
-	    return df.format(this.sentDate);
+	    return DATE_FORMAT.format(this.sentDate);
 	}
 
 	/**
@@ -80,19 +123,14 @@ public class EmailMessage {
 	 * @return The sender of the email message.
 	 */
 	public String getSender() {
-		return this.sender;
+	    return sender;
 	}
 
-	/**
-	 * Sets the sender of this email message.
-	 *
-	 * @param sender The email message sender.
-	 */
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
+    public String getSenderName() {
+        return getSender().split("\\s*<")[0];
+    }
 
-	/**
+    /**
 	 * Returns the email message subject.
 	 *
 	 * @return The email message subject.
@@ -101,49 +139,21 @@ public class EmailMessage {
 		return this.subject;
 	}
 
-	/**
-	 * Sets the email message subject.
-	 *
-	 * @param subject The subject of the email message.
-	 */
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-	
-	public String getSenderName() {
-	    return this.sender.split("\\s*<")[0];
-	}
 
     public boolean isUnread() {
-        return isUnread;
-    }
-
-    public void setUnread(boolean isUnread) {
-        this.isUnread = isUnread;
+        return unread;
     }
 
     public boolean isAnswered() {
-        return isAnswered;
-    }
-
-    public void setAnswered(boolean answered) {
-        this.isAnswered = answered;
+        return answered;
     }
 
     public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+        return deleted;
     }
 
     public EmailMessageContent getContent() {
         return content;
-    }
-
-    public void setContent(EmailMessageContent content) {
-        this.content = content;
     }
 
 }

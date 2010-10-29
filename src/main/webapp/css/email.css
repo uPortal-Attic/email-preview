@@ -22,10 +22,10 @@
 .email-inbox-link-unread {
     font-weight: bold;
 }
-.email-refresh-link {
+.email-action-link {
     text-decoration: none;
 }
-.email-refresh-link:hover {
+.email-action-link:hover {
     text-decoration: underline;
 }
 .email-portlet-table {
@@ -45,6 +45,8 @@
 .message-headers .message-header-name { font-weight: bold; color: #333; text-align: right; }
 
 .loading-message { height: 150px; background: url(../images/loading.gif) no-repeat center center; }
+
+.select { width: 16px; text-align: center; padding: 0.1em 0.5em; }
 
 .flags-header { width: 16px; text-align: right; }
 

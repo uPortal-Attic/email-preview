@@ -145,7 +145,7 @@ var jasig = jasig || {};
             that.locate("errorMessage").show();
         },
         'default': function(that) {
-            var msg = "Unknown error connecting to mail store";
+            var msg = "Unknown mail store error";
             that.locate("errorText").html(msg);
             that.locate("errorMessage").show();
         }
@@ -166,6 +166,14 @@ var jasig = jasig || {};
         if (message.deleted) classes += " deleted";
         return classes;
     };
+    
+    var removeMessages = function(messages, cache) {
+        that.locate("emailRow").each(function(index, row) {
+            if (row.find(options.selectors.selectMessage).attr("checked")) {
+                row.remove();
+            }
+        });
+    };
                 
     jasig.EmailBrowser = function(container, options) {
         
@@ -179,9 +187,20 @@ var jasig = jasig || {};
         if (!account) { return that; }
         that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
         
-        var options = {
+        var batchOptions = {
             pagerOptions: {
                columnDefs: [
+                   { key: "select", valuebinding: "*.select",
+                        components: function(row, index) {
+                            return {
+                                markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.uid}"/>',
+                                decorators: [
+                                    { attrs: { messageNum: '\${*.messageNumber}' } },
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                   },
                    { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
                             return {
@@ -250,7 +269,7 @@ var jasig = jasig || {};
             dataLengthFunction: function() { return account.accountInfo.totalMessageCount; }
         };
         
-        that.pager = unicon.batchedpager(that.locate("emailList"), options);
+        that.pager = unicon.batchedpager(that.locate("emailList"), batchOptions);
 
         that.refresh = function() {
             showLoadingMessage(that);
@@ -260,9 +279,48 @@ var jasig = jasig || {};
             showEmailList(that);
         };
 
+        that.deleteMessage = function() {
+            if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
+                alert("No Messages Selected.");
+                return;
+            }
+            if (confirm("Delete Selected Messages?")) {
+                showLoadingMessage(that);
+                var params = that.locate("emailForm").serializeArray();
+                var ajaxOptions = {
+                    url: options.deleteUrl,
+                    type: "POST",
+                    data: params,
+                    dataType: "json",
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        showErrorMessage(that, request.status);
+                    },
+                    success: function(data) {
+                        that.refresh();
+                    }
+                }
+                $.ajax(ajaxOptions);
+            }
+        };
+
+        that.toggleSelectAll = function() {
+            var chk = $(this).attr("checked");
+            that.locate("selectMessage").attr("checked", chk);
+        }
+
         that.locate("refreshLink").click(that.refresh);
+        if (account.accountInfo.deleteSupported) {
+            that.locate("deleteLink").click(that.deleteMessage);
+        } else {
+            var anchor = that.locate("deleteLink");
+            anchor.find("span").html("Delete Not Available");
+            anchor.find("span").addClass("fl-text-silver");
+            anchor.attr("title", "The delete feature is not supported by this mail store");
+        }
         that.locate("returnLink").click(function(){ showEmailList(that); });
         that.locate("inboxLink").attr("href", account.inboxUrl);
+        
+        that.locate("selectAll").click(that.toggleSelectAll);
 
         showEmailList(that);
 
@@ -273,10 +331,17 @@ var jasig = jasig || {};
     fluid.defaults("jasig.EmailBrowser", {
         accountInfoUrl: null,
         messageUrl: null,
+        deleteUrl: null,
         selectors: {
             refreshLink: ".refresh-link",
+            deleteLink: ".delete-link",
             returnLink: ".return-link",
+            emailForm: "form[name='email']",
+            timestamp: "input[name='timestamp']",
+            selectAll: ".select-all",
+            selectMessage: ".select-message",
             emailList: ".email-list",
+            emailRow: ".email-row",
             emailMessage: ".email-message",
             loadingMessage: ".loading-message",
             errorMessage: ".error-message",

@@ -27,17 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.FetchProfile;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.UIDFolder;
 import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMultipart;
 
@@ -75,17 +76,18 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
  * inbox.
  *
  * @author Andreas Christoforides
+ * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
 @Component
 public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, ApplicationContextAware {
 
     protected final Log log = LogFactory.getLog(getClass());
-    
+
     private Policy policy;
 
     private ApplicationContext ctx;
-    
+
     /*
      * (non-Javadoc)
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
@@ -94,13 +96,13 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                     throws BeansException {
             this.ctx = ctx;
     }
-    
+
     private String filePath = "classpath:antisamy.xml";
 
     /**
      * Set the file path to the Anti-samy policy file to be used for cleaning
      * strings.
-     * 
+     *
      * @param path
      */
     public void setSecurityFile(String path) {
@@ -116,7 +118,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         policy = Policy.getInstance(stream);
     }
 
-    @TriggersRemove(cacheName="inboxCache", 
+    @TriggersRemove(cacheName="inboxCache",
         keyGenerator = @KeyGenerator(
             name="StringCacheKeyGenerator",
             properties = @Property( name="includeMethod", value="false" )
@@ -126,20 +128,19 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         // Nothing to do here;  all the work is in the annotations.
     }
 
-    
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
      */
     @Cacheable(cacheName="inboxCache", selfPopulating=true,
         keyGenerator = @KeyGenerator(
             name="StringCacheKeyGenerator",
-            properties = @Property( name="includeMethod", value="false" )
+            properties = @Property(name="includeMethod", value="false")
         )
     )
-    public AccountInfo retrieveEmailAccountInfo (@PartialCacheKey String username, 
-            @PartialCacheKey String mailAccount, MailStoreConfiguration storeConfig, 
-            Authenticator auth, int start, int messageCount) throws EmailPreviewException {
-        
+    public AccountInfo fetchAccountInfoFromStore(@PartialCacheKey String username,
+            @PartialCacheKey String mailAccount, MailStoreConfiguration config,
+            Authenticator auth, int start, int count) throws EmailPreviewException {
+
         if (username == null) {
             throw new MailAuthenticationException();
         }
@@ -148,29 +149,25 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         try {
 
             // Retrieve user's inbox
-            inbox = getUserInbox(storeConfig, auth);
+            inbox = getUserInbox(config, auth);
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
-            List<EmailMessage> messages = getEmailMessages(inbox, start, messageCount);
-            int totalMessageCount = getTotalEmailMessageCount(inbox);
-            int unreadMessageCount = getUnreadEmailMessageCount(inbox);
-            
+            List<EmailMessage> messages = getEmailMessages(inbox, start, count);
+
             if ( log.isDebugEnabled() ) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                int unreadMessageToDisplayCount = messages.size();
-                log.debug("Finished looking up email messages. Inbox size: " + totalMessageCount + 
-                        " Unread message count: " + unreadMessageToDisplayCount + 
+                int messagesToDisplayCount = messages.size();
+                log.debug("Finished looking up email messages. Inbox size: " + inbox.getMessageCount() +
+                        " Unread message count: " + inbox.getUnreadMessageCount() +
                         " Total elapsed time: " + elapsedTime + "ms " +
-                        " Time per message in inbox: " + (totalMessageCount == 0 ? 0 : (elapsedTime / totalMessageCount)) + "ms" +
-                        " Time per unread message: " + (unreadMessageToDisplayCount == 0 ? 0 : (elapsedTime / unreadMessageToDisplayCount)) + "ms");
+                        " Time per message in inbox: " + (inbox.getMessageCount() == 0 ? 0 : (elapsedTime / inbox.getMessageCount())) + "ms" +
+                        " Time per displayed message: " + (messagesToDisplayCount == 0 ? 0 : (elapsedTime / messagesToDisplayCount)) + "ms");
             }
-            inbox.close(false);
-            
+
             // Initialize account information with information retrieved from inbox
-            AccountInfo acountInfo = new AccountInfo();
-            acountInfo.setMessages(messages);
-            acountInfo.setUnreadMessageCount(unreadMessageCount);
-            acountInfo.setTotalMessageCount(totalMessageCount);
+            AccountInfo acountInfo = new AccountInfo(inbox, messages, start, count);
+
+            inbox.close(false);
 
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved email account info");
@@ -198,9 +195,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             }
         }
 
-        
+
     }
-    
+
     private Folder getUserInbox(MailStoreConfiguration storeConfig, Authenticator authenticator)
             throws MessagingException {
 
@@ -220,7 +217,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 mailProperties.put(protocolPropertyPrefix +
                         "connectiontimeout", connectionTimeout);
             }
-            
+
             // Set timeout property
             int timeout = storeConfig.getTimeout();
             if (timeout >= 0) {
@@ -258,7 +255,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         int start = Math.max(1, totalMessageCount - pageStart - (messageCount - 1));
         int end = Math.max(totalMessageCount - pageStart, 1);
 
-        Message[] messages = totalMessageCount != 0 
+        Message[] messages = totalMessageCount != 0
                                 ? mailFolder.getMessages(start, end)
                                 : new Message[0];
 
@@ -294,9 +291,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         return emails;
 
     }
-    
+
     public EmailMessage retrieveMessage(MailStoreConfiguration storeConfig, Authenticator auth, int messageNum) {
-        
+
         Folder inbox = null;
         try {
 
@@ -306,9 +303,9 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
             Message message = inbox.getMessage(messageNum);
             EmailMessage emailMessage = wrapMessage(message, true);
-            
+
             inbox.close(false);
-            
+
             return emailMessage;
         } catch (MessagingException e) {
             log.error("Messaging exception while retrieving individual message", e);
@@ -325,36 +322,62 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 } catch ( Exception e ) {}
             }
         }
-        
+
         return null;
     }
-    
-    protected EmailMessage wrapMessage(Message currentMessage, boolean populateContent) throws MessagingException, IOException, ScanException, PolicyException {
-        EmailMessage emailMessage = new EmailMessage();
-        emailMessage.setMessageNumber(currentMessage.getMessageNumber());
 
-        // Set sender address
-        Address[] addresses = currentMessage.getFrom();
-        String sender = addresses[0].toString();
-        emailMessage.setSender(sender);
+    public boolean deleteMessages(MailStoreConfiguration storeConfig, Authenticator auth, long[] uids) {
 
-        // Set subject and sent date
-        String subject = currentMessage.getSubject();
+        Folder inbox = null;
+        try {
+
+            // Retrieve user's inbox
+            inbox = getUserInbox(storeConfig, auth);
+
+            // Verify that we can even perform this operation
+            if (!(inbox instanceof UIDFolder)) {
+                String msg = "Delete feature is supported only for UIDFolder instances";
+                throw new UnsupportedOperationException(msg);
+            }
+
+            inbox.open(Folder.READ_WRITE);
+
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(uids);
+            inbox.setFlags(msgs, new Flags(Flag.DELETED), true);
+
+            return true;  // Indicate success
+
+        } catch (MessagingException e) {
+            log.error("Messaging exception while deleting messages", e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(true);
+                } catch ( Exception e ) {
+                    log.error("Error closing inbox folder", e);
+                }
+            }
+        }
+
+        return false;  // We failed if we reached this point
+
+    }
+
+    protected EmailMessage wrapMessage(Message msg, boolean populateContent) throws MessagingException, IOException, ScanException, PolicyException {
+
+        // Prepare subject
+        String subject = msg.getSubject();
         if (!StringUtils.isBlank(subject)) {
             AntiSamy as = new AntiSamy();
             CleanResults cr = as.scan(subject, policy);
             subject = cr.getCleanHTML();
         }
-        emailMessage.setSubject(subject);
-        emailMessage.setSentDate(currentMessage.getSentDate());
-        
-        emailMessage.setUnread(!currentMessage.isSet(Flag.SEEN));
-        emailMessage.setAnswered(currentMessage.isSet(Flag.ANSWERED));
-        emailMessage.setDeleted(currentMessage.isSet(Flag.DELETED));
-        
+
+        // Prepare content if requested
+        EmailMessageContent body = null;  // default...
         if (populateContent) {
-            Object content = currentMessage.getContent();
-            EmailMessageContent body = getContentString(content, currentMessage.getContentType());
+            Object content = msg.getContent();
+            body = getContentString(content, msg.getContentType());
             String contentString = body.getContentString();
             if (!StringUtils.isBlank(contentString)) {
                 AntiSamy as = new AntiSamy();
@@ -362,105 +385,86 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 subject = cr.getCleanHTML();
             }
             body.setContentString(contentString);
-            emailMessage.setContent(body);
         }
 
-        return emailMessage;
+        // Prepare the UID if present
+        Long uid = null;  // default
+        if (msg.getFolder() instanceof UIDFolder) {
+            uid = ((UIDFolder) msg.getFolder()).getUID(msg);
+        }
+
+        return new EmailMessage(msg, uid, subject, body);
+
     }
-    
+
     protected EmailMessageContent getContentString(Object content, String mimeType) throws IOException, MessagingException {
-        
+
         // if this content item is a String, simply return it.
         if (content instanceof String) {
             return new EmailMessageContent((String) content, isHtml(mimeType));
-        } 
-        
+        }
+
         else if (content instanceof MimeMultipart) {
             Multipart m = (Multipart) content;
             int parts = m.getCount();
-            
+
             // iterate backwards through the parts list
             for (int i = parts-1; i >= 0; i--) {
                 EmailMessageContent result = null;
-                
+
                 BodyPart part = m.getBodyPart(i);
                 Object partContent = part.getContent();
                 String contentType = part.getContentType();
                 boolean isHtml = isHtml(contentType);
                 log.debug("Examining Multipart " + i + " with type " + contentType + " and class " + partContent.getClass());
-                
+
                 if (partContent instanceof String) {
                     result = new EmailMessageContent((String) partContent, isHtml);
-                } 
-                
+                }
+
                 else if (partContent instanceof InputStream && (contentType.startsWith("text/html"))) {
                     StringWriter writer = new StringWriter();
                     IOUtils.copy((InputStream) partContent, writer);
                     result = new EmailMessageContent(writer.toString(), isHtml);
-                } 
-                
+                }
+
                 else if (partContent instanceof MimeMultipart) {
                     result = getContentString(partContent, contentType);
                 }
-                
+
                 if (result != null) {
                     return result;
                 }
-                
+
             }
         }
-        
+
         return null;
 
     }
-    
+
     /**
-     * Determine if the supplied MIME type represents HTML content.  This 
+     * Determine if the supplied MIME type represents HTML content.  This
      * implementation assumes that the inclusion of the string "text/html"
      * in a mime-type indicates HTML content.
-     * 
+     *
      * @param mimeType
      * @return
      */
     protected boolean isHtml(String mimeType) {
-        
+
         // if the mime-type is null, assume the content is not HTML
         if (mimeType == null) {
             return false;
         }
-        
+
         // otherwise, check for the presence of the string "text/html"
         mimeType = mimeType.trim().toLowerCase();
         if (mimeType.contains("text/html")) {
             return true;
         }
-        
+
         return false;
-    }
-
-    /**
-     * Get the total number of email messages in the supplied folder.
-     * 
-     * @param inbox
-     * @return
-     * @throws MessagingException
-     */
-    protected int getTotalEmailMessageCount(Folder inbox)
-            throws MessagingException {
-        return inbox.getMessageCount();
-    }
-
-
-    /**
-     * Get the total number of unread email messages in the supplied folder.
-     * 
-     * @param inbox
-     * @return
-     * @throws MessagingException
-     */
-    protected int getUnreadEmailMessageCount(Folder inbox)
-            throws MessagingException {
-        return inbox.getUnreadMessageCount();
     }
 
 }

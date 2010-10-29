@@ -104,6 +104,7 @@ var unicon = unicon || {};
 	        fluid.model.copyModel(that.pager.options.dataModel, data);
 	        var newModel = fluid.copy(that.pager.model);
 	        newModel.totalRange = that.options.dataLengthFunction(data);
+	        newModel.pageIndex = 0;
 	        newModel.sortKey = that.state.sortKey;
 	        newModel.sortDir = that.state.sortDir;
 	        newModel.pageCount = Math.max(1, Math.floor((newModel.totalRange - 1)/ newModel.pageSize) + 1);

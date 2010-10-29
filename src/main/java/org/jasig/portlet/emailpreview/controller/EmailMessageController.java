@@ -39,11 +39,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ *
+ * @author Jen Bourey, jbourey@unicon.net
+ * @author Drew Wills, drew@unicon.net
+ */
 @Controller
 @RequestMapping("VIEW")
 public class EmailMessageController {
 
-    
+
     protected final Log log = LogFactory.getLog(getClass());
 
     private IEmailAccountDao accountDao;
@@ -52,19 +57,19 @@ public class EmailMessageController {
     public void setAccountInfoDao(IEmailAccountDao accountInfoDao) {
         this.accountDao = accountInfoDao;
     }
-    
+
     private IMailStoreDao mailStoreDao;
-    
+
     @Autowired(required = true)
     public void setMailStoreDao(IMailStoreDao mailStoreDao) {
         this.mailStoreDao = mailStoreDao;
     }
 
     private AjaxPortletSupportService ajaxPortletSupportService;
-    
+
     /**
      * Set the service for handling portlet AJAX requests.
-     * 
+     *
      * @param ajaxPortletSupportService
      */
     @Autowired(required = true)
@@ -72,25 +77,25 @@ public class EmailMessageController {
                     AjaxPortletSupportService ajaxPortletSupportService) {
             this.ajaxPortletSupportService = ajaxPortletSupportService;
     }
-    
+
     private IAuthenticationServiceRegistry authServiceRegistry;
-    
-    @Autowired(required = true) 
+
+    @Autowired(required = true)
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
     }
-    
+
     @RequestMapping(params = "action=emailMessage")
-    public void getAccountSummary(ActionRequest request, ActionResponse response,
+    public void showMessage(ActionRequest request, ActionResponse response,
             @RequestParam("messageNum") int messageNum){
 
         try {
-            
+
             MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
 
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
             if (authService == null) {
-                String msg = "Unrecognized authentication service:  " 
+                String msg = "Unrecognized authentication service:  "
                                 + config.getAuthenticationServiceKey();
                 log.error(msg);
                 throw new RuntimeException(msg);
@@ -99,18 +104,58 @@ public class EmailMessageController {
 
             // Get current user's account information
             EmailMessage message = accountDao.retrieveMessage(config, auth, messageNum);
-    
+
             // Define view and generate model
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("message", message);
-            
+
             ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
-            
+
         } catch (Exception ex) {
             log.error("Error encountered while attempting to retrieve message", ex);
         }
-        
+
     }
 
+    @RequestMapping(params = "action=deleteMessages")
+    public void deleteMessages(ActionRequest req, ActionResponse res,
+                @RequestParam(value="selectMessage", required=false) long[] messages) {
+
+        try {
+
+            String deletePermitted = req.getPreferences().getValue(EmailSummaryController.ALLOW_DELETE_KEY, "true");
+            if (!Boolean.valueOf(deletePermitted)) {
+                String msg = "The delete function is not permitted for this portlet";
+                throw new RuntimeException(msg);
+            }
+
+            if (messages != null && messages.length != 0) {
+
+                MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+
+                IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+                if (authService == null) {
+                    String msg = "Unrecognized authentication service:  "
+                                    + config.getAuthenticationServiceKey();
+                    log.error(msg);
+                    throw new RuntimeException(msg);
+                }
+                Authenticator auth = authService.getAuthenticator(req, config);
+
+                accountDao.deleteMessages(config, auth, messages);
+
+            }
+
+            // Define view and generate model
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("success", "success");
+
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete specified messages", e);
+        }
+
+    }
 
 }

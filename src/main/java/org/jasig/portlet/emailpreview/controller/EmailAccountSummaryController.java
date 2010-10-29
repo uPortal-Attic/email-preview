@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountInfo;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
@@ -46,10 +47,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ *
+ * @author Jen Bourey, jbourey@unicon.net
+ * @author Drew Wills, drew@unicon.net
+ */
 @Controller
 @RequestMapping("VIEW")
 public class EmailAccountSummaryController {
-    
+
     protected final Log log = LogFactory.getLog(getClass());
 
     private IEmailAccountDao accountDao;
@@ -58,19 +64,19 @@ public class EmailAccountSummaryController {
     public void setAccountInfoDao(IEmailAccountDao accountInfoDao) {
         this.accountDao = accountInfoDao;
     }
-    
+
     private IMailStoreDao mailStoreDao;
-    
+
     @Autowired(required = true)
     public void setMailStoreDao(IMailStoreDao mailStoreDao) {
         this.mailStoreDao = mailStoreDao;
     }
 
     private AjaxPortletSupportService ajaxPortletSupportService;
-    
+
     /**
      * Set the service for handling portlet AJAX requests.
-     * 
+     *
      * @param ajaxPortletSupportService
      */
     @Autowired(required = true)
@@ -78,24 +84,24 @@ public class EmailAccountSummaryController {
                     AjaxPortletSupportService ajaxPortletSupportService) {
             this.ajaxPortletSupportService = ajaxPortletSupportService;
     }
-    
+
     private ILinkServiceRegistry linkServiceRegistry;
-    
+
     @Autowired(required = true)
     public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
         this.linkServiceRegistry = linkServiceRegistry;
     }
-    
+
     private IAuthenticationServiceRegistry authServiceRegistry;
-    
-    @Autowired(required = true) 
+
+    @Autowired(required = true)
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
     }
-    
+
     @RequestMapping(params = "action=accountSummary")
-    public void getAccountSummary(ActionRequest request, ActionResponse response, 
-            @RequestParam("pageStart") int pageStart, 
+    public void getAccountSummary(ActionRequest request, ActionResponse response,
+            @RequestParam("pageStart") int pageStart,
             @RequestParam("numberOfMessages") int numberOfMessages) throws IOException {
 
         // Define view and generate model
@@ -103,39 +109,38 @@ public class EmailAccountSummaryController {
 
         String username = request.getRemoteUser();
         try {
-            
+
             MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
-    
+
             IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
             if (linkService != null) {
                 String inboxUrl = linkService.getInboxUrl(request, config);
                 model.put("inboxUrl", inboxUrl);
             }
-            
+
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
             if (authService == null) {
-                String msg = "Unrecognized authentication service:  " 
+                String msg = "Unrecognized authentication service:  "
                                 + config.getAuthenticationServiceKey();
                 log.error(msg);
                 throw new RuntimeException(msg);
             }
             Authenticator auth = authService.getAuthenticator(request, config);
             String mailAccountName = authService.getMailAccountName(request, config);
-            
+
             // Check if this is a refresh call;  clear cache if it is
             if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
                 accountDao.clearCache(username, mailAccountName);
             }
-    
+
             // Get current user's account information
-            AccountInfo accountInfo = accountDao.retrieveEmailAccountInfo(username, 
-                                        mailAccountName, config, auth, pageStart, 
-                                        numberOfMessages);
-            
+            AccountInfo accountInfo = getAccountInfo(username, mailAccountName,
+                                config, auth, pageStart, numberOfMessages);
+
             model.put("accountInfo", accountInfo);
-            
+
             ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
-            
+
         } catch (MailAuthenticationException ex) {
             model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
             ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
@@ -151,5 +156,27 @@ public class EmailAccountSummaryController {
         }
 
     }
-    
+
+    private AccountInfo getAccountInfo(String username, String mailAccount,
+            MailStoreConfiguration config, Authenticator auth, int start,
+            int count) throws EmailPreviewException {
+
+        // NB:  The role of this method is to make sure we return the right
+        // AccountInfo based on *all* the parameters, not just the ones
+        // annotated with @PartialCacheKey on fetchAccountInfoFromStore (below).
+
+        AccountInfo rslt = accountDao.fetchAccountInfoFromStore(username,
+                        mailAccount, config, auth, start, count);
+
+        if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != count) {
+            // Clear the cache & try again
+            accountDao.clearCache(username, mailAccount);
+            rslt = accountDao.fetchAccountInfoFromStore(username,
+                    mailAccount, config, auth, start, count);
+        }
+
+        return rslt;
+
+    }
+
 }

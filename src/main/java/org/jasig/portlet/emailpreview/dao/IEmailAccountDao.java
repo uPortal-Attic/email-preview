@@ -28,18 +28,24 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 /**
  * IEmailAccountDao is repsonsible for retrieving email messages from an
  * arbitrary email store.
- * 
+ *
  * @author Jen Bourey, jbourey@unicon.net
+ * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
 public interface IEmailAccountDao {
-    
+
     public void clearCache(String username, String mailAccount);
 
     /**
-     * Retrieve a list of recent email from the mail store, as well as a 
-     * summary of the email account's current state. 
-     * 
+     * Obtains the {@link AccountInfo} object from the email store itself or
+     * possibly from cache.  <strong>WARNING:</strong>  the object returned will
+     * always correctly reflect the specified 'username' and 'mailAccount'
+     * arguments;  the other arguments, however, are more like suggestions.
+     * They will only be applied if the object must be build from the store
+     * itself.  This behavior is understandably somewhat surprising (and a great
+     * candidate for re-design at a later time).
+     *
      * @param username
      * @param storeConfig
      * @param auth
@@ -49,18 +55,29 @@ public interface IEmailAccountDao {
      * @throws MailAuthenticationException When authentication with the mail server fails
      * @throws EmailPreviewException On other errors
      */
-    public AccountInfo retrieveEmailAccountInfo(String username, String mailAccount,
+    public AccountInfo fetchAccountInfoFromStore(String username, String mailAccount,
             MailStoreConfiguration storeConfig, Authenticator auth, int start,
             int maxMessages) throws EmailPreviewException;
-    
+
     /**
      * Retrieve an individual message from the mail store.
-     * 
+     *
      * @param storeConfig
      * @param auth
      * @param messageNum
      * @return
      */
     public EmailMessage retrieveMessage(MailStoreConfiguration storeConfig, Authenticator auth, int messageNum);
-    
+
+    /**
+     * Delete and expunge the specified massages from the store.  Supported for
+     * UIDFolder implementations only.
+     *
+     * @param storeConfig
+     * @param auth
+     * @param uids
+     * @return
+     */
+    boolean deleteMessages(MailStoreConfiguration storeConfig, Authenticator auth, long[] uids);
+
 }

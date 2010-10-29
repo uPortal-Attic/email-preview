@@ -18,7 +18,12 @@
  */
 package org.jasig.portlet.emailpreview;
 
+import java.util.Collections;
 import java.util.List;
+
+import javax.mail.Folder;
+import javax.mail.MessagingException;
+import javax.mail.UIDFolder;
 
 /**
  * An entity object that abstracts the email account information
@@ -27,83 +32,82 @@ import java.util.List;
  *
  * @author Andreas Christoforides
  * @author Jen Bourey, jbourey@unicon.net
+ * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
 public class AccountInfo {
 
-	private int unreadMessageCount;
-	private int totalMessageCount;
+    private final int numUnreadMessages;
+    private final int numTotalMessages;
+    private final List<EmailMessage> messages;
+    private final int messagesStart;
+    private final int messagesCount;
+    private final boolean deleteSupported;
 
-	private List<EmailMessage> messages;
+    public AccountInfo(Folder inbox, List<EmailMessage> messages,
+                        int messagesStart, int messagesCount) throws MessagingException {
 
-	/**
-	 * Returns the number of unread messages in the user's inbox. The number
-	 * of unread messages is bounded by the
-	 * {@link #inspectedMessageCount inspectedMessageCount} attribute.
-	 *
-	 * @return The number of unread messages in the user's inbox.
-	 */
-	public int getUnreadMessageCount() {
-		return this.unreadMessageCount;
-	}
+        // Instance Members
+        this.numUnreadMessages = inbox.getUnreadMessageCount();
+        this.numTotalMessages = inbox.getMessageCount();
+        this.messages = Collections.unmodifiableList(messages);
+        this.messagesStart = messagesStart;
+        this.messagesCount = messagesCount;
+        this.deleteSupported = inbox instanceof UIDFolder;
 
-	/**
-	 * Sets the number of unread messages in the user's inbox. The number
-	 * of unread messages is bounded by the
-	 * {@link #inspectedMessageCount inspectedMessageCount} attribute.
-	 *
-	 * @param unreadMessageCount The number of unread messages in
-	 * the user's inbox.
-	 */
-	public void setUnreadMessageCount(int unreadMessageCount) {
-		this.unreadMessageCount = unreadMessageCount;
-	}
+    }
 
-	/**
-	 * Returns a list that contains a certain number of the most recent
-	 * unread emails in the user's inbox. The number of unread messages
-	 * is controlled by a property in <code>mail.properties</code>.
-	 *
-	 * @return A <code>List<EmailMessage></code> containing
-	 * information about the most recent unread emails in the user's inbox.
-	 */
-	public List<EmailMessage> getMessages() {
+    /**
+     * Returns the number of unread messages in the user's inbox.
+     *
+     * @return The number of unread messages in the user's inbox.
+     */
+    public int getUnreadMessageCount() {
+        return this.numUnreadMessages;
+    }
 
-		return this.messages;
-	}
+    /**
+     * Returns the total number messages in the user's inbox.
+     *
+     * @return The total number of messages in the user's inbox.
+     */
+    public int getTotalMessageCount() {
+        return this.numTotalMessages;
+    }
 
-	/**
-	 * Sets a list that contains a certain number of the most recent
-	 * unread emails in the user's inbox. The number of unread messages
-	 * is controlled by a property in <code>mail.properties</code>.
-	 *
-	 * @param unreadMessages A <code>List<EmailMessage></code> containing
-	 * information about the most recent unread emails in the user's inbox.
-	 */
-	public void setMessages(List<EmailMessage> unreadMessages) {
-		this.messages = unreadMessages;
-	}
+    /**
+     * Returns a list that contains the emails bound by <code>messagesStart</code>
+     * and <code>messagesCode</code>.
+     *
+     * @return A <code>List<EmailMessage></code> containing information about
+     * emails in the user's inbox
+     */
+    public List<EmailMessage> getMessages() {
 
-	/**
-	 * Returns the number of total messages in the user's inbox. The number is not
-	 * bounded by the value of the {@link #inspectedMessageCount inspectedMessageCount}
-	 * attribute.
-	 *
-	 * @return The total number of messages in the user's inbox.
-	 */
-	public int getTotalMessageCount() {
-		return this.totalMessageCount;
-	}
+        return this.messages;
+    }
 
-	/**
-	 * Sets the number of total messages in the user's inbox. The number is not
-	 * bounded by the value of the {@link #inspectedMessageCount inspectedMessageCount}
-	 * attribute.
-	 *
-	 * @param totalMessagecount The number of total messages in the user's inbox.
-	 */
-	public void setTotalMessageCount(int totalMessagecount) {
-		this.totalMessageCount = totalMessagecount;
-	}
+    /**
+     * Returns the index of the first message in the Messages list.
+     *
+     * @return
+     */
+    public int getMessagesStart() {
+        return this.messagesStart;
+    }
+
+    /**
+     * Returns the number of messages requested for the Messages list.  The
+     * actual size of the list may be lower.
+     *
+     * @return
+     */
+    public int getMessagesCount() {
+        return this.messagesCount;
+    }
+
+    public boolean isDeleteSupported() {
+        return deleteSupported;
+    }
 
 }

@@ -37,6 +37,9 @@
 <portlet:actionURL var="messageUrl">
     <portlet:param name="action" value="emailMessage"/>
 </portlet:actionURL>
+<portlet:actionURL var="deleteUrl">
+    <portlet:param name="action" value="deleteMessages"/>
+</portlet:actionURL>
 
 <c:if test="${showConfigLink}">
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
@@ -45,9 +48,7 @@
 
 <div id="${n}container" class="email-container">
 
-    <div class="loading-message">
-        
-    </div>
+    <div class="loading-message"></div>
 
     <div class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
         <p id="error-text"></p>
@@ -57,55 +58,65 @@
     </div>
 
     <div class="email-list" style="display:none;">
-        <p>
-            <a class="inbox-link" href="" target="_blank">Inbox</a> 
-            (<span class="unread-message-count"></span>)
-            | <a class="refresh-link email-refresh-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> Refresh</a>
-        </p>
+    
+        <form name="email">
         
-        <div class="fl-pager">
+            <p>
+                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> Inbox</a> 
+                (<span class="unread-message-count"></span>)
+                | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> Refresh</a>
+                <c:if test="${allowDelete}">
+                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <span>Delete Selected</span></a>
+                </c:if>
+            </p>
             
-            <div class="flc-pager-top">
-                <ul id="pager-top" class="fl-pager-ui">
-                    <li class="flc-pager-previous"><a href="javascript:;">&lt; prev</a></li>
-                    <li>
-                        <ul class="fl-pager-links flc-pager-links" style="margin:0; display:inline">
-                            <li class="flc-pager-pageLink"><a href="javascript:;">1</a></li>
-                            <li class="flc-pager-pageLink-disabled">2</li>
-                            <li class="flc-pager-pageLink-skip">...</li>
-                            <li class="flc-pager-pageLink"><a href="javascript:;">3</a></li>
-                        </ul>
-                    </li>
-                    <li class="flc-pager-next"><a href="javascript:;">next &gt;</a></li>
-                    <li>
-                        <span class="flc-pager-summary">page</span>
-                        <span> <select class="pager-page-size flc-pager-page-size">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select></span> per page
-                    </li>
-                </ul>
+            <div class="fl-pager">
+                
+                <div class="flc-pager-top">
+                    <ul id="pager-top" class="fl-pager-ui">
+                        <li class="flc-pager-previous"><a href="javascript:;">&lt; prev</a></li>
+                        <li>
+                            <ul class="fl-pager-links flc-pager-links" style="margin:0; display:inline">
+                                <li class="flc-pager-pageLink"><a href="javascript:;">1</a></li>
+                                <li class="flc-pager-pageLink-disabled">2</li>
+                                <li class="flc-pager-pageLink-skip">...</li>
+                                <li class="flc-pager-pageLink"><a href="javascript:;">3</a></li>
+                            </ul>
+                        </li>
+                        <li class="flc-pager-next"><a href="javascript:;">next &gt;</a></li>
+                        <li>
+                            <span class="flc-pager-summary">page</span>
+                            <span> <select class="pager-page-size flc-pager-page-size">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select></span> per page
+                        </li>
+                    </ul>
+                </div>
+            
+                <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
+                    <tr>
+                        <th class="select"><input type="checkbox" class="select-all"></th>
+                        <th class="flags-header">&nbsp;</th>
+                        <th>Subject</th>
+                        <th>Sender</th>
+                        <th>Date Sent</th>
+                    </tr>
+                    <tr rsf:id="row:" class="email-row">
+                        <td rsf:id="select" class="select"></td>
+                        <td rsf:id="flags" class="flags">
+                            <span class="answered-span">&nbsp;</span>
+                        </td>
+                        <td rsf:id="subject" class="subject"></td>
+                        <td rsf:id="sender" class="sender"></td>
+                        <td rsf:id="sentDate" class="sentDate"></td>
+                    </tr>
+                </table>
             </div>
-        
-            <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
-                <tr>
-                    <th class="flags-header">&nbsp;</th>
-                    <th>Subject</th>
-                    <th>Sender</th>
-                    <th>Date Sent</th>
-                </tr>
-                <tr rsf:id="row:" class="email-row">
-                    <td rsf:id="flags" class="flags">
-                        <span class="answered-span">&nbsp;</span>
-                    </td>
-                    <td rsf:id="subject" class="subject"></td>
-                    <td rsf:id="sender" class="sender"></td>
-                    <td rsf:id="sentDate" class="sentDate"></td>
-                </tr>
-            </table>
-        </div>
+            
+        </form>
         
     </div>
     
@@ -137,8 +148,9 @@
 
        jasig.EmailBrowser("#${n}container", 
            {
-               accountInfoUrl: "${ accountInfoUrl }",
-               messageUrl: "${ messageUrl }"
+                accountInfoUrl: "${accountInfoUrl}",
+                messageUrl: "${messageUrl}",
+                deleteUrl: "${deleteUrl}"
            }
        );
 

@@ -18,18 +18,52 @@
  */
 package org.jasig.portlet.emailpreview;
 
+import java.util.Date;
+
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Flags.Flag;
+
 import org.junit.Test;
+import static org.mockito.Mockito.*;
 
 public class EmailMessageTest {
-    
+
     @Test
-    public void testSubjectName() {
-        EmailMessage message = new EmailMessage();
-        message.setSender("Test User <testuser@nowhere.net>");
+    public void testSenderNamePruneEmail() throws MessagingException {
+
+        Address addr = mock(Address.class);
+        when(addr.toString()).thenReturn("Test User <testuser@nowhere.net>");
+        Message msg = mock(Message.class);
+        when(msg.getFrom()).thenReturn(new Address[] {addr});
+        when(msg.getSentDate()).thenReturn(new Date());
+        when(msg.isSet(Flag.SEEN)).thenReturn(false);
+        when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
+        when(msg.isSet(Flag.DELETED)).thenReturn(false);
+
+        EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
+
         assert "Test User".equals(message.getSenderName());
-        
-        message.setSender("Test User");
+
+    }
+
+    @Test
+    public void testSenderNameNoEmail() throws MessagingException {
+
+        Address addr = mock(Address.class);
+        when(addr.toString()).thenReturn("Test User");
+        Message msg = mock(Message.class);
+        when(msg.getFrom()).thenReturn(new Address[] {addr});
+        when(msg.getSentDate()).thenReturn(new Date());
+        when(msg.isSet(Flag.SEEN)).thenReturn(false);
+        when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
+        when(msg.isSet(Flag.DELETED)).thenReturn(false);
+
+        EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
+
         assert "Test User".equals(message.getSenderName());
+
     }
 
 }
