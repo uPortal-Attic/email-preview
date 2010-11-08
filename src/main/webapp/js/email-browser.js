@@ -41,6 +41,10 @@ var jasig = jasig || {};
         return false;
     };
     
+    // Top-level abstraction of the user's email account;  
+    // needs to be re-set whenever mail is fetched.
+    var account = null;
+    
     // If true, will drop the cache entry (if present) 
     // for this user on the next call to the server
     var clearCache = "false";
@@ -53,7 +57,6 @@ var jasig = jasig || {};
             return that.cache[start][size];
         }
         
-        var account;
         $.ajax({
             url: that.options.accountInfoUrl,
             async: false,
@@ -92,26 +95,7 @@ var jasig = jasig || {};
         });
         return message;
     };
-     
-    var getAccount = function(that) {
-        var account;
-        $.ajax({
-            url: that.options.accountInfoUrl,
-            async: false,
-            data: { pageStart: 0, numberOfMessages: 20 },
-            type: 'POST',
-            dataType: "json",
-            success: function(data) { 
-                account = data; 
-                var messages = account.accountInfo.messages;
-                that.cache[0] = that.cache[1] || [];
-                that.cache[0][20] = messages;
-            },
-            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
-        });
-        return account;
-    };
-     
+
     var showEmailList = function(that) {
         that.locate("loadingMessage").hide();
         that.locate("emailMessage").hide();
@@ -180,14 +164,10 @@ var jasig = jasig || {};
         var that = fluid.initView("jasig.EmailBrowser", container, options);
 
         that.cache = [];
-
         showLoadingMessage(that);
-        
-        var account = getAccount(that);
-        if (!account) { return that; }
-        that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
-        
+
         var batchOptions = {
+            batchSize: that.options.batchSize,
             pagerOptions: {
                columnDefs: [
                    { key: "select", valuebinding: "*.select",
@@ -276,6 +256,7 @@ var jasig = jasig || {};
             clearCache = "true";  // Server-side cache
             that.cache = [];      // Client-side cache
             that.pager.refreshView();
+            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
             showEmailList(that);
         };
 
@@ -322,6 +303,8 @@ var jasig = jasig || {};
         
         that.locate("selectAll").click(that.toggleSelectAll);
 
+        that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
+
         showEmailList(that);
 
         return that;
@@ -332,6 +315,7 @@ var jasig = jasig || {};
         accountInfoUrl: null,
         messageUrl: null,
         deleteUrl: null,
+        batchSize: 20,
         selectors: {
             refreshLink: ".refresh-link",
             deleteLink: ".delete-link",

@@ -169,6 +169,19 @@ public class EmailAccountSummaryController {
                         mailAccount, config, auth, start, count);
 
         if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != count) {
+            
+            if (log.isTraceEnabled()) {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Clearing AccountInfo cache for username '")
+                                .append(username).append("', mailAccount '")
+                                .append(mailAccount).append("':  start=[")
+                                .append(rslt.getMessagesStart()).append(" prev, ")
+                                .append(start).append(" current] ").append("count=[")
+                                .append(rslt.getMessagesCount()).append(" prev, ")
+                                .append(count).append(" current]");
+                log.trace(msg.toString());
+            }
+            
             // Clear the cache & try again
             accountDao.clearCache(username, mailAccount);
             rslt = accountDao.fetchAccountInfoFromStore(username,

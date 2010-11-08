@@ -97,13 +97,13 @@ var unicon = unicon || {};
 	    };
 
 	    that.refreshView = function() {
-	    	var data = that.options.dataFunction(0, Math.min(that.options.batchSize, length));
+	    	var data = that.options.dataFunction(0, that.options.batchSize);
 	        // re-copy the list of items into the pager model and update
 	        // the expected number of list items
 	        fluid.clear(that.pager.options.dataModel);
 	        fluid.model.copyModel(that.pager.options.dataModel, data);
 	        var newModel = fluid.copy(that.pager.model);
-	        newModel.totalRange = that.options.dataLengthFunction(data);
+	        newModel.totalRange = that.options.dataLengthFunction();
 	        newModel.pageIndex = 0;
 	        newModel.sortKey = that.state.sortKey;
 	        newModel.sortDir = that.state.sortDir;
@@ -116,8 +116,9 @@ var unicon = unicon || {};
 		that.state = {
 			batchStart: 0
 		};
-		var length = that.options.dataLengthFunction();
-        var data = that.options.dataFunction(0, Math.min(that.options.batchSize, length));
+		// var length = that.options.dataLengthFunction();
+        // var data = that.options.dataFunction(0, Math.min(that.options.batchSize, length));
+        var data = that.options.dataFunction(0, that.options.batchSize);
 
 		// modify the provided pager options to use the batched pager
 		var pagerOptions = options.pagerOptions;
@@ -130,7 +131,7 @@ var unicon = unicon || {};
        
         // update the model's page range
         var newModel = fluid.copy(that.pager.model);
-        newModel.totalRange = length;
+        newModel.totalRange = that.options.dataLengthFunction();
         newModel.pageCount = Math.max(1, Math.floor((newModel.totalRange - 1)/ newModel.pageSize) + 1);
         newModel.sortKey = that.state.sortKey;
         newModel.sortDir = that.state.sortDir;
