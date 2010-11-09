@@ -39,6 +39,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 public final class EmailMessage {
 
     private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
+    private static final String CONTENT_TYPE_ATTACHMENTS_PATTERN = "multipart/mixed;";
     
     private final Message message;
     private final Long uid;
@@ -48,6 +49,7 @@ public final class EmailMessage {
     private final boolean unread;  // Evaluate in constructor to detect errors early
     private final boolean answered;  // Evaluate in constructor to detect errors early
     private final boolean deleted;  // Evaluate in constructor to detect errors early
+    private final boolean multipart;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
 
 	/*
@@ -87,6 +89,7 @@ public final class EmailMessage {
         this.unread = !message.isSet(Flag.SEEN);
         this.answered = message.isSet(Flag.ANSWERED);
         this.deleted = message.isSet(Flag.DELETED);
+        this.multipart = message.getContentType().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
         this.content = content;
 	    
 	}
@@ -150,6 +153,10 @@ public final class EmailMessage {
 
     public boolean isDeleted() {
         return deleted;
+    }
+    
+    public boolean isMultipart() {
+        return multipart;
     }
 
     public EmailMessageContent getContent() {

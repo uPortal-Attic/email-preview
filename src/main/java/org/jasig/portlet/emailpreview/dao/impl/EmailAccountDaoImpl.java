@@ -265,6 +265,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         FetchProfile profile = new FetchProfile();
         profile.add(FetchProfile.Item.ENVELOPE);
         profile.add(FetchProfile.Item.FLAGS);
+        profile.add(FetchProfile.Item.CONTENT_INFO);
         mailFolder.fetch(messages, profile);
 
         if (log.isDebugEnabled()) {

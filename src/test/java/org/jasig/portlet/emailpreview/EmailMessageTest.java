@@ -41,6 +41,7 @@ public class EmailMessageTest {
         when(msg.isSet(Flag.SEEN)).thenReturn(false);
         when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
         when(msg.isSet(Flag.DELETED)).thenReturn(false);
+        when(msg.getContentType()).thenReturn("text/plain");
 
         EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
 
@@ -59,6 +60,7 @@ public class EmailMessageTest {
         when(msg.isSet(Flag.SEEN)).thenReturn(false);
         when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
         when(msg.isSet(Flag.DELETED)).thenReturn(false);
+        when(msg.getContentType()).thenReturn("text/plain");
 
         EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
 

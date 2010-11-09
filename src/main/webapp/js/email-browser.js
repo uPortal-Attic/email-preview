@@ -148,6 +148,7 @@ var jasig = jasig || {};
         if (message.unread) classes += " unread";
         if (message.answered) classes += " answered";
         if (message.deleted) classes += " deleted";
+        if (message.multipart) classes += " attached";
         return classes;
     };
     
@@ -181,6 +182,24 @@ var jasig = jasig || {};
                             }
                         }
                    },
+                   { key: "flags", valuebinding: "*.answered",
+                       components: function(row, index) {
+                           return {
+                               decorators: [
+                                   { type: "addClass", classes: getClasses(index, row) }
+                               ]
+                           };
+                       }
+                   },
+                   { key: "attachments", valuebinding: "*.multipart",
+                       components: function(row, index) {
+                           return {
+                               decorators: [
+                                   { type: "addClass", classes: getClasses(index, row) }
+                               ]
+                           };
+                       }
+                   },
                    { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
                             return {
@@ -213,15 +232,6 @@ var jasig = jasig || {};
                                    { type: "addClass", classes: getClasses(index, row) }
                                ]
                            }
-                       }
-                   },
-                   { key: "flags", valuebinding: "*.answered",
-                       components: function(row, index) {
-                           return {
-                               decorators: [
-                                   { type: "addClass", classes: getClasses(index, row) }
-                               ]
-                           };
                        }
                    }
                ],
@@ -301,7 +311,7 @@ var jasig = jasig || {};
         that.locate("returnLink").click(function(){ showEmailList(that); });
         that.locate("inboxLink").attr("href", account.inboxUrl);
         
-        that.locate("selectAll").click(that.toggleSelectAll);
+        that.locate("selectAll").live("click", that.toggleSelectAll);
 
         that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
 

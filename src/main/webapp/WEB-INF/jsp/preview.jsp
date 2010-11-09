@@ -99,7 +99,12 @@
                 <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
                     <tr>
                         <th class="select"><input type="checkbox" class="select-all"></th>
-                        <th class="flags-header">&nbsp;</th>
+                        <th class="flags-header">
+                            <span class="flags-span">&nbsp;</span>
+                        </th>
+                        <th class="flags-header">
+                            <span class="attached-span">&nbsp;</span>
+                        </th>
                         <th>Subject</th>
                         <th>Sender</th>
                         <th>Date Sent</th>
@@ -108,6 +113,9 @@
                         <td rsf:id="select" class="select"></td>
                         <td rsf:id="flags" class="flags">
                             <span class="answered-span">&nbsp;</span>
+                        </td>
+                        <td rsf:id="attachments" class="flags">
+                            <span class="attached-span">&nbsp;</span>
                         </td>
                         <td rsf:id="subject" class="subject"></td>
                         <td rsf:id="sender" class="sender"></td>
