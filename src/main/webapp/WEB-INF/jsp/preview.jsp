@@ -46,7 +46,7 @@
     <p style="text-align: right;"><a href="${ configUrl }">Configure portlet</a></p>
 </c:if>
 
-<div id="${n}container" class="email-container">
+<div id="${n}container" class="email-container portlet">
 
     <div class="loading-message"></div>
 
