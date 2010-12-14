@@ -1,0 +1,74 @@
+Copyright 2010, JA-SIG, Inc.
+This project includes software developed by Jasig.
+http://www.jasig.org/
+
+Licensed under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This project includes:
+  Fluid Infusion and Skinning System under the New BSD license
+  jQuery, jQueryUI, and the jQuery Form Plugin under the MIT license
+  The famfamfam Silk Icons under the Creative Commons Attribution 3.0 License
+    http://www.famfamfam.com/lab/icons/silk/
+
+  == GreenMail == under Apache 2.0
+  AJAX Portlet Support under The BSD License
+  AOP alliance under Public Domain
+  Batik CSS engine under The Apache Software License, Version 2.0
+  Batik external code under The Apache Software License, Version 2.0
+  Batik utility library under The Apache Software License, Version 2.0
+  Collections under The Apache Software License, Version 2.0
+  Commons Codec under The Apache Software License, Version 2.0
+  Commons IO under The Apache Software License, Version 2.0
+  Commons Lang under The Apache Software License, Version 2.0
+  Ehcache Core under The Apache Software License, Version 2.0
+  Ehcache Spring Annotations under Apache 2
+  Ehcache Web Filters under The Apache Software License, Version 2.0
+  Email Preview Portlet under JA-SIG Collaborative Licence
+  ezmorph under The Apache Software License, Version 2.0
+  Hamcrest Core under BSD style
+  HttpClient under Apache License
+  JASYPT: Java Simplified Encryption under The Apache Software License, Version 2.0
+  JavaBeans(TM) Activation Framework under COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+  JavaMail API under Common Development and Distribution License (CDDL) v1.0
+  json-lib under The Apache Software License, Version 2.0
+  Json-lib4Spring under The Apache Software License, Version 2.0
+  JUnit under Common Public License Version 1.0
+  Log4j under The Apache Software License, Version 2.0
+  Logging under The Apache Software License, Version 2.0
+  Mockito under The MIT License
+  Neko HTML under The Apache Software License, Version 2.0
+  Objenesis under MIT License
+  OWASP AntiSamy under BSD License
+  Pluto Portlet Tag Library under The Apache Software License, Version 2.0
+  Portlet API under Commons Development and Distribution License, Version 1.0
+  Resource Server Content under Apache License Version 2.0
+  Resource Server Utilities under Apache License Version 2.0
+  SLF4J API Module under MIT License
+  Spring Framework: AOP under The Apache Software License, Version 2.0
+  Spring Framework: Beans under The Apache Software License, Version 2.0
+  Spring Framework: Context under The Apache Software License, Version 2.0
+  Spring Framework: Context Support under The Apache Software License, Version 2.0
+  Spring Framework: Core under The Apache Software License, Version 2.0
+  Spring Framework: Test under The Apache Software License, Version 2.0
+  Spring Framework: Web under The Apache Software License, Version 2.0
+  Spring Framework: Web MVC under The Apache Software License, Version 2.0
+  Spring Framework: Web MVC Portlet under The Apache Software License, Version 2.0
+  Unnamed - commons-beanutils:commons-beanutils:jar:1.7.0 under Apache License, Version 2.0
+  Unnamed - javax.servlet:jstl:jar:1.1.2 under Commons Development and Distribution License, Version 1.0
+  Unnamed - javax.servlet:servlet-api:jar:2.4 under Commons Development and Distribution License, Version 1.0
+  Unnamed - taglibs:standard:jar:1.1.2 under Apache License, Version 2.0
+  Unnamed - xml-apis:xml-apis:jar:1.3.03 under The Apache Software License, Version 2.0
+  Xerces2 Java Parser under The Apache Software License, Version 2.0
+  XML Commons External Components XML APIs Extensions under The Apache Software License, Version 2.0
+

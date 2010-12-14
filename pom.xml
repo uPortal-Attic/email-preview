@@ -430,6 +430,17 @@
                     </overlays>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>maven-notice-plugin</artifactId>
+                <configuration>
+                    <noticeTemplate>NOTICE.template</noticeTemplate>
+                    <generateChildNotices>false</generateChildNotices>
+                    <licenseMapping>
+                        <url>https://source.jasig.org/licenses/license-mappings.xml</url>
+                    </licenseMapping>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     
