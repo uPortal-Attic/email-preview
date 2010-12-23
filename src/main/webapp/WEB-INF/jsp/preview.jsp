@@ -40,6 +40,9 @@
 <portlet:actionURL var="deleteUrl">
     <portlet:param name="action" value="deleteMessages"/>
 </portlet:actionURL>
+<portlet:actionURL var="updatePageSizeUrl">
+    <portlet:param name="action" value="updatePageSize"/>
+</portlet:actionURL>
 
 <c:if test="${showConfigLink}">
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
@@ -151,16 +154,24 @@
     fluid_1_1 = null;
 
     ${n}.jQuery(function() {
-       var $ = ${n}.jQuery;
-       var fluid = ${n}.fluid;
+        var $ = ${n}.jQuery;
+        var fluid = ${n}.fluid;
+       
+        // Notify the server of changes to pageSize so they can be remembered
+        var updatePageSize = function(newPageSize) {
+            $.post("${updatePageSizeUrl}", {newPageSize: newPageSize});
+        };
 
-       jasig.EmailBrowser("#${n}container", 
-           {
-                accountInfoUrl: "${accountInfoUrl}",
-                messageUrl: "${messageUrl}",
-                deleteUrl: "${deleteUrl}"
-           }
-       );
+        var options = {
+            accountInfoUrl: "${accountInfoUrl}",
+            messageUrl: "${messageUrl}",
+            deleteUrl: "${deleteUrl}",
+            pageSize: <c:out value="${pageSize}"/>,
+            listeners: {
+                initiatePageSizeChange: updatePageSize
+            }
+        };
+        jasig.EmailBrowser("#${n}container", options);
 
     });
 

@@ -41,8 +41,8 @@ import org.springframework.web.portlet.ModelAndView;
 @RequestMapping("VIEW")
 public class EmailSummaryController {
 
+    public final static String PAGE_SIZE_KEY = "pageSize";
     public final static String ALLOW_DELETE_KEY = "allowDelete";
-
     private final static String SHOW_CONFIG_LINK_KEY = "showConfigLink";
 
     private String adminRoleName = "admin";
@@ -56,9 +56,16 @@ public class EmailSummaryController {
 
         Map<String,Object> model = new HashMap<String,Object>();
 
-        // first check to see if the portlet is configured to display a link
-        // to config mode and if it applies to this user
         PortletPreferences prefs = request.getPreferences();
+
+        // PageSize:  this value can be set by administrators as a publish-time 
+        // portlet preference, and (normally) overridden by users as a 
+        // user-defined portlet preference.
+        int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_KEY, "10"));
+        model.put(PAGE_SIZE_KEY, pageSize);
+        
+        // Check to see if the portlet is configured to display a link
+        // to config mode and if it applies to this user
         boolean showConfigLink = Boolean.valueOf(prefs.getValue(
                             SHOW_CONFIG_LINK_KEY, "false"));
         if (showConfigLink) {

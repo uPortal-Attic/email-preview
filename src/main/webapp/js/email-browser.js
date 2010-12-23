@@ -170,8 +170,8 @@ var jasig = jasig || {};
         var batchOptions = {
             batchSize: that.options.batchSize,
             pagerOptions: {
-               columnDefs: [
-                   { key: "select", valuebinding: "*.select",
+                columnDefs: [
+                    { key: "select", valuebinding: "*.select",
                         components: function(row, index) {
                             return {
                                 markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.uid}"/>',
@@ -181,26 +181,26 @@ var jasig = jasig || {};
                                 ]
                             }
                         }
-                   },
-                   { key: "flags", valuebinding: "*.answered",
-                       components: function(row, index) {
-                           return {
-                               decorators: [
-                                   { type: "addClass", classes: getClasses(index, row) }
-                               ]
-                           };
-                       }
-                   },
-                   { key: "attachments", valuebinding: "*.multipart",
-                       components: function(row, index) {
-                           return {
-                               decorators: [
-                                   { type: "addClass", classes: getClasses(index, row) }
-                               ]
-                           };
-                       }
-                   },
-                   { key: "subject", valuebinding: "*.subject",
+                    },
+                    { key: "flags", valuebinding: "*.answered",
+                        components: function(row, index) {
+                            return {
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            };
+                        }
+                    },
+                    { key: "attachments", valuebinding: "*.multipart",
+                        components: function(row, index) {
+                            return {
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            };
+                        }
+                    },
+                    { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
                             return {
                                 markup: "<a href=\"javascript:;\">\${*.subject}</a>",
@@ -213,47 +213,51 @@ var jasig = jasig || {};
                                 ]
                             }
                         }
-                   },
-                   { key: "sender", valuebinding: "*.senderName",
-                       components: function(row, index) {
-                           return {
-                               value: "\${*.senderName}",
-                               decorators: [
-                                   { type: "addClass", classes: getClasses(index, row) }
-                               ]
-                           }
-                       }
-                   },
-                   { key: "sentDate", valuebinding: "*.sentDateString",
-                       components: function(row, index) {
-                           return {
-                               value: "\${*.sentDateString}",
-                               decorators: [
-                                   { type: "addClass", classes: getClasses(index, row) }
-                               ]
-                           }
-                       }
-                   }
-               ],
-               bodyRenderer: {
-                   type: "fluid.pager.selfRender",
-                   options: {
-                       selectors: { root: "table" },
-                       row: "row:"
-                   }
-               },
-               pagerBar: {
-                   type: "fluid.pager.pagerBar", 
-                   options: {
-                       pageList: { 
-                           type: "fluid.pager.renderedPageList",
-                           options: { 
-                               linkBody: "a",
-                               pageStrategy: fluid.pager.gappedPageStrategy(3, 1)
-                           }
-                       }
-                   }
-               }
+                    },
+                    { key: "sender", valuebinding: "*.senderName",
+                        components: function(row, index) {
+                            return {
+                                value: "\${*.senderName}",
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                    },
+                    { key: "sentDate", valuebinding: "*.sentDateString",
+                        components: function(row, index) {
+                            return {
+                                value: "\${*.sentDateString}",
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                }
+                ],
+                bodyRenderer: {
+                    type: "fluid.pager.selfRender",
+                    options: {
+                        selectors: { root: "table" },
+                        row: "row:"
+                    }
+                },
+                pagerBar: {
+                    type: "fluid.pager.pagerBar", 
+                    options: {
+                        pageList: { 
+                            type: "fluid.pager.renderedPageList",
+                            options: { 
+                                linkBody: "a",
+                                pageStrategy: fluid.pager.gappedPageStrategy(3, 1)
+                            }
+                        }
+                    }
+                },
+                model: {
+                    pageSize: that.options.pageSize
+                },
+                listeners: that.options.listeners
             },
             dataFunction: getEmailFunction(that),
             dataLengthFunction: function() { return account.accountInfo.totalMessageCount; }
@@ -325,6 +329,7 @@ var jasig = jasig || {};
         accountInfoUrl: null,
         messageUrl: null,
         deleteUrl: null,
+        pageSize: 10,
         batchSize: 20,
         selectors: {
             refreshLink: ".refresh-link",
@@ -342,7 +347,8 @@ var jasig = jasig || {};
             errorText: ".error-message #error-text",
             unreadMessageCount: ".unread-message-count",
             inboxLink: ".inbox-link"
-        }
+        },
+        listeners: {}
     });
 
 })(jQuery, fluid);

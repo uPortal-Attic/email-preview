@@ -59,6 +59,16 @@
         </portlet-info>
         
         <portlet-preferences>
+        
+            <!-- 
+                Determines how many emails initially appear in the list on the 
+                preview screen.  Users may choose a different setting.
+            -->
+            <preference>
+                <name>pageSize</name>
+                <value>10</value>
+            </preference>
+        
             <!-- 
                 Set includeJQuery to true to explicitly import jQuery and
                 jQuery UI javascript libraries within the portlet.  When true,
