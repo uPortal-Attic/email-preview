@@ -104,7 +104,7 @@ public final class EmailMessage {
 	 * 
 	 * @return The UID provided by the Folder for this message or null
 	 */
-	public long getUid() {
+	public Long getUid() {
 	    return uid;
 	}
 	
