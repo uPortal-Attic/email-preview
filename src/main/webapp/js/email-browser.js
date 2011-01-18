@@ -118,18 +118,18 @@ var jasig = jasig || {};
     };
     
     var errorHandlers = {
-        401: function(that) {
+        401: function(that,code) {
             var msg = "Failed to authenticate to mail store";
             that.locate("errorText").html(msg);
             that.locate("errorMessage").show();
         },
-        504: function(that) {
-            var msg = "Mail store connection failed:  Gateway Timeout";
+        504: function(that,code) {
+            var msg = "Mail store connection failed: Gateway Timeout";
             that.locate("errorText").html(msg);
             that.locate("errorMessage").show();
         },
-        'default': function(that) {
-            var msg = "Unknown mail store error";
+        'default': function(that,code) {
+            var msg = "Unknown mail store error: " + code;
             that.locate("errorText").html(msg);
             that.locate("errorMessage").show();
         }
@@ -139,7 +139,7 @@ var jasig = jasig || {};
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         var handler = errorHandlers[code] || errorHandlers['default'];
-        handler(that);
+        handler(that,code);
     };
 
     var getClasses = function(idx, message) {
