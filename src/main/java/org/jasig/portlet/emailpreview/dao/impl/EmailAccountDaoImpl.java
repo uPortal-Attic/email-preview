@@ -383,7 +383,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             if (!StringUtils.isBlank(contentString)) {
                 AntiSamy as = new AntiSamy();
                 CleanResults cr = as.scan(contentString, policy);
-                subject = cr.getCleanHTML();
+                contentString = cr.getCleanHTML();
             }
             body.setContentString(contentString);
         }
