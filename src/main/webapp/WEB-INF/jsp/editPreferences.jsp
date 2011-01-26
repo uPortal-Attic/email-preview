@@ -54,22 +54,27 @@
             <input type="text" name="port" id="plt-email-input-port" title="This is the port used to access your IMAP email" value="<c:out value="${form.port}"/>"/>
         </label>
     </div>          
-    
-    <div class="fieldset plt-email-fieldset-verify">
-        <c:if test="${authenticationServices.cachedPassword ne null}">
-            <label>
-                <input id="authtype_cache" type="radio" name="authenticationServiceKey" value="cachedPassword"<c:if test="${form.authenticationServiceKey eq 'cachedPassword'}"> checked="checked"</c:if>> My email credentials are the same as those for this portal 
-            </label>
-        </c:if>
-        <c:if test="${authenticationServices.portletPreferences ne null}">
-            <label>
-                <input id="authtype_preferences" type="radio" name="authenticationServiceKey" value="portletPreferences"<c:if test="${form.authenticationServiceKey eq 'portletPreferences'}"> checked="checked"</c:if>> My email credentials are the DIFFERENT than those used for this portal 
-            </label>
-        </c:if>
-    </div>
-    
+
+    <!-- Show radio buttons if multiple authenticationServices are in use -->
+    <c:if test="${fn:length(authenticationServices) > 1}">
+        <div class="fieldset plt-email-fieldset-verify">
+            <c:if test="${authenticationServices.cachedPassword ne null}">
+                <label>
+                    <input id="authtype_cache" type="radio" name="authenticationServiceKey" value="cachedPassword"<c:if test="${form.authenticationServiceKey eq 'cachedPassword'}"> checked="checked"</c:if>> My email credentials are the same as those for this portal 
+                </label>
+            </c:if>
+            <c:if test="${authenticationServices.portletPreferences ne null}">
+                <label>
+                    <input id="authtype_preferences" type="radio" name="authenticationServiceKey" value="portletPreferences"<c:if test="${form.authenticationServiceKey eq 'portletPreferences'}"> checked="checked"</c:if>> My email credentials are the DIFFERENT than those used for this portal 
+                </label>
+            </c:if>
+        </div>
+    </c:if>
+
     <c:if test="${authenticationServices.portletPreferences ne null}">
-        <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth">
+        <!-- Show these fields if the authService is currently 'portletPreferences' -->
+        <c:set var="displayStyle" value="${form.authenticationServiceKey eq 'portletPreferences' ? '' : 'display: none;'}" />
+        <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth" style="${displayStyle}">
             <label>Email Address
                 <input type="text" name="username" id="plt-email-input-email" title="Input the email address you are trying to access." value="<c:out value="${form.additionalProperties.username}"/>"/>
                 <span class="plt-email-address-suffix"><c:out value="${form.usernameSuffix}"/></span>
@@ -130,10 +135,6 @@
                     $('#authtype_preferences').addClass('disabled').attr('disabled',true);
                 }
                 
-                if ($("input[@name='authtype']:checked").val()=="portletPreferences") {
-                    $('.' + that.options.selectors.fieldset_preferences).slideDown(400);
-                } 
-                
                 setTimeout(
                     function(){
                         $(that.options.selectors.submission_error).slideDown();
@@ -159,13 +160,13 @@
                 });
                 
                 $(that.options.selectors.authtype_cache).click(function() {
-                    $('.' + that.options.selectors.fieldset_preferences).slideUp(400);
+                    $(that.options.selectors.fieldset_preferences).slideUp(400);
                     $(that.options.selectors.input_email).val($(that.options.selectors.input_current_email).val());
                     $(that.options.selectors.input_password).val($(that.options.selectors.input_current_password).val());
                 });
                 
                 $(that.options.selectors.authtype_preferences).click(function() {
-                    $('.' + that.options.selectors.fieldset_preferences).slideDown(400);
+                    $(that.options.selectors.fieldset_preferences).slideDown(400);
                 });
                 
             };//end:function
@@ -179,7 +180,7 @@
                 var validRegExp = /^([a-zA-Z0-9_.-])+$/;
                                     
                 /* Hide error bar initially in case a previous error occured */
-                $('.' + that.options.selectors.input_error).slideUp(200);
+                $(that.options.selectors.input_error).slideUp(200);
                 
                 /*
                  * Stuff we always check
@@ -227,7 +228,7 @@
              */
             var displayError = function (error_msg, culprit) {
                 
-                $('.' + that.options.selectors.input_error).remove();
+                $(that.options.selectors.input_error).remove();
                 
                 var error_html = '<div class="'+that.options.selectors.input_error+'">' + error_msg + '</div>';
                 
@@ -237,11 +238,11 @@
                 $(culprit).focus();
                 
                 if(culprit == that.options.selectors.input_email || culprit == that.options.selectors.input_password){
-                    $('.' + that.options.selectors.fieldset_preferences).slideDown(400);
+                    $(that.options.selectors.fieldset_preferences).slideDown(400);
                 }   
                                             
                 $(that.container).prepend(error_html);
-                $('.' + that.options.selectors.input_error).slideDown(400);
+                $(that.options.selectors.input_error).slideDown(400);
                             
             };//end:function
             
@@ -261,12 +262,12 @@
                 input_port: "#plt-email-input-port",
                 input_imap: "#plt-email-input-server",
                 help: ".help",
-                input_error: "plt-email-input-error",
-                input_error_highlight: "plt-email-input-error-highlight",
+                input_error: ".plt-email-input-error",
+                input_error_highlight: "plt-email-input-error-highlight",  // No initial '.' b/c this one is used with addClass/removeClass
                 submission_error: "#plt-email-submission-error",
                 authtype_cache: "#authtype_cache",
                 authtype_preferences: "#authtype_preferences",
-                fieldset_preferences: "plt-email-fieldset-ppauth"
+                fieldset_preferences: ".plt-email-fieldset-ppauth"
             },
             disableProtocol: false,
             disableHost: false,
