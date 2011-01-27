@@ -102,6 +102,23 @@
                 <name>allowDelete</name>
                 <value>true</value>
             </preference>
+
+            <!-- 
+                Name of the inbox folder on the mail server.  The javadoc for 
+                the JavaMail API states:  "INBOX is reserved to mean the 
+                'primary folder for this user on this server.'  Not all Stores 
+                will provide an INBOX folder, and not all users will have an 
+                INBOX folder at all times. The name INBOX is reserved to refer 
+                to this folder, when it exists, in Stores that provide it."
+                
+                This value pre-populates the "Inbox folder name:" field in 
+                CONFIG mode, but may be overridden by the administrator. 
+            -->
+            <preference>
+                <name>inboxName</name>
+                <value>INBOX</value>
+            </preference>
+
         </portlet-preferences>
         
         <security-role-ref>
