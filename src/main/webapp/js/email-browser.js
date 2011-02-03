@@ -133,7 +133,8 @@ var jasig = jasig || {};
             that.locate("errorText").html(msg);
             that.locate("errorMessage").show();
         }
-    }
+    };
+
     var showErrorMessage = function(that, code) {
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
