@@ -40,19 +40,22 @@
 <form id="plt-email-form" action="<portlet:actionURL><portlet:param name="action" value="updatePreferences"/></portlet:actionURL>" method="POST">
     
     <div class="fieldset plt-email-fieldset-settings">
-        <label>Server Protocol
+        <div class="plt-email-row">
+            <label>Server Protocol</label>
             <select name="protocol" id="plt-email-input-protocol" title="Type of email server, either IMAP or IMAPS">
                 <c:forEach items="${protocols}" var="protocol">
                     <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
                 </c:forEach>
             </select>
-        </label>
-        <label>Server Name
+        </div>
+        <div class="plt-email-row">
+            <label>Server Name</label>
             <input type="text" name="host" id="plt-email-input-server" title="This is the address of the server that hosts your IMAP email" value="<c:out value="${form.host}"/>"/>
-        </label>
-        <label>Server Port
+        </div>
+        <div class="plt-email-row">
+            <label>Server Port</label>
             <input type="text" name="port" id="plt-email-input-port" title="This is the port used to access your IMAP email" value="<c:out value="${form.port}"/>"/>
-        </label>
+        </div>
     </div>          
 
     <!-- Show radio buttons if multiple authenticationServices are in use -->
@@ -75,16 +78,19 @@
         <!-- Show these fields if the authService is currently 'portletPreferences' -->
         <c:set var="displayStyle" value="${form.authenticationServiceKey eq 'portletPreferences' ? '' : 'display: none;'}" />
         <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth" style="${displayStyle}">
-            <label>Email Address
+            <div class="plt-email-row">
+                <label>Email Address</label>
                 <input type="text" name="username" id="plt-email-input-email" title="Input the email address you are trying to access." value="<c:out value="${form.additionalProperties.username}"/>"/>
                 <span class="plt-email-address-suffix"><c:out value="${form.usernameSuffix}"/></span>
-            </label>
-            <label>Password
+            </div>
+            <div class="plt-email-row">
+                <label>Password</label>
                 <input type="password" name="ppauth_password" id="plt-email-input-password" title="Input the password asscociated with the email address" value="<c:out value="${unchangedPassword}"/>"/>
-            </label>
-            <label>Confirm Password
+            </div>
+            <div class="plt-email-row">
+                <label>Confirm Password</label>
                 <input type="password" name="ppauth_confirm" id="plt-email-input-confirm" title="Type the password again" value="<c:out value="${unchangedPassword}"/>"/>
-            </label>
+            </div>
         </div>
     </c:if>
             
