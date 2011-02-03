@@ -171,7 +171,10 @@
                 initiatePageSizeChange: updatePageSize
             }
         };
-        jasig.EmailBrowser("#${n}container", options);
+        // Initialize the display asynchronously
+        setTimeout(function() {
+            jasig.EmailBrowser("#${n}container", options);
+        }, 1);
 
     });
 
