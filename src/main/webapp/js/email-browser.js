@@ -64,11 +64,15 @@ var jasig = jasig || {};
             type: 'POST',
             dataType: "json",
             success: function(data) { 
+                if ( data.errorMessage != null ) {
+                    showErrorMessage( that, 900, data.errorMessage );
+                }
                 clearCache = "false";
                 account = data; 
             },
             error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
+
         var messages = account.accountInfo.messages;
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
@@ -90,9 +94,15 @@ var jasig = jasig || {};
             data: { messageNum: messageNum },
             type: 'POST',
             dataType: "json",
-            success: function(data) { message = data.message; },
+            success: function(data) {
+                if ( data.errorMessage != null ) {
+                    showErrorMessage( that, 900, data.errorMessage );
+                }
+                message = data.message;
+            },
             error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
         });
+
         return message;
     };
 
@@ -116,31 +126,42 @@ var jasig = jasig || {};
         that.locate("errorMessage").hide();
         that.locate("emailMessage").show();
     };
+
+    /* ****************************************************************
+        The errorHandlers correspond to HTTP Status Codes, except
+        that 900 is an internal code used when a more elaborate error
+        message is being reported by the email-preview portlet via
+        normal content data path.
+    **************************************************************** */
     
     var errorHandlers = {
-        401: function(that,code) {
-            var msg = "Failed to authenticate to mail store";
-            that.locate("errorText").html(msg);
+        401: function(that, code) {
+            var msg = "Invalid userid or password";
+            that.locate("errorText").html(code + ": " + msg);
             that.locate("errorMessage").show();
         },
-        504: function(that,code) {
-            var msg = "Mail store connection failed: Gateway Timeout";
-            that.locate("errorText").html(msg);
+        504: function(that, code) {
+            var msg = "Mail service timeout";
+            that.locate("errorText").html(code + ": " + msg);
             that.locate("errorMessage").show();
         },
-        'default': function(that,code) {
-            var msg = "Unknown mail store error: " + code;
-            that.locate("errorText").html(msg);
+        900: function(that, code, msg) {
+            that.locate("errorText").html(code + ": " + msg);
+            that.locate("errorMessage").show();
+        },
+        'default': function(that, code) {
+            var msg = "Service error";
+            that.locate("errorText").html(code + ": " + msg);
             that.locate("errorMessage").show();
         }
     };
 
-    var showErrorMessage = function(that, code) {
+    var showErrorMessage = function(that, code, msg) {
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         var handler = errorHandlers[code] || errorHandlers['default'];
-        handler(that,code);
+        handler(that, code, msg);
     };
 
     var getClasses = function(idx, message) {
@@ -288,10 +309,13 @@ var jasig = jasig || {};
                     type: "POST",
                     data: params,
                     dataType: "json",
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    error: function(request, textStatus, errorThrown) {
                         showErrorMessage(that, request.status);
                     },
                     success: function(data) {
+                        if ( data.errorMessage != null ) {
+                            showErrorMessage( that, 900, data.errorMessage );
+                        }
                         that.refresh();
                     }
                 }

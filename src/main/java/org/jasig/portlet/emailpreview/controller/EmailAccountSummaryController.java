@@ -144,15 +144,22 @@ public class EmailAccountSummaryController {
         } catch (MailAuthenticationException ex) {
             model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
             ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
-            log.error("Error encountered attempting to retrieve account information", ex);
+            log.info( "Authentication Failure (username='" + username + "') : " + ex.getMessage() );
         } catch (MailTimeoutException ex) {
             model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
             ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
-            log.error("Error encountered attempting to retrieve account information", ex);
+            log.error( "Mail Service Timeout", ex);
         } catch (Exception ex) {
-            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, 500);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
-            log.error("Error encountered attempting to retrieve account information", ex);
+            /* ********************************************************
+                In the case of an unknown error we want to send the
+                exception's message back to the portlet. This will
+                let implementers write specific instructions for
+                their service desks to follow for specific errors.
+            ******************************************************** */
+
+            model.put( "errorMessage", ex.getMessage() );
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+            log.error( "Unanticipated Error", ex);
         }
 
     }
