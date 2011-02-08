@@ -38,7 +38,10 @@
         </property>
     </bean>
 
-    <bean
-        class="org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+    <bean class="org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="defaultHandler">
+            <bean class="org.jasig.portlet.emailpreview.controller.BadRequestDefaultController"/>
+        </property> 
+    </bean>
 
 </beans>
