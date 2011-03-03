@@ -28,20 +28,16 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:annotation-config />
 
-    <bean id="exceptionResolver"
-        class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
-        <property name="exceptionMappings">
-            <props>
-                <prop
-                    key="org.jasig.portlet.emailpreview.EmailPreviewException">error</prop>
-            </props>
-        </property>
-    </bean>
-
-    <bean class="org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <property name="defaultHandler">
-            <bean class="org.jasig.portlet.emailpreview.controller.BadRequestDefaultController"/>
-        </property> 
+    <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
+        <!-- 
+         | Always declare an 'exceptionResolver' bean with a 'defaultErrorView' 
+         | because, in addition to other uses, it protects the portlet from 
+         | failing when a bad request (due to a bug or malicious user) doesn't 
+         | match any declared @RequestMapping.  When this happens, the portlet 
+         | throws an Exception and takes itself out of service until a portal 
+         | restart.  THIS CONDITION AFFECTS ALL USERS!
+         +-->
+        <property name="defaultErrorView" value="error"/>
     </bean>
 
 </beans>
