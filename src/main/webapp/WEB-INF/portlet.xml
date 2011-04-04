@@ -119,6 +119,21 @@
                 <value>INBOX</value>
             </preference>
 
+            <!-- 
+                List of AuthenticationService(s) available for use with the 
+                portlet.  Two service implementations come with the portlet 
+                codebase (also custom implementations are possible):
+                
+                  - 'portletPreferences' (Users enter credentials, which are 
+                    encrypted and stored)
+                  - 'cachedPassword' (The portlet receives credentials from the 
+                    portal - configure 'cached' security in uPortal)
+            -->
+            <preference>
+                <name>allowableAuthenticationServiceKeys</name>
+                <value>portletPreferences</value>
+            </preference>
+
         </portlet-preferences>
         
         <security-role-ref>
