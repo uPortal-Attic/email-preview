@@ -198,7 +198,7 @@ public final class EditPreferencesController {
                 }
             }
 
-            // Update password, if entered & confirmed
+            // Update password, if entered
             if (!mailStoreDao.isReadOnly(req, MailPreferences.PASSWORD)) {
                 String password = req.getParameter("ppauth_password");
                 password = password != null ? password.trim() : "";
@@ -206,19 +206,8 @@ public final class EditPreferencesController {
                     log.debug("Receieved user input of the following length for Password:  " + password.length());
                 }
                 if (!UNCHANGED_PASSWORD.equals(password)) {
-                    if (password.length() > 0) {
-                        String confirm = req.getParameter("ppauth_confirm");
-                        confirm = confirm != null ? confirm.trim() : "";
-                        if (log.isDebugEnabled()) {
-                            log.debug("Receieved user input of the following length for Confirm:  " + confirm.length());
-                        }
-                        if (confirm.equals(password)) {
-                            // Don't put the password back into the form!
-                            ppPassword = password;
-                        } else {
-                            err = "Password and Confirm Password fields must match";
-                            form.getAdditionalProperties().remove(MailPreferences.PASSWORD.getKey());
-                        }
+                    if (password.length() != 0) {
+                        ppPassword = password;
                     } else {
                         err = "Password is required for this form of authentication";
                         form.getAdditionalProperties().remove(MailPreferences.PASSWORD.getKey());

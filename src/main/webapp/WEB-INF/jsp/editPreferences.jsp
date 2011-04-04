@@ -87,10 +87,6 @@
                 <label>Password</label>
                 <input type="password" name="ppauth_password" id="plt-email-input-password" title="Input the password asscociated with the email address" value="<c:out value="${unchangedPassword}"/>"/>
             </div>
-            <div class="plt-email-row">
-                <label>Confirm Password</label>
-                <input type="password" name="ppauth_confirm" id="plt-email-input-confirm" title="Type the password again" value="<c:out value="${unchangedPassword}"/>"/>
-            </div>
         </div>
     </c:if>
             
@@ -213,7 +209,6 @@
                         error_msg = 'Please input a valid email address.';
                         culprit = that.options.selectors.input_email;   
                     }
-                    // NB:  Check passwd/confirm server-side
                 }
 
                 /* Show error */
@@ -264,7 +259,6 @@
                 cancel_button: "#plt-email-input-cancel",
                 input_email: "#plt-email-input-email",
                 input_password: "#plt-email-input-password",
-                input_confirm: "#plt-email-input-confirm",
                 input_port: "#plt-email-input-port",
                 input_imap: "#plt-email-input-server",
                 help: ".help",
