@@ -50,6 +50,7 @@ public final class EmailMessage {
     private final boolean answered;  // Evaluate in constructor to detect errors early
     private final boolean deleted;  // Evaluate in constructor to detect errors early
     private final boolean multipart;
+    private final String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
 
 	/*
@@ -90,6 +91,7 @@ public final class EmailMessage {
         this.answered = message.isSet(Flag.ANSWERED);
         this.deleted = message.isSet(Flag.DELETED);
         this.multipart = message.getContentType().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
+        this.contentType = message.getContentType();
         this.content = content;
 	    
 	}
@@ -157,6 +159,10 @@ public final class EmailMessage {
     
     public boolean isMultipart() {
         return multipart;
+    }
+    
+    public String getContentType() {
+        return contentType;
     }
 
     public EmailMessageContent getContent() {

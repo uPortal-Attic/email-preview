@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.jasig.portlet.emailpreview.controller;
 
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,7 +50,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("VIEW")
 public class EmailMessageController {
 
-
+    private static final String CONTENT_TYPE_TEXT_PREFIX = "text/plain;";
+    
     protected final Log log = LogFactory.getLog(getClass());
 
     private IEmailAccountDao accountDao;
@@ -104,6 +107,16 @@ public class EmailMessageController {
 
             // Get current user's account information
             EmailMessage message = accountDao.retrieveMessage(config, auth, messageNum);
+            
+            /*
+             * A bit of after-market work on messages in certain circumstances
+             */
+
+            // Make links embedded in text/plain messages clickable
+            if (message.getContentType().startsWith(CONTENT_TYPE_TEXT_PREFIX)) {
+                String messageBody = message.getContent().getContentString();
+                message.getContent().setContentString(MessageUtils.addClickableUrlsToMessageBody(messageBody));
+            }
 
             // Define view and generate model
             Map<String, Object> model = new HashMap<String, Object>();
