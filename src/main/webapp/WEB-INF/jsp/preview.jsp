@@ -34,6 +34,9 @@
 <portlet:actionURL var="accountInfoUrl">
     <portlet:param name="action" value="accountSummary"/>
 </portlet:actionURL>
+<portlet:renderURL var="showRollupUrl">
+    <portlet:param name="action" value="showRollup"/>
+</portlet:renderURL>
 <portlet:actionURL var="messageUrl">
     <portlet:param name="action" value="emailMessage"/>
 </portlet:actionURL>
@@ -71,6 +74,7 @@
                 <c:if test="${allowDelete}">
                 | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <span>Delete Selected</span></a>
                 </c:if>
+                | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/> Close Preview</a>
             </p>
             
             <div class="fl-pager">

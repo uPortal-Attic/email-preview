@@ -28,6 +28,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 
@@ -117,6 +118,32 @@ public final class EditPreferencesController {
 
     @RequestMapping(params = "action=updatePreferences")
     public void updatePreferences(ActionRequest req, ActionResponse res) throws PortletModeException {
+        
+        /*
+         * Preferences
+         */
+
+        PortletPreferences prefs = req.getPreferences();
+        if (!prefs.isReadOnly(EmailSummaryController.DEFAULT_VIEW_PREFERENCE)) {
+            String defaultViewParam = req.getParameter(EmailSummaryController.DEFAULT_VIEW_PREFERENCE);
+            String currentDefaultView = prefs.getValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, EmailSummaryController.VIEW_ROLLUP);
+            if (defaultViewParam != null && !currentDefaultView.equals(defaultViewParam)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Changing users default view for user '" + req.getRemoteUser() 
+                                                    + "' to:  '" + defaultViewParam + "'");
+                }
+                try {
+                    prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, defaultViewParam);
+                    prefs.store();
+                } catch (Throwable t) {
+                    throw new RuntimeException("Unable to set defalutView preference", t);
+                }
+            }
+        }
+        
+        /*
+         * Mail Config
+         */
         
         MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
         MailStoreConfigurationForm form = MailStoreConfigurationForm.create(mailStoreDao, req);

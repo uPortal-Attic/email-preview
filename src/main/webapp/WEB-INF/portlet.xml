@@ -61,6 +61,18 @@
         <portlet-preferences>
         
             <!-- 
+                Determines which screen appears first when the portlet first 
+                renders.  Available values are:
+                
+                  - rollup:  show only an icon and the number of unread messages
+                  - preview:  show the contents of the inbox
+            -->
+            <preference>
+                <name>defaultView</name>
+                <value>rollup</value>
+            </preference>
+
+            <!-- 
                 Determines how many emails initially appear in the list on the 
                 preview screen.  Users may choose a different setting.
             -->

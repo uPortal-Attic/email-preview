@@ -30,14 +30,15 @@
 
 <c:set var="n"><portlet:namespace/></c:set>
 
-<h2>Email Settings</h2>
-
-<!-- Error message will always be displayed if rendered in the markup -->
-<c:if test="${errorMessage ne null}">
-    <div id="plt-email-submission-error"><p><c:out value="${errorMessage}"/></p></div>
-</c:if>
-
 <form id="plt-email-form" action="<portlet:actionURL><portlet:param name="action" value="updatePreferences"/></portlet:actionURL>" method="POST">
+
+    <h2>Email Settings</h2>
+
+    <!-- Error message will always be displayed if rendered in the markup -->
+    <c:if test="${errorMessage ne null}">
+        <div id="plt-email-submission-error"><p><c:out value="${errorMessage}"/></p></div>
+    </c:if>
+
     
     <div class="fieldset plt-email-fieldset-settings">
         <div class="plt-email-row">
@@ -90,6 +91,18 @@
         </div>
     </c:if>
             
+    <h2>Preferences</h2>
+
+    <div class="fieldset plt-email-fieldset-settings">
+        <div class="plt-email-row">
+            <label>Default View</label>
+            <select name="defaultView" title="Default View, either rollup or preview">
+                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'rollup'}"> selected="selected"</c:if> value="rollup">rollup</option>
+                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'preview'}"> selected="selected"</c:if> value="preview">preview</option>
+            </select>
+        </div>
+    </div>          
+
     <input type="submit" name="submit_email" value=" Save Settings " id="plt-email-input-submit"/>
     <a id="plt-email-input-cancel" href="<portlet:renderURL portletMode="view"/>">cancel</a>
     
@@ -99,8 +112,6 @@
     </c:if>
     
 </form>
-
-</body>
 
 <script type="text/javascript">
 

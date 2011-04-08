@@ -20,12 +20,19 @@ package org.jasig.portlet.emailpreview.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
@@ -41,18 +48,103 @@ import org.springframework.web.portlet.ModelAndView;
 @RequestMapping("VIEW")
 public class EmailSummaryController {
 
+    public final static String DEFAULT_VIEW_PREFERENCE = "defaultView";
     public final static String PAGE_SIZE_KEY = "pageSize";
     public final static String ALLOW_DELETE_KEY = "allowDelete";
+    public final static String VIEW_ROLLUP = "rollup";
+    public final static String VIEW_PREVIEW = "preview";
+
     private final static String SHOW_CONFIG_LINK_KEY = "showConfigLink";
+    private final static String LAST_VIEW_SESSION_ATTRIBUTE =
+            "org.jasig.portlet.emailpreview.controller.EmailSummaryController.LAST_VIEW_SESSION_ATTRIBUTE"; 
+    
+    private final Pattern domainPattern = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
 
     private String adminRoleName = "admin";
 
     public void setAdminRoleName(String adminRoleName) {
         this.adminRoleName = adminRoleName;
     }
+    
+    private IMailStoreDao mailStoreDao;
+
+    @Autowired(required = true)
+    public void setMailStoreDao(IMailStoreDao mailStoreDao) {
+        this.mailStoreDao = mailStoreDao;
+    }
+
+    private IAuthenticationServiceRegistry authServiceRegistry;
+
+    @Autowired(required = true)
+    public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
+        this.authServiceRegistry = authServiceRegistry;
+    }
 
     @RequestMapping
-    public ModelAndView showEmail(RenderRequest request, RenderResponse response) throws Exception {
+    public ModelAndView chooseView(RenderRequest request, RenderResponse response) throws Exception {
+
+        ModelAndView rslt = null;
+        
+        // Once the user clicks a different view, that choice should 
+        // be sticky until either (1) he makes a different choice, or 
+        // (2) the session expires.
+        String showView = (String) request.getPortletSession().getAttribute(LAST_VIEW_SESSION_ATTRIBUTE);
+        if (showView == null) {
+            // The user has not rendered a view yet, choose one based on settings
+            PortletPreferences prefs = request.getPreferences();
+            showView = prefs.getValue(DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+        }
+        
+        // Now render the choice...
+        if (VIEW_PREVIEW.equals(showView)) {
+            rslt = showPreview(request, response);
+        } else {
+            rslt = showRollup(request, response);
+        }
+        
+        return rslt;
+
+    }
+
+    @RequestMapping(params="action=showRollup")
+    public ModelAndView showRollup(RenderRequest request, RenderResponse response) throws Exception {
+        
+        Map<String,Object> model = new HashMap<String,Object>();
+        
+        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+
+        // Make an intelligent guess about the emailAddress
+        String emailAddress = null;
+        String mailAccount = authService.getMailAccountName(request, config);
+        String nameSuffix = config.getUsernameSuffix();
+        String serverName = config.getHost();
+        if (mailAccount.contains("@")) {
+            emailAddress = mailAccount;
+        } else if (nameSuffix != null && nameSuffix.length() != 0) {
+            emailAddress = mailAccount + nameSuffix;
+        } else {
+            emailAddress = mailAccount;
+            Matcher m = domainPattern.matcher(serverName);
+            if (m.find()) {
+                emailAddress = emailAddress + "@" + m.group(1);
+            }
+        }
+        model.put("emailAddress", emailAddress);
+        
+        // Lastly check whether EDIT is supported
+        boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
+        model.put("supportsEdit", supportsEdit);
+
+        // Make this choice "sticky" 
+        request.getPortletSession().setAttribute(LAST_VIEW_SESSION_ATTRIBUTE, VIEW_ROLLUP);
+        
+        return new ModelAndView("rollup", model);
+
+    }
+
+    @RequestMapping(params="action=showPreview")
+    public ModelAndView showPreview(RenderRequest request, RenderResponse response) throws Exception {
 
         Map<String,Object> model = new HashMap<String,Object>();
 
@@ -83,7 +175,11 @@ public class EmailSummaryController {
         boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
         model.put("supportsEdit", supportsEdit);
 
+        // Make this choice "sticky" 
+        request.getPortletSession().setAttribute(LAST_VIEW_SESSION_ATTRIBUTE, VIEW_PREVIEW);
+
         return new ModelAndView("preview", model);
+
     }
 
 }
