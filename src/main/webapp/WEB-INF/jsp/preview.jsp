@@ -59,7 +59,7 @@
     <div class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
         <p id="error-text"></p>
         <c:if test="${supportsEdit}">
-            <p>Click <a href="<portlet:renderURL portletMode="EDIT"/>">here</a> to change your mail preferences.</p>
+            <p><spring:message code="preview.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="preview.errorMessage.changePreferences.linkText"/></a> <spring:message code="preview.errorMessage.changePreferences.postLink"/></p>
         </c:if>
     </div>
 
@@ -68,20 +68,20 @@
         <form name="email">
         
             <p>
-                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> Inbox</a> 
+                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="preview.toolbar.inbox"/></a> 
                 (<span class="unread-message-count"></span>)
-                | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> Refresh</a>
+                | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> <spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
-                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <span>Delete Selected</span></a>
+                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <spring:message code="preview.toolbar.deleteSelected"/></a>
                 </c:if>
-                | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/> Close Preview</a>
+                | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/> <spring:message code="preview.toolbar.closePreview"/></a>
             </p>
-            
+
             <div class="fl-pager">
                 
                 <div class="flc-pager-top">
                     <ul id="pager-top" class="fl-pager-ui">
-                        <li class="flc-pager-previous"><a href="javascript:;">&lt; prev</a></li>
+                        <li class="flc-pager-previous"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></li>
                         <li>
                             <ul class="fl-pager-links flc-pager-links" style="margin:0; display:inline">
                                 <li class="flc-pager-pageLink"><a href="javascript:;">1</a></li>
@@ -90,7 +90,7 @@
                                 <li class="flc-pager-pageLink"><a href="javascript:;">3</a></li>
                             </ul>
                         </li>
-                        <li class="flc-pager-next"><a href="javascript:;">next &gt;</a></li>
+                        <li class="flc-pager-next"><a href="javascript:;"><spring:message code="preview.pager.next"/> &gt;</a></li>
                         <li>
                             <span class="flc-pager-summary">page</span>
                             <span> <select class="pager-page-size flc-pager-page-size">
@@ -98,7 +98,7 @@
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                                 <option value="50">50</option>
-                            </select></span> per page
+                            </select></span> <spring:message code="preview.pager.perPage"/>
                         </li>
                     </ul>
                 </div>
@@ -112,9 +112,9 @@
                         <th class="flags-header">
                             <span class="attached-span">&nbsp;</span>
                         </th>
-                        <th>Subject</th>
-                        <th>Sender</th>
-                        <th>Date Sent</th>
+                        <th><spring:message code="preview.column.subject"/></th>
+                        <th><spring:message code="preview.column.sender"/></th>
+                        <th><spring:message code="preview.column.dateSent"/></th>
                     </tr>
                     <tr rsf:id="row:" class="email-row">
                         <td rsf:id="select" class="select"></td>
@@ -137,15 +137,15 @@
     
     <div class="email-message" style="display:none">
         <table cellpadding="0" cellspacing="0" class="message-headers">
-            <tr><td class="message-header-name">From</td><td class="sender"></td></tr>
-            <tr><td class="message-header-name">Subject</td><td class="subject"></td></tr>
-            <tr><td class="message-header-name">Date</td><td class="sentDate"></td></tr>
+            <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
+            <tr><td class="message-header-name"><spring:message code="preview.message.subject"/></td><td class="subject"></td></tr>
+            <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
         </table>
         <hr/>
         <div class="message-content">
         </div>
-        <p><a class="return-link" href="javascript:;">Return to messages</a></p>
-    </div>
+        <p><a class="return-link" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
+    </div>    
 
 </div>
 

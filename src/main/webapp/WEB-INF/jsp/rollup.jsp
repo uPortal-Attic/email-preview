@@ -93,7 +93,7 @@
 <div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
     <p class="error-text"></p>
     <c:if test="${supportsEdit}">
-        <p>Click <a href="<portlet:renderURL portletMode="EDIT"/>">here</a> to change your mail preferences.</p>
+        <p><spring:message code="rollup.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="rollup.errorMessage.changePreferences.linkText"/></a> <spring:message code="rollup.errorMessage.changePreferences.postLink"/></p>
     </c:if>
 </div>
 
@@ -103,7 +103,7 @@
     </div>
     <div class="text">
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
-        <p class="unreadContainer" style="display: none;">You have <a href="<c:out value="${showPreviewUrl}"/>"><span class="unreadCount"></span> unread messages</a></p>
+        <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <a href="<c:out value="${showPreviewUrl}"/>"><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></a> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/></p>
     </div>
 </div>
 
@@ -129,6 +129,7 @@
                 var count = data.accountInfo.unreadMessageCount;
                 $("#${n}splash .unreadCount").text(count);
                 $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
+                $("#${n}splash .totalCount").text(data.accountInfo.totalMessageCount);
                 $("#${n}splash .unreadContainer").slideDown(500);
             },
             error: function(request, textStatus, error) {

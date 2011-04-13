@@ -32,30 +32,29 @@
 
 <form id="plt-email-form" action="<portlet:actionURL><portlet:param name="action" value="updatePreferences"/></portlet:actionURL>" method="POST">
 
-    <h2>Email Settings</h2>
+    <h2><spring:message code="editPreferences.emailSettings.title"/></h2>
 
     <!-- Error message will always be displayed if rendered in the markup -->
     <c:if test="${errorMessage ne null}">
         <div id="plt-email-submission-error"><p><c:out value="${errorMessage}"/></p></div>
     </c:if>
 
-    
     <div class="fieldset plt-email-fieldset-settings">
         <div class="plt-email-row">
-            <label>Server Protocol</label>
-            <select name="protocol" id="plt-email-input-protocol" title="Type of email server, either IMAP or IMAPS">
+            <label><spring:message code="editPreferences.emailSettings.serverProtocol"/></label>
+            <select name="protocol" id="plt-email-input-protocol" title="<spring:message code="editPreferences.emailSettings.serverProtocol.tooltip"/>">
                 <c:forEach items="${protocols}" var="protocol">
                     <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
                 </c:forEach>
             </select>
         </div>
         <div class="plt-email-row">
-            <label>Server Name</label>
-            <input type="text" name="host" id="plt-email-input-server" title="This is the address of the server that hosts your IMAP email" value="<c:out value="${form.host}"/>"/>
+            <label><spring:message code="editPreferences.emailSettings.serverName"/></label>
+            <input type="text" name="host" id="plt-email-input-server" title="<spring:message code="editPreferences.emailSettings.serverName.tooltip"/>" value="<c:out value="${form.host}"/>"/>
         </div>
         <div class="plt-email-row">
-            <label>Server Port</label>
-            <input type="text" name="port" id="plt-email-input-port" title="This is the port used to access your IMAP email" value="<c:out value="${form.port}"/>"/>
+            <label><spring:message code="editPreferences.emailSettings.serverPort"/></label>
+            <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
         </div>
     </div>          
 
@@ -64,12 +63,12 @@
         <div class="fieldset plt-email-fieldset-verify">
             <c:if test="${authenticationServices.cachedPassword ne null}">
                 <label>
-                    <input id="authtype_cache" type="radio" name="authenticationServiceKey" value="cachedPassword"<c:if test="${form.authenticationServiceKey eq 'cachedPassword'}"> checked="checked"</c:if>> My email credentials are the same as those for this portal 
+                    <input id="authtype_cache" type="radio" name="authenticationServiceKey" value="cachedPassword"<c:if test="${form.authenticationServiceKey eq 'cachedPassword'}"> checked="checked"</c:if>> <spring:message code="editPreferences.emailSettings.cachedPasswordAuthN.description"/> 
                 </label>
             </c:if>
             <c:if test="${authenticationServices.portletPreferences ne null}">
                 <label>
-                    <input id="authtype_preferences" type="radio" name="authenticationServiceKey" value="portletPreferences"<c:if test="${form.authenticationServiceKey eq 'portletPreferences'}"> checked="checked"</c:if>> My email credentials are the DIFFERENT than those used for this portal 
+                    <input id="authtype_preferences" type="radio" name="authenticationServiceKey" value="portletPreferences"<c:if test="${form.authenticationServiceKey eq 'portletPreferences'}"> checked="checked"</c:if>> <spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.description"/>
                 </label>
             </c:if>
         </div>
@@ -80,37 +79,33 @@
         <c:set var="displayStyle" value="${form.authenticationServiceKey eq 'portletPreferences' ? '' : 'display: none;'}" />
         <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth" style="${displayStyle}">
             <div class="plt-email-row">
-                <label>Email Address</label>
-                <input type="text" name="username" id="plt-email-input-email" title="Input the email address you are trying to access." value="<c:out value="${form.additionalProperties.username}"/>"/>
+                <label><spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.emailAddress"/></label>
+                <input type="text" name="username" id="plt-email-input-email" title="<spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.emailAddress.tooltip"/>" value="<c:out value="${form.additionalProperties.username}"/>"/>
                 <span class="plt-email-address-suffix"><c:out value="${form.usernameSuffix}"/></span>
             </div>
             <div class="plt-email-row">
-                <label>Password</label>
-                <input type="password" name="ppauth_password" id="plt-email-input-password" title="Input the password asscociated with the email address" value="<c:out value="${unchangedPassword}"/>"/>
+                <label><spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.password"/></label>
+                <input type="password" name="ppauth_password" id="plt-email-input-password" title="<spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.password.tooltip"/>" value="<c:out value="${unchangedPassword}"/>"/>
             </div>
         </div>
     </c:if>
             
-    <h2>Preferences</h2>
+    <h2><spring:message code="editPreferences.preferences.title"/></h2>
 
     <div class="fieldset plt-email-fieldset-settings">
         <div class="plt-email-row">
-            <label>Default View</label>
-            <select name="defaultView" title="Default View, either rollup or preview">
-                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'rollup'}"> selected="selected"</c:if> value="rollup">rollup</option>
-                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'preview'}"> selected="selected"</c:if> value="preview">preview</option>
+            <label><spring:message code="editPreferences.preferences.show"/></label>
+            <select name="defaultView" title="<spring:message code="editPreferences.preferences.show.tooltip"/>">
+                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'rollup'}"> selected="selected"</c:if> value="rollup"><spring:message code="editPreferences.preferences.show.rollup"/></option>
+                <option<c:if test="${renderRequest.preferences.map['defaultView'][0] eq 'preview'}"> selected="selected"</c:if> value="preview"><spring:message code="editPreferences.preferences.show.preview"/></option>
             </select>
+            <label><spring:message code="editPreferences.preferences.onLogin"/></label>
         </div>
     </div>          
 
-    <input type="submit" name="submit_email" value=" Save Settings " id="plt-email-input-submit"/>
-    <a id="plt-email-input-cancel" href="<portlet:renderURL portletMode="view"/>">cancel</a>
-    
-    <c:if test="${false}">
-        <!-- not currently implemented -->
-        <div class="help">Help<span> : To access your email account, please enter the email address and password associated with that account. Note, it may not be the same as your portal password. You can find additional information <a href="email" target="_blank">HERE</a>.</span></div>
-    </c:if>
-    
+    <input type="submit" name="submit_email" value=" <spring:message code="editPreferences.buttonGroup.saveSettings"/> " id="plt-email-input-submit"/>
+    <a id="plt-email-input-cancel" href="<portlet:renderURL portletMode="view"/>"><spring:message code="editPreferences.buttonGroup.cancel"/></a>
+
 </form>
 
 <script type="text/javascript">
