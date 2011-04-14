@@ -37,7 +37,7 @@
 <!-- email splash styles -->
 <style type="text/css">
     .emailSplash {
-        height: 94px;
+        height: 84px;
         margin: 0 auto;
         color: #847d76;
         position: relative;
@@ -88,6 +88,9 @@
     .emailSplash .text a:hover {
         color: #0b4133;
     }
+    .emailSplash .inbox {
+        float: right;
+    }
 </style>
 
 <div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
@@ -105,6 +108,11 @@
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
         <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <a href="<c:out value="${showPreviewUrl}"/>"><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></a> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/></p>
     </div>
+    <c:if test="${inboxUrl ne null}">
+        <div class="inbox">
+            <a href="${inboxUrl}" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a>
+        </div>
+    </c:if>
 </div>
 
 <script type="text/javascript">

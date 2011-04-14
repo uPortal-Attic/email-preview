@@ -32,6 +32,8 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
+import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,6 +80,13 @@ public class EmailSummaryController {
     @Autowired(required = true)
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
+    }
+
+    private ILinkServiceRegistry linkServiceRegistry;
+
+    @Autowired(required = true)
+    public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
+        this.linkServiceRegistry = linkServiceRegistry;
     }
 
     @RequestMapping
@@ -132,6 +141,12 @@ public class EmailSummaryController {
         }
         model.put("emailAddress", emailAddress);
         
+        IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
+        if (linkService != null) {
+            String inboxUrl = linkService.getInboxUrl(request, config);
+            model.put("inboxUrl", inboxUrl);
+        }
+
         // Lastly check whether EDIT is supported
         boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
         model.put("supportsEdit", supportsEdit);
