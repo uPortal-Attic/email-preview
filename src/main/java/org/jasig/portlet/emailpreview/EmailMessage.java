@@ -24,6 +24,7 @@ import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Flags.Flag;
+import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang.time.FastDateFormat;
 
@@ -40,6 +41,7 @@ public final class EmailMessage {
 
     private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
     private static final String CONTENT_TYPE_ATTACHMENTS_PATTERN = "multipart/mixed;";
+    private static final String INTERNET_ADDRESS_TYPE = "rfc822";
     
     private final Message message;
     private final Long uid;
@@ -82,9 +84,17 @@ public final class EmailMessage {
         this.message = message;
         this.uid = uid;
         Address[] addr = message.getFrom();
-        this.sender = (addr != null && addr.length != 0) 
-                                ? addr[0].toString() 
-                                : null;
+        String sdr = null;
+        if (addr != null && addr.length != 0) {
+            Address a = addr[0];
+            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
+                InternetAddress inet = (InternetAddress) a;
+                sdr = inet.toUnicodeString();
+            } else {
+                sdr = a.toString();
+            }
+        }
+        this.sender = sdr;
         this.subject = subject;
         this.sentDate = message.getSentDate();
         this.unread = !message.isSet(Flag.SEEN);
