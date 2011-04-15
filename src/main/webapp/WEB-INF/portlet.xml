@@ -73,6 +73,16 @@
             </preference>
 
             <!-- 
+                Determines whether the portlet automatically enters MAXIMIZED 
+                (focused) window state when the user clicks the link on the 
+                'rollup' screen to enter the 'preview' screen.
+            -->
+            <preference>
+                <name>focusOnPreview</name>
+                <value>true</value>
+            </preference>
+
+            <!-- 
                 Determines how many emails initially appear in the list on the 
                 preview screen.  Users may choose a different setting.
             -->

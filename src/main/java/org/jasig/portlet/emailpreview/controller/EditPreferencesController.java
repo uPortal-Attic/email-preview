@@ -55,6 +55,8 @@ public final class EditPreferencesController {
     
     private static final String UNCHANGED_PASSWORD = "uNch@ng3d.pswd!";
     private static final String CONFIG_FORM_KEY = "org.jasig.portlet.emailpreview.controller.CONFIG_FORM_KEY";
+    private static final String FOCUS_ON_PREVIEW_PREFERENCE = "focusOnPreview";
+    private static final String DEFAULT_FOCUS_ON_PREVIEW = "true";
 
     private IMailStoreDao mailStoreDao;
     IEmailAccountDao emailAccountDao;
@@ -124,6 +126,7 @@ public final class EditPreferencesController {
          */
 
         PortletPreferences prefs = req.getPreferences();
+
         if (!prefs.isReadOnly(EmailSummaryController.DEFAULT_VIEW_PREFERENCE)) {
             String defaultViewParam = req.getParameter(EmailSummaryController.DEFAULT_VIEW_PREFERENCE);
             String currentDefaultView = prefs.getValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, EmailSummaryController.VIEW_ROLLUP);
@@ -141,6 +144,26 @@ public final class EditPreferencesController {
             }
         }
         
+        if (!prefs.isReadOnly(FOCUS_ON_PREVIEW_PREFERENCE)) {
+            String focusOnPreviewParam = req.getParameter(FOCUS_ON_PREVIEW_PREFERENCE);
+            String focusOnPreviewSelection = focusOnPreviewParam != null
+                                                ? focusOnPreviewParam
+                                                : "false";
+            String currentFocusOnPreview = prefs.getValue(FOCUS_ON_PREVIEW_PREFERENCE, DEFAULT_FOCUS_ON_PREVIEW);
+            if (!currentFocusOnPreview.equals(focusOnPreviewSelection)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Changing focusOnPreview setting for user '" + req.getRemoteUser() 
+                                                    + "' to:  '" + focusOnPreviewSelection + "'");
+                }
+                try {
+                    prefs.setValue(FOCUS_ON_PREVIEW_PREFERENCE, focusOnPreviewSelection);
+                    prefs.store();
+                } catch (Throwable t) {
+                    throw new RuntimeException("Unable to set focusOnPreview preference", t);
+                }
+            }
+        }
+
         /*
          * Mail Config
          */

@@ -101,6 +101,10 @@
             </select>
             <label><spring:message code="editPreferences.preferences.onLogin"/></label>
         </div>
+        <div class="plt-email-row">
+            <label><spring:message code="editPreferences.preferences.focusOnPreview"/></label>
+            <input type="checkbox" name="defaultView" title="<spring:message code="editPreferences.preferences.focusOnPreview.tooltip"/>" value="true"<c:if test="${renderRequest.preferences.map['focusOnPreview'][0] == true}"> checked="checked"</c:if>/>
+        </div>
     </div>          
 
     <input type="submit" name="submit_email" value=" <spring:message code="editPreferences.buttonGroup.saveSettings"/> " id="plt-email-input-submit"/>
