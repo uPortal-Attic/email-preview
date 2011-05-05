@@ -23,11 +23,16 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.WindowState;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
@@ -57,13 +62,13 @@ public class EmailSummaryController {
     public final static String VIEW_PREVIEW = "preview";
 
     private final static String SHOW_CONFIG_LINK_KEY = "showConfigLink";
-    private final static String LAST_VIEW_SESSION_ATTRIBUTE =
-            "org.jasig.portlet.emailpreview.controller.EmailSummaryController.LAST_VIEW_SESSION_ATTRIBUTE"; 
     
     private final Pattern domainPattern = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
 
     private String adminRoleName = "admin";
 
+    private final Log log = LogFactory.getLog(this.getClass());
+    
     public void setAdminRoleName(String adminRoleName) {
         this.adminRoleName = adminRoleName;
     }
@@ -88,35 +93,69 @@ public class EmailSummaryController {
     public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
         this.linkServiceRegistry = linkServiceRegistry;
     }
+    
+    /*
+     * Action Phase
+     */
 
+    @RequestMapping(params="action=showRollup")
+    public void switchToRollup(ActionRequest req, ActionResponse res) {
+        PortletPreferences prefs = req.getPreferences();
+        try {
+            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+            prefs.store();
+        } catch (Throwable t) {
+            log.error("Failed to update " + DEFAULT_VIEW_PREFERENCE + " for user " + req.getRemoteUser(), t);
+            throw new RuntimeException(t);
+        }
+    }
+
+    @RequestMapping(params="action=showPreview")
+    public void switchToPreview(ActionRequest req, ActionResponse res) {
+        PortletPreferences prefs = req.getPreferences();
+        try {
+            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, VIEW_PREVIEW);
+            prefs.store();
+        } catch (Throwable t) {
+            log.error("Failed to update " + DEFAULT_VIEW_PREFERENCE + " for user " + req.getRemoteUser(), t);
+            throw new RuntimeException(t);
+        }
+    }
+    
+    /*
+     * Render Phase
+     */
+    
     @RequestMapping
-    public ModelAndView chooseView(RenderRequest request, RenderResponse response) throws Exception {
-
-        ModelAndView rslt = null;
+    public ModelAndView chooseView(RenderRequest req, RenderResponse res) throws Exception {
         
-        // Once the user clicks a different view, that choice should 
-        // be sticky until either (1) he makes a different choice, or 
-        // (2) the session expires.
-        String showView = (String) request.getPortletSession().getAttribute(LAST_VIEW_SESSION_ATTRIBUTE);
-        if (showView == null) {
-            // The user has not rendered a view yet, choose one based on settings
-            PortletPreferences prefs = request.getPreferences();
-            showView = prefs.getValue(DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+        String showView = null;
+        
+        // Rule #1:  WindowState trumps other factors
+        if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
+            showView = VIEW_PREVIEW;
         }
         
+        // Rule #2:  Use the defaultView preference;  this setting gets updated 
+        // every time the user changes from one to the other
+        if (showView == null) {
+            PortletPreferences prefs = req.getPreferences();
+            showView = prefs.getValue(DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+        }
+
         // Now render the choice...
+        ModelAndView rslt = null;
         if (VIEW_PREVIEW.equals(showView)) {
-            rslt = showPreview(request, response);
+            rslt = showPreview(req, res);
         } else {
-            rslt = showRollup(request, response);
+            rslt = showRollup(req, res);
         }
         
         return rslt;
 
     }
 
-    @RequestMapping(params="action=showRollup")
-    public ModelAndView showRollup(RenderRequest request, RenderResponse response) throws Exception {
+    private ModelAndView showRollup(RenderRequest request, RenderResponse response) throws Exception {
         
         Map<String,Object> model = new HashMap<String,Object>();
         
@@ -151,15 +190,11 @@ public class EmailSummaryController {
         boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
         model.put("supportsEdit", supportsEdit);
 
-        // Make this choice "sticky" 
-        request.getPortletSession().setAttribute(LAST_VIEW_SESSION_ATTRIBUTE, VIEW_ROLLUP);
-        
         return new ModelAndView("rollup", model);
 
     }
 
-    @RequestMapping(params="action=showPreview")
-    public ModelAndView showPreview(RenderRequest request, RenderResponse response) throws Exception {
+    private ModelAndView showPreview(RenderRequest request, RenderResponse response) throws Exception {
 
         Map<String,Object> model = new HashMap<String,Object>();
 
@@ -189,9 +224,6 @@ public class EmailSummaryController {
         // Lastly check whether EDIT is supported
         boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
         model.put("supportsEdit", supportsEdit);
-
-        // Make this choice "sticky" 
-        request.getPortletSession().setAttribute(LAST_VIEW_SESSION_ATTRIBUTE, VIEW_PREVIEW);
 
         return new ModelAndView("preview", model);
 

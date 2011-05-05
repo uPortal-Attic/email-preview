@@ -30,12 +30,12 @@
 <portlet:actionURL var="accountInfoUrl">
     <portlet:param name="action" value="accountSummary"/>
 </portlet:actionURL>
-<portlet:renderURL var="showPreviewUrl">
+<portlet:actionURL var="showPreviewUrl">
     <portlet:param name="action" value="showPreview"/>
-</portlet:renderURL>
-<portlet:renderURL var="showPreviewUrlMaximized" windowState="maximized">
+</portlet:actionURL>
+<portlet:actionURL var="showPreviewUrlMaximized" windowState="maximized">
     <portlet:param name="action" value="showPreview"/>
-</portlet:renderURL>
+</portlet:actionURL>
 <c:set var="focusOnPreview" value="${renderRequest.preferences.map['focusOnPreview'][0]}"/>
 
 <!-- email splash styles -->

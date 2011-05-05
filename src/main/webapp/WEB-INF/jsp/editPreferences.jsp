@@ -103,7 +103,7 @@
         </div>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.focusOnPreview"/></label>
-            <input type="checkbox" name="defaultView" title="<spring:message code="editPreferences.preferences.focusOnPreview.tooltip"/>" value="true"<c:if test="${renderRequest.preferences.map['focusOnPreview'][0] == true}"> checked="checked"</c:if>/>
+            <input type="checkbox" name="focusOnPreview" title="<spring:message code="editPreferences.preferences.focusOnPreview.tooltip"/>" value="true"<c:if test="${renderRequest.preferences.map['focusOnPreview'][0] == true}"> checked="checked"</c:if>/>
         </div>
     </div>          
 

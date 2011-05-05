@@ -34,9 +34,9 @@
 <portlet:actionURL var="accountInfoUrl">
     <portlet:param name="action" value="accountSummary"/>
 </portlet:actionURL>
-<portlet:renderURL var="showRollupUrl">
+<portlet:actionURL var="showRollupUrl" windowState="normal">
     <portlet:param name="action" value="showRollup"/>
-</portlet:renderURL>
+</portlet:actionURL>
 <portlet:actionURL var="messageUrl">
     <portlet:param name="action" value="emailMessage"/>
 </portlet:actionURL>
