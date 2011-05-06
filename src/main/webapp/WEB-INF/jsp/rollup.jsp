@@ -112,11 +112,14 @@
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
         <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>"><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></a> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/></p>
     </div>
-    <c:if test="${inboxUrl ne null}">
-        <div class="inbox">
-            <a href="${inboxUrl}" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a>
-        </div>
-    </c:if>
+    <div class="inbox">
+        <c:if test="${inboxUrl ne null}">
+            <a href="${inboxUrl}" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a><br/>
+        </c:if>
+        <c:if test="${supportsEdit}">
+            <a href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="rollup.inbox.preferences"/></a>
+        </c:if>
+    </div>
 </div>
 
 <script type="text/javascript">

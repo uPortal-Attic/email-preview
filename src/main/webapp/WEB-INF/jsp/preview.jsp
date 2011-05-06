@@ -75,6 +75,9 @@
                 | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <spring:message code="preview.toolbar.deleteSelected"/></a>
                 </c:if>
                 | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/> <spring:message code="preview.toolbar.closePreview"/></a>
+                <c:if test="${supportsEdit}">
+                | <a class="email-action-link" href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="preview.toolbar.preferences"/></a>
+                </c:if>
             </p>
 
             <div class="fl-pager">
