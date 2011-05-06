@@ -65,7 +65,7 @@
 
     <div class="email-list" style="display:none;">
     
-        <form name="email">
+        <form name="inboxForm">
         
             <p>
                 <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="preview.toolbar.inbox"/></a> 
@@ -144,7 +144,13 @@
         <hr/>
         <div class="message-content">
         </div>
-        <p><a class="return-link" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
+        <form name="messageForm">
+            <a class="return-link" style="margin-right: 1.5em;" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a>
+            <c:if test="${allowDelete}">
+                <input class="delete-message-button" type="button" value=" <spring:message code="preview.message.delete"/> "/>
+                <input class="messageUid" type="hidden" name="selectMessage" value=""/>
+            </c:if>
+        </form>
     </div>    
 
 </div>

@@ -34,6 +34,7 @@ var jasig = jasig || {};
         $(".email-message .subject").html(message.subject);
         $(".email-message .sender").html(message.sender);
         $(".email-message .sentDate").html(message.sentDateString);
+        $(".email-message .messageUid").val(message.uid);
         
         // show the message display
         showEmailMessage(that);
@@ -295,31 +296,40 @@ var jasig = jasig || {};
             that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
             showEmailList(that);
         };
+        
+        var doDelete = function(data) {
+            showLoadingMessage(that);
+            var ajaxOptions = {
+                url: options.deleteUrl,
+                type: "POST",
+                data: data,
+                dataType: "json",
+                error: function(request, textStatus, errorThrown) {
+                    showErrorMessage(that, request.status);
+                },
+                success: function(data) {
+                    if (data.errorMessage != null) {
+                        showErrorMessage(that, 900, data.errorMessage);
+                    }
+                    that.refresh();
+                }
+            }
+            $.ajax(ajaxOptions);
+        }
 
-        that.deleteMessage = function() {
+        that.deleteSelectedMessages = function() {
             if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
                 alert("No Messages Selected.");
                 return;
             }
             if (confirm("Delete Selected Messages?")) {
-                showLoadingMessage(that);
-                var params = that.locate("emailForm").serializeArray();
-                var ajaxOptions = {
-                    url: options.deleteUrl,
-                    type: "POST",
-                    data: params,
-                    dataType: "json",
-                    error: function(request, textStatus, errorThrown) {
-                        showErrorMessage(that, request.status);
-                    },
-                    success: function(data) {
-                        if ( data.errorMessage != null ) {
-                            showErrorMessage( that, 900, data.errorMessage );
-                        }
-                        that.refresh();
-                    }
-                }
-                $.ajax(ajaxOptions);
+                doDelete(that.locate("inboxForm").serializeArray());
+            }
+        };
+
+        that.deleteShownMessage = function() {
+            if (confirm("Delete This Message?")) {
+                doDelete(that.locate("messageForm").serializeArray());
             }
         };
 
@@ -330,9 +340,10 @@ var jasig = jasig || {};
 
         that.locate("refreshLink").click(that.refresh);
         if (account.accountInfo.deleteSupported) {
-            that.locate("deleteLink").click(that.deleteMessage);
+            that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
+            that.locate("deleteMessageButton").click(that.deleteShownMessage);
         } else {
-            var anchor = that.locate("deleteLink");
+            var anchor = that.locate("deleteMessagesLink");
             anchor.find("span").html("Delete Not Available");
             anchor.find("span").addClass("fl-text-silver");
             anchor.attr("title", "The delete feature is not supported by this mail store");
@@ -358,9 +369,11 @@ var jasig = jasig || {};
         batchSize: 20,
         selectors: {
             refreshLink: ".refresh-link",
-            deleteLink: ".delete-link",
+            deleteMessagesLink: ".delete-link",
             returnLink: ".return-link",
-            emailForm: "form[name='email']",
+            inboxForm: "form[name='inboxForm']",
+            messageForm: "form[name='messageForm']",
+            deleteMessageButton: ".delete-message-button",
             timestamp: "input[name='timestamp']",
             selectAll: ".select-all",
             selectMessage: ".select-message",
