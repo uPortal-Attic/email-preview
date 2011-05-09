@@ -21,7 +21,7 @@
 -->
 
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false">
+    xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false">
 
     <!--
      | Please see http://ehcache.sourceforge.net/documentation/configuration.html for
