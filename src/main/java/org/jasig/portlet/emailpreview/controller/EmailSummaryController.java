@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
@@ -94,6 +95,9 @@ public class EmailSummaryController {
         this.linkServiceRegistry = linkServiceRegistry;
     }
     
+    @Resource
+    private Map<String,String> jsErrorMessages;
+    
     /*
      * Action Phase
      */
@@ -127,6 +131,7 @@ public class EmailSummaryController {
      */
     
     @RequestMapping
+    @SuppressWarnings("unchecked")
     public ModelAndView chooseView(RenderRequest req, RenderResponse res) throws Exception {
         
         String showView = null;
@@ -150,6 +155,10 @@ public class EmailSummaryController {
         } else {
             rslt = showRollup(req, res);
         }
+        
+        // Add common model stuff...
+        rslt.getModel().put("jsErrorMessages", jsErrorMessages);
+        rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
         
         return rslt;
 
@@ -186,10 +195,6 @@ public class EmailSummaryController {
             model.put("inboxUrl", inboxUrl);
         }
 
-        // Lastly check whether EDIT is supported
-        boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
-        model.put("supportsEdit", supportsEdit);
-
         return new ModelAndView("rollup", model);
 
     }
@@ -220,10 +225,6 @@ public class EmailSummaryController {
         boolean allowDelete = Boolean.valueOf(prefs.getValue(
                             ALLOW_DELETE_KEY, "false"));
         model.put("allowDelete", allowDelete);
-
-        // Lastly check whether EDIT is supported
-        boolean supportsEdit = request.isPortletModeAllowed(PortletMode.EDIT);
-        model.put("supportsEdit", supportsEdit);
 
         return new ModelAndView("preview", model);
 

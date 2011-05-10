@@ -97,13 +97,6 @@
     }
 </style>
 
-<div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
-    <p class="error-text"></p>
-    <c:if test="${supportsEdit}">
-        <p><spring:message code="rollup.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="rollup.errorMessage.changePreferences.linkText"/></a> <spring:message code="rollup.errorMessage.changePreferences.postLink"/></p>
-    </c:if>
-</div>
-
 <div id="${n}splash" class="emailSplash">
     <div class="graphic">
         <span class="unreadContainer unreadCountCircle" style="display: none;"></span>
@@ -122,6 +115,13 @@
     </div>
 </div>
 
+<div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
+    <p class="error-text"></p>
+    <c:if test="${supportsEdit}">
+        <p><spring:message code="rollup.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="rollup.errorMessage.changePreferences.linkText"/></a> <spring:message code="rollup.errorMessage.changePreferences.postLink"/></p>
+    </c:if>
+</div>
+
 <script type="text/javascript">
 
     var ${n} = {};
@@ -129,6 +129,22 @@
 
     ${n}.jQuery(function() {
         var $ = ${n}.jQuery;
+        
+        var jsErrorMessages = {
+            <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
+                '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
+            </c:forEach>        
+        };
+
+        var showErrorMessage = function(httpStatus, customMessage) {
+            var errorText = jsErrorMessages[httpStatus] || jsErrorMessages['default'];
+            if (customMessage) {
+                // Add a server-specified custom message to the end
+                errorText += '<br/>' + customMessage;
+            }
+            $("#${n}error-message .error-text").html(httpStatus + ": " + errorText);
+            $("#${n}error-message").slideDown(500);
+        };
 
         var account = null;
         $.ajax({
@@ -138,18 +154,18 @@
             dataType: "json",
             success: function(data) { 
                 if (data.errorMessage != null) {
-                    $("#${n}error-message .error-text").text(data.errorMessage);
-                    $("#${n}error-message").slideDown(500);
+                    showErrorMessage('900', data.errorMessage);
                 }
-                var count = data.accountInfo.unreadMessageCount;
-                $("#${n}splash .unreadCount").text(count);
-                $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
-                $("#${n}splash .totalCount").text(data.accountInfo.totalMessageCount);
-                $("#${n}splash .unreadContainer").slideDown(500);
+                if (data.accountInfo) {
+                    var count = data.accountInfo.unreadMessageCount;
+                    $("#${n}splash .unreadCount").text(count);
+                    $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
+                    $("#${n}splash .totalCount").text(data.accountInfo.totalMessageCount);
+                    $("#${n}splash .unreadContainer").slideDown(500);
+                }
             },
             error: function(request, textStatus, error) {
-                $("#${n}error-message .error-text").text(textStatus);
-                $("#${n}error-message").slideDown(500);
+                showErrorMessage(request.status);
             }
         });
 

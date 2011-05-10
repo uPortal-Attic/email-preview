@@ -175,6 +175,12 @@
             $.post("${updatePageSizeUrl}", {newPageSize: newPageSize});
         };
 
+        var jsErrorMessages = {
+            <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
+                '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
+            </c:forEach>        
+        };
+
         var options = {
             accountInfoUrl: "${accountInfoUrl}",
             messageUrl: "${messageUrl}",
@@ -182,7 +188,8 @@
             pageSize: <c:out value="${pageSize}"/>,
             listeners: {
                 initiatePageSizeChange: updatePageSize
-            }
+            },
+            jsErrorMessages: jsErrorMessages
         };
         // Initialize the display asynchronously
         setTimeout(function() {

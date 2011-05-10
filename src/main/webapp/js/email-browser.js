@@ -44,7 +44,7 @@ var jasig = jasig || {};
     
     // Top-level abstraction of the user's email account;  
     // needs to be re-set whenever mail is fetched.
-    var account = null;
+    var account = {};
     
     // If true, will drop the cache entry (if present) 
     // for this user on the next call to the server
@@ -71,10 +71,12 @@ var jasig = jasig || {};
                 clearCache = "false";
                 account = data; 
             },
-            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
+            error: function(request, textStatus, error) { 
+                showErrorMessage(that, request.status); 
+            }
         });
 
-        var messages = account.accountInfo.messages;
+        var messages = account.accountInfo ? account.accountInfo.messages : [];
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
         
@@ -101,7 +103,9 @@ var jasig = jasig || {};
                 }
                 message = data.message;
             },
-            error: function(request, textStatus, error) { showErrorMessage(that, request.status); }
+            error: function(request, textStatus, error) { 
+                showErrorMessage(that, request.status); 
+            }
         });
 
         return message;
@@ -128,41 +132,17 @@ var jasig = jasig || {};
         that.locate("emailMessage").show();
     };
 
-    /* ****************************************************************
-        The errorHandlers correspond to HTTP Status Codes, except
-        that 900 is an internal code used when a more elaborate error
-        message is being reported by the email-preview portlet via
-        normal content data path.
-    **************************************************************** */
-    
-    var errorHandlers = {
-        401: function(that, code) {
-            var msg = "Invalid userid or password";
-            that.locate("errorText").html(code + ": " + msg);
-            that.locate("errorMessage").show();
-        },
-        504: function(that, code) {
-            var msg = "Mail service timeout";
-            that.locate("errorText").html(code + ": " + msg);
-            that.locate("errorMessage").show();
-        },
-        900: function(that, code, msg) {
-            that.locate("errorText").html(code + ": " + msg);
-            that.locate("errorMessage").show();
-        },
-        'default': function(that, code) {
-            var msg = "Service error";
-            that.locate("errorText").html(code + ": " + msg);
-            that.locate("errorMessage").show();
-        }
-    };
-
-    var showErrorMessage = function(that, code, msg) {
+    var showErrorMessage = function(that, httpStatus, customMessage) {
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
-        var handler = errorHandlers[code] || errorHandlers['default'];
-        handler(that, code, msg);
+        var errorText = that.options.jsErrorMessages[httpStatus] || that.options.jsErrorMessages['default'];
+        if (customMessage) {
+            // Add a server-specified custom message to the end
+            errorText += '<br/>' + customMessage;
+        }
+        that.locate("errorText").html(httpStatus + ": " + errorText);
+        that.locate("errorMessage").show();
     };
 
     var getClasses = function(idx, message) {
@@ -283,79 +263,84 @@ var jasig = jasig || {};
                 listeners: that.options.listeners
             },
             dataFunction: getEmailFunction(that),
-            dataLengthFunction: function() { return account.accountInfo.totalMessageCount; }
+            dataLengthFunction: function() { return account.accountInfo ? account.accountInfo.totalMessageCount : 0; }
         };
         
         that.pager = unicon.batchedpager(that.locate("emailList"), batchOptions);
-
-        that.refresh = function() {
-            showLoadingMessage(that);
-            clearCache = "true";  // Server-side cache
-            that.cache = [];      // Client-side cache
-            that.pager.refreshView();
-            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
-            showEmailList(that);
-        };
         
-        var doDelete = function(data) {
-            showLoadingMessage(that);
-            var ajaxOptions = {
-                url: options.deleteUrl,
-                type: "POST",
-                data: data,
-                dataType: "json",
-                error: function(request, textStatus, errorThrown) {
-                    showErrorMessage(that, request.status);
-                },
-                success: function(data) {
-                    if (data.errorMessage != null) {
-                        showErrorMessage(that, 900, data.errorMessage);
+        // The 'accountInfo' key indicates we obtained email info successfully
+        if (account.accountInfo) {
+
+            that.refresh = function() {
+                showLoadingMessage(that);
+                clearCache = "true";  // Server-side cache
+                that.cache = [];      // Client-side cache
+                that.pager.refreshView();
+                that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
+                showEmailList(that);
+            };
+            
+            var doDelete = function(data) {
+                showLoadingMessage(that);
+                var ajaxOptions = {
+                    url: options.deleteUrl,
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    error: function(request, textStatus, errorThrown) {
+                        showErrorMessage(that, request.status);
+                    },
+                    success: function(data) {
+                        if (data.errorMessage != null) {
+                            showErrorMessage(that, 900, data.errorMessage);
+                        }
+                        that.refresh();
                     }
-                    that.refresh();
                 }
+                $.ajax(ajaxOptions);
             }
-            $.ajax(ajaxOptions);
-        }
-
-        that.deleteSelectedMessages = function() {
-            if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
-                alert("No Messages Selected.");
-                return;
+    
+            that.deleteSelectedMessages = function() {
+                if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
+                    alert("No Messages Selected.");
+                    return;
+                }
+                if (confirm("Delete Selected Messages?")) {
+                    doDelete(that.locate("inboxForm").serializeArray());
+                }
+            };
+    
+            that.deleteShownMessage = function() {
+                if (confirm("Delete This Message?")) {
+                    doDelete(that.locate("messageForm").serializeArray());
+                }
+            };
+    
+            that.toggleSelectAll = function() {
+                var chk = $(this).attr("checked");
+                that.locate("selectMessage").attr("checked", chk);
             }
-            if (confirm("Delete Selected Messages?")) {
-                doDelete(that.locate("inboxForm").serializeArray());
+    
+            that.locate("refreshLink").click(that.refresh);
+            if (account.accountInfo.deleteSupported) {
+                that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
+                that.locate("deleteMessageButton").click(that.deleteShownMessage);
+            } else {
+                var anchor = that.locate("deleteMessagesLink");
+                anchor.find("span").html("Delete Not Available");
+                anchor.find("span").addClass("fl-text-silver");
+                anchor.attr("title", "The delete feature is not supported by this mail store");
             }
-        };
-
-        that.deleteShownMessage = function() {
-            if (confirm("Delete This Message?")) {
-                doDelete(that.locate("messageForm").serializeArray());
-            }
-        };
-
-        that.toggleSelectAll = function() {
-            var chk = $(this).attr("checked");
-            that.locate("selectMessage").attr("checked", chk);
-        }
-
-        that.locate("refreshLink").click(that.refresh);
-        if (account.accountInfo.deleteSupported) {
-            that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
-            that.locate("deleteMessageButton").click(that.deleteShownMessage);
-        } else {
-            var anchor = that.locate("deleteMessagesLink");
-            anchor.find("span").html("Delete Not Available");
-            anchor.find("span").addClass("fl-text-silver");
-            anchor.attr("title", "The delete feature is not supported by this mail store");
-        }
-        that.locate("returnLink").click(function(){ showEmailList(that); });
-        that.locate("inboxLink").attr("href", account.inboxUrl);
+            that.locate("returnLink").click(function(){ showEmailList(that); });
+            that.locate("inboxLink").attr("href", account.inboxUrl);
+            
+            that.locate("selectAll").live("click", that.toggleSelectAll);
+    
+            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
+    
+            showEmailList(that);
         
-        that.locate("selectAll").live("click", that.toggleSelectAll);
-
-        that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
-
-        showEmailList(that);
+        }
 
         return that;
     
@@ -386,7 +371,8 @@ var jasig = jasig || {};
             unreadMessageCount: ".unread-message-count",
             inboxLink: ".inbox-link"
         },
-        listeners: {}
+        listeners: {},
+        jsErrorMessages: {'default': 'Server Error'}
     });
 
 })(jQuery, fluid);
