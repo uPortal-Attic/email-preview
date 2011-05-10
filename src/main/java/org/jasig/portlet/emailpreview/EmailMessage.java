@@ -100,7 +100,7 @@ public final class EmailMessage {
         this.unread = !message.isSet(Flag.SEEN);
         this.answered = message.isSet(Flag.ANSWERED);
         this.deleted = message.isSet(Flag.DELETED);
-        this.multipart = message.getContentType().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
+        this.multipart = message.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
         this.contentType = message.getContentType();
         this.content = content;
 	    
