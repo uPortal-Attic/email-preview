@@ -69,7 +69,7 @@
         
             <p>
                 <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="preview.toolbar.inbox"/></a> 
-                (<span class="unread-message-count"></span>)
+                (<span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>)
                 | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> <spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
                 | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <spring:message code="preview.toolbar.deleteSelected"/></a>
@@ -189,7 +189,8 @@
             listeners: {
                 initiatePageSizeChange: updatePageSize
             },
-            jsErrorMessages: jsErrorMessages
+            jsErrorMessages: jsErrorMessages,
+            markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
         };
         // Initialize the display asynchronously
         setTimeout(function() {

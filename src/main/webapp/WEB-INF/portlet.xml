@@ -83,6 +83,17 @@
             </preference>
 
             <!-- 
+                Determines whether the portlet will change the READ flag to true 
+                when the user views a message.  Seeing the subject and sender in 
+                the INBOX table doesn't count - you have to click through to 
+                view the entire message.
+            -->
+            <preference>
+                <name>markMessagesAsRead</name>
+                <value>false</value><!-- Left 'false' for now because there's no way for users to choose this setting yet -->
+            </preference>
+
+            <!-- 
                 Determines how many emails initially appear in the list on the 
                 preview screen.  Users may choose a different setting.
             -->

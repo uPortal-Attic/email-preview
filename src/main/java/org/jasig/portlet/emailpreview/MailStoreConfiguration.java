@@ -35,6 +35,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  */
 public class MailStoreConfiguration {
     
+    // Connection settings
     private String protocol;
     private String host;
     private int port;
@@ -51,6 +52,9 @@ public class MailStoreConfiguration {
     private Map<String, String> additionalProperties = new HashMap<String, String>();
     private Map<String, String> javaMailProperties = new HashMap<String, String>();
     
+    // Preferences
+    private boolean markMessagesAsRead;
+    
     public String getProtocol() {
         return protocol;
     }
@@ -65,6 +69,14 @@ public class MailStoreConfiguration {
 
     public void setHost(String mailHost) {
         this.host = mailHost;
+    }
+    
+    public boolean getMarkMessagesAsRead() {
+        return markMessagesAsRead;
+    }
+    
+    public void setMarkMessagesAsRead(boolean markMessagesAsRead) {
+        this.markMessagesAsRead = markMessagesAsRead;
     }
 
     public int getPort() {

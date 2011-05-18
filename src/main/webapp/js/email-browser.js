@@ -18,15 +18,44 @@
  */
 var jasig = jasig || {};
 
-(function($, fluid){
+(function($, fluid) {
 
-    var displayMessage = function(that, num) {
+    var displayMessage = function(that, cell) {
         
         // display the loading message while we retrieve the desired message
         showLoadingMessage(that);
         
         // get the message
-        var message = getMessage(that, num);
+        var messageNum = parseInt($(cell).attr("messageNum"));
+        var message = getMessage(that, messageNum);
+        
+        // Update the display to reflect the new state of the SEEN flag
+        if (that.options.markMessagesAsRead && $(cell).hasClass("unread")) {
+            // The UI needs to reflect that a previously unread message is now read
+            // $(cell).parent().children().removeClass("unread");
+            var found = false;
+            for (var f in that.cache) {
+                var first = that.cache[f];
+                for (var s in first) {
+                    var second = first[s];
+                    for (var m in second) {
+                        var msg = second[m];
+                        if (msg.messageNumber === messageNum) {
+                            msg.unread = false;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+                if (found) break;
+            }
+            that.pager.refreshView();
+            var unreadCount = parseInt(that.locate("unreadMessageCount").html());
+            if (unreadCount && unreadCount > 0) {
+                that.locate("unreadMessageCount").html(unreadCount - 1);
+            }
+        }
         
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
@@ -147,8 +176,8 @@ var jasig = jasig || {};
 
     var getClasses = function(idx, message) {
         var classes = "";
-        if (idx % 2 == 0) classes += " portlet-section-alternate";
         if (message.unread) classes += " unread";
+        if (!message.unread) classes += " portlet-section-alternate";
         if (message.answered) classes += " answered";
         if (message.deleted) classes += " deleted";
         if (message.multipart) classes += " attached";
@@ -210,7 +239,7 @@ var jasig = jasig || {};
                                 decorators: [
                                     { attrs: { messageNum: '\${*.messageNumber}' } },
                                     { type: "jQuery", func: "click",
-                                        args: function(){ displayMessage(that, $(this).attr("messageNum")); }
+                                        args: function(){ displayMessage(that, this); }
                                     },
                                     { type: "addClass", classes: getClasses(index, row) }
                                 ]
@@ -276,7 +305,7 @@ var jasig = jasig || {};
                 clearCache = "true";  // Server-side cache
                 that.cache = [];      // Client-side cache
                 that.pager.refreshView();
-                that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
+                that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount);
                 showEmailList(that);
             };
             
@@ -336,7 +365,7 @@ var jasig = jasig || {};
             
             that.locate("selectAll").live("click", that.toggleSelectAll);
     
-            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount + (account.accountInfo.unreadMessageCount != 1 ? " unread messages" : " unread message"));
+            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount);
     
             showEmailList(that);
         
@@ -372,7 +401,8 @@ var jasig = jasig || {};
             inboxLink: ".inbox-link"
         },
         listeners: {},
-        jsErrorMessages: {'default': 'Server Error'}
+        jsErrorMessages: {'default': 'Server Error'},
+        markMessagesAsRead: true
     });
 
 })(jQuery, fluid);

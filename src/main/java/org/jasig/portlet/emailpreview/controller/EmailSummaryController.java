@@ -225,6 +225,9 @@ public class EmailSummaryController {
         boolean allowDelete = Boolean.valueOf(prefs.getValue(
                             ALLOW_DELETE_KEY, "false"));
         model.put("allowDelete", allowDelete);
+        
+        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+        model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
 
         return new ModelAndView("preview", model);
 

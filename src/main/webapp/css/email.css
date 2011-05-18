@@ -33,6 +33,9 @@
     border-collapse: collapse;
     table-layout:fixed;
 }
+.email-portlet-table tbody tr {
+    border-bottom: 1px solid;
+}
 .email-portlet-table th, .email-portlet-table td {
     border: 1px solid #CCC;
     cursor: auto;

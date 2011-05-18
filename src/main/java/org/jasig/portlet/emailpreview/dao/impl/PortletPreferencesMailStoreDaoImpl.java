@@ -55,7 +55,8 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
                     MailPreferences.INBOX_NAME.getKey(), MailPreferences.PROTOCOL.getKey(), 
                     MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
                     MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
-                    MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey()
+                    MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey(),
+                    MailPreferences.MARK_MESSAGES_AS_READ.getKey()
                 });    
     
     /* (non-Javadoc)
@@ -74,6 +75,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
         String[] authServiceKeys = preferences.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
         config.setUsernameSuffix(preferences.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
+        config.setMarkMessagesAsRead(Boolean.valueOf(preferences.getValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), "true")));
         
         // set the port number
         try {

@@ -85,6 +85,11 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
     protected final Log log = LogFactory.getLog(getClass());
 
     private Policy policy;
+    
+    /**
+     * Value for the 'mail.debug' setting in JavaMail
+     */
+    private boolean debug = false;
 
     private ApplicationContext ctx;
 
@@ -207,7 +212,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             mailProperties.put("mail.store.protocol", storeConfig.getProtocol());
             mailProperties.put("mail.host", storeConfig.getHost());
             mailProperties.put("mail.port", storeConfig.getPort());
-            mailProperties.put("mail.debug", true);
+            mailProperties.put("mail.debug", debug ? "true" : "false");
 
             String protocolPropertyPrefix = "mail." + storeConfig.getProtocol() + ".";
 
@@ -297,12 +302,17 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
         Folder inbox = null;
         try {
+            
+            int mode = storeConfig.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
 
             // Retrieve user's inbox
             inbox = getUserInbox(storeConfig, auth);
-            inbox.open(Folder.READ_ONLY);
+            inbox.open(mode);
 
             Message message = inbox.getMessage(messageNum);
+            if (storeConfig.getMarkMessagesAsRead()) {
+                message.setFlag(Flag.SEEN, true);
+            }
             EmailMessage emailMessage = wrapMessage(message, true);
 
             inbox.close(false);
