@@ -27,6 +27,8 @@ import javax.mail.Flags.Flag;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An entity abstraction for representing information
@@ -51,9 +53,11 @@ public final class EmailMessage {
     private final boolean unread;  // Evaluate in constructor to detect errors early
     private final boolean answered;  // Evaluate in constructor to detect errors early
     private final boolean deleted;  // Evaluate in constructor to detect errors early
-    private final boolean multipart;
-    private final String contentType;
+    private boolean multipart;
+    private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
+
+    private final Log log = LogFactory.getLog(getClass());
 
 	/*
 	 * Public API.
@@ -100,8 +104,17 @@ public final class EmailMessage {
         this.unread = !message.isSet(Flag.SEEN);
         this.answered = message.isSet(Flag.ANSWERED);
         this.deleted = message.isSet(Flag.DELETED);
-        this.multipart = message.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
-        this.contentType = message.getContentType();
+        // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
+        try {
+            this.multipart = message.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
+            this.contentType = message.getContentType();
+        } catch (MessagingException me) {
+            // Message was digitally signed and we are unable to read it; 
+            // logging as INFO because the behavior is known & expected
+            log.info("Unable to read message (digitally signed?)", me);
+            this.multipart = false;
+            this.contentType = null;
+        }
         this.content = content;
 	    
 	}
@@ -171,6 +184,11 @@ public final class EmailMessage {
         return multipart;
     }
     
+    /**
+     * 
+     * @return The content type (e.g. "text/plain") of the message body or 
+     * <code>null</code> if the content cannot be read
+     */
     public String getContentType() {
         return contentType;
     }

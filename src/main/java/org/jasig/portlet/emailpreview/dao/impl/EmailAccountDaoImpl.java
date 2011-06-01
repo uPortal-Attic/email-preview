@@ -82,7 +82,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 @Component
 public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, ApplicationContextAware {
 
-    protected final Log log = LogFactory.getLog(getClass());
+    private final Log log = LogFactory.getLog(getClass());
 
     private Policy policy;
     
@@ -279,15 +279,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         }
 
         List<EmailMessage> emails = new LinkedList<EmailMessage>();
-
-        /*
-         * Retrieving maxUnreadMessages and the unread message count. Not using
-         * the getUnreadMessageCount() method since the method also traverses
-         * all messages which we need to do anyway to retrieve
-         * maxUnreadMessages.
-         */
         for (Message currentMessage : messages) {
-
             EmailMessage emailMessage = wrapMessage(currentMessage, false);
             emails.add(emailMessage);
         }
@@ -386,16 +378,26 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
         // Prepare content if requested
         EmailMessageContent body = null;  // default...
+        // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
         if (populateContent) {
-            Object content = msg.getContent();
-            body = getContentString(content, msg.getContentType());
-            String contentString = body.getContentString();
-            if (!StringUtils.isBlank(contentString)) {
-                AntiSamy as = new AntiSamy();
-                CleanResults cr = as.scan(contentString, policy);
-                contentString = cr.getCleanHTML();
+            try {
+                Object content = msg.getContent();
+                body = getContentString(content, msg.getContentType());
+                String contentString = body.getContentString();
+                if (!StringUtils.isBlank(contentString)) {
+                    AntiSamy as = new AntiSamy();
+                    CleanResults cr = as.scan(contentString, policy);
+                    contentString = cr.getCleanHTML();
+                }
+                body.setContentString(contentString);
+            } catch (MessagingException me) {
+                // Message was digitally signed and we are unable to read it; 
+                // logging as DEBUG because (1) this behavior is known & expected, 
+                // and (2) the problem was (presumably) already acknowledged when
+                // the INBOX table was built.
+                log.debug("Unable to read message (digitally signed?)", me);
+                body = new EmailMessageContent("UNABLE TO READ MESSAGE BODY: " + me.getMessage(), false);
             }
-            body.setContentString(contentString);
         }
 
         // Prepare the UID if present

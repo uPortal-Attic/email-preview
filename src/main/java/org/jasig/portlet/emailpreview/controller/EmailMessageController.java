@@ -113,7 +113,8 @@ public class EmailMessageController {
              */
 
             // Make links embedded in text/plain messages clickable
-            if (message.getContentType().startsWith(CONTENT_TYPE_TEXT_PREFIX)) {
+            String contentType = message.getContentType();  // might be null if there was an error
+            if (contentType != null && contentType.startsWith(CONTENT_TYPE_TEXT_PREFIX)) {
                 String messageBody = message.getContent().getContentString();
                 message.getContent().setContentString(MessageUtils.addClickableUrlsToMessageBody(messageBody));
             }
