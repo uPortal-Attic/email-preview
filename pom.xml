@@ -24,6 +24,7 @@
     <properties>
         <spring.version>2.5.6</spring.version>
         <resource-server.version>1.0.12</resource-server.version>
+        <filters.file>src/main/filters/email-preview.properties</filters.file>
     </properties>
 
     <licenses>
@@ -337,6 +338,21 @@
     </dependencies>
 
     <build>
+        <filters>
+            <filter>${filters.file}</filter>
+        </filters>
+        <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+        </resource>
+        <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>log4j.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
