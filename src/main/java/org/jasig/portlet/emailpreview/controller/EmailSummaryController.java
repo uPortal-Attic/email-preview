@@ -59,6 +59,7 @@ public class EmailSummaryController {
     public final static String DEFAULT_VIEW_PREFERENCE = "defaultView";
     public final static String PAGE_SIZE_KEY = "pageSize";
     public final static String ALLOW_DELETE_KEY = "allowDelete";
+    public final static String SUPPORTS_TOGGLE_SEEN = "supportsToggleSeen";
     public final static String VIEW_ROLLUP = "rollup";
     public final static String VIEW_PREVIEW = "preview";
 
@@ -228,6 +229,9 @@ public class EmailSummaryController {
         
         MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
         model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
+        
+        // Check if this mail server supports setting the READ/UNREAD flag
+        model.put(SUPPORTS_TOGGLE_SEEN, config.supportsToggleSeen());
 
         return new ModelAndView("preview", model);
 

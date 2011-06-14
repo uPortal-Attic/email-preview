@@ -63,7 +63,13 @@ var jasig = jasig || {};
         $(".email-message .subject").html(message.subject);
         $(".email-message .sender").html(message.sender);
         $(".email-message .sentDate").html(message.sentDateString);
-        $(".email-message .messageUid").val(message.uid);
+        $(".email-message .message-uid").val(message.uid);
+        
+        if (that.options.markMessagesAsRead || !message.unread) {
+            that.locate("markMessageUnreadButton").show();
+        } else {
+            that.locate("markMessageReadButton").show();
+        }
         
         // show the message display
         showEmailMessage(that);
@@ -325,9 +331,30 @@ var jasig = jasig || {};
                         }
                         that.refresh();
                     }
-                }
+                };
                 $.ajax(ajaxOptions);
-            }
+            };
+            
+            var doToggleSeen = function(data, seenValue) {
+                showLoadingMessage(that);
+                data.push({name:'seenValue', value:seenValue});
+                var ajaxOptions = {
+                    url: options.toggleSeenUrl,
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    error: function(request, textStatus, errorThrown) {
+                        showErrorMessage(that, request.status);
+                    },
+                    success: function(data) {
+                        if (data.errorMessage != null) {
+                            showErrorMessage(that, 900, data.errorMessage);
+                        }
+                        that.refresh();
+                    }
+                };
+                $.ajax(ajaxOptions);
+            };
     
             that.deleteSelectedMessages = function() {
                 if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
@@ -361,6 +388,8 @@ var jasig = jasig || {};
                 anchor.attr("title", "The delete feature is not supported by this mail store");
             }
             that.locate("returnLink").click(function(){ showEmailList(that); });
+            that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
+            that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("inboxLink").attr("href", account.inboxUrl);
             
             that.locate("selectAll").live("click", that.toggleSelectAll);
@@ -379,6 +408,7 @@ var jasig = jasig || {};
         accountInfoUrl: null,
         messageUrl: null,
         deleteUrl: null,
+        toggleSeenUrl: null,
         pageSize: 10,
         batchSize: 20,
         selectors: {
@@ -388,6 +418,8 @@ var jasig = jasig || {};
             inboxForm: "form[name='inboxForm']",
             messageForm: "form[name='messageForm']",
             deleteMessageButton: ".delete-message-button",
+            markMessageReadButton: ".mark-read-button",
+            markMessageUnreadButton: ".mark-unread-button",
             timestamp: "input[name='timestamp']",
             selectAll: ".select-all",
             selectMessage: ".select-message",

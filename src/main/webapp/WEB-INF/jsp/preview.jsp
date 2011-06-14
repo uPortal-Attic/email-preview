@@ -21,7 +21,7 @@
 <jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
-<c:if test="${ includeJQuery }">
+<c:if test="${includeJQuery}">
     <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
 </c:if>
@@ -43,6 +43,9 @@
 <portlet:actionURL var="deleteUrl">
     <portlet:param name="action" value="deleteMessages"/>
 </portlet:actionURL>
+<portlet:actionURL var="toggleSeenUrl">
+    <portlet:param name="action" value="toggleSeen"/>
+</portlet:actionURL>
 <portlet:actionURL var="updatePageSizeUrl">
     <portlet:param name="action" value="updatePageSize"/>
 </portlet:actionURL>
@@ -52,7 +55,7 @@
     <p style="text-align: right;"><a href="${ configUrl }">Configure portlet</a></p>
 </c:if>
 
-<div id="${n}container" class="email-container portlet">
+<div id="${n}container" class="email-container portlet" xmlns:rsf="http://ponder.org.uk">
 
     <div class="loading-message"></div>
 
@@ -148,10 +151,14 @@
         <div class="message-content">
         </div>
         <form name="messageForm">
+            <input class="message-uid" type="hidden" name="selectMessage" value=""/>
             <a class="return-link" style="margin-right: 1.5em;" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a>
             <c:if test="${allowDelete}">
                 <input class="delete-message-button" type="button" value=" <spring:message code="preview.message.delete"/> "/>
-                <input class="messageUid" type="hidden" name="selectMessage" value=""/>
+            </c:if>
+            <c:if test="${supportsToggleSeen}">
+                <input class="mark-read-button" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
+                <input class="mark-unread-button" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
             </c:if>
         </form>
     </div>    
@@ -185,6 +192,7 @@
             accountInfoUrl: "${accountInfoUrl}",
             messageUrl: "${messageUrl}",
             deleteUrl: "${deleteUrl}",
+            toggleSeenUrl: "${toggleSeenUrl}",
             pageSize: <c:out value="${pageSize}"/>,
             listeners: {
                 initiatePageSizeChange: updatePageSize

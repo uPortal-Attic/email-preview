@@ -366,6 +366,44 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
     }
 
+    @Override
+    public boolean setSeenFlag(MailStoreConfiguration config, Authenticator auth, long[] uids, boolean seenValue) {
+
+        Folder inbox = null;
+        try {
+
+            // Retrieve user's inbox
+            inbox = getUserInbox(config, auth);
+
+            // Verify that we can even perform this operation
+            if (!(inbox instanceof UIDFolder)) {
+                String msg = "Toggle unread feature is supported only for UIDFolder instances";
+                throw new UnsupportedOperationException(msg);
+            }
+
+            inbox.open(Folder.READ_WRITE);
+
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(uids);
+            inbox.setFlags(msgs, new Flags(Flag.SEEN), seenValue);
+
+            return true;  // Indicate success
+
+        } catch (MessagingException e) {
+            log.error("Messaging exception while deleting messages", e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(true);
+                } catch ( Exception e ) {
+                    log.error("Error closing inbox folder", e);
+                }
+            }
+        }
+
+        return false;  // We failed if we reached this point
+
+    }
+
     protected EmailMessage wrapMessage(Message msg, boolean populateContent) throws MessagingException, IOException, ScanException, PolicyException {
 
         // Prepare subject

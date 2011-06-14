@@ -172,4 +172,42 @@ public class EmailMessageController {
 
     }
 
+    @RequestMapping(params = "action=toggleSeen")
+    public void toggleSeen(ActionRequest req, ActionResponse res,
+                @RequestParam(value="selectMessage", required=false) long[] messages,
+                @RequestParam("seenValue") boolean seenValue) {
+
+        try {
+
+            if (messages != null && messages.length != 0) {
+
+                MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+
+                IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+                if (authService == null) {
+                    String msg = "Unrecognized authentication service:  "
+                                    + config.getAuthenticationServiceKey();
+                    log.error(msg);
+                    throw new RuntimeException(msg);
+                }
+                Authenticator auth = authService.getAuthenticator(req, config);
+
+                // Opportunity for improvement:  respond to return value 
+                // of 'false' with some user-facing message 
+                accountDao.setSeenFlag(config, auth, messages, seenValue);
+
+            }
+
+            // Define view and generate model
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("success", "success");
+
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete specified messages", e);
+        }
+
+    }
+
 }

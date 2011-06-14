@@ -82,6 +82,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
             int port = Integer.parseInt(preferences.getValue(MailPreferences.PORT.getKey(), "25"));
             config.setPort(port);
         } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
         }
 
         // set the connection timeout
@@ -97,6 +98,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
             int timeout = Integer.parseInt(preferences.getValue(MailPreferences.TIMEOUT.getKey(), "-1"));
             config.setTimeout(timeout);
         } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
         }
         
         

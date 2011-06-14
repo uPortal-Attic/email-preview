@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * @author Jen Bourey, jbourey@unicon.net
  * @version $Revision$
  */
-public class MailStoreConfiguration {
+public final class MailStoreConfiguration {
     
     // Connection settings
     private String protocol;
@@ -157,6 +157,16 @@ public class MailStoreConfiguration {
 
     public void setUsernameSuffix(String usernameSuffix) {
         this.usernameSuffix = usernameSuffix;
+    }
+
+    public boolean supportsToggleSeen() {
+        // To the best of my understanding, the IMAP protocol supports 
+        // the SEEN flag and POP3 just doesn't  
+        String protocol = this.getProtocol().toLowerCase(); 
+        return protocol.startsWith("imap");
+        // NB:  We probably *should* also be checking whether the javax.mail.Folder 
+        // object implements UIDFolder, but that's not easy with the present set of 
+        // class interactions.  Something to work in on refactoring.
     }
 
     /**

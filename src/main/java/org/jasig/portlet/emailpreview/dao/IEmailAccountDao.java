@@ -73,11 +73,23 @@ public interface IEmailAccountDao {
      * Delete and expunge the specified massages from the store.  Supported for
      * UIDFolder implementations only.
      *
-     * @param storeConfig
+     * @param config
      * @param auth
-     * @param uids
-     * @return
+     * @param messages
+     * @return Success or failure
      */
     boolean deleteMessages(MailStoreConfiguration storeConfig, Authenticator auth, long[] uids);
+
+    /**
+     * Switch the value of the SEEN flag for the specified messages.  Supported 
+     * for UIDFolder implementations only.
+     *
+     * @param config
+     * @param auth
+     * @param messages
+     * @param seenValue
+     * @return Success or failure
+     */
+    public boolean setSeenFlag(MailStoreConfiguration config, Authenticator auth, long[] messages, boolean seenValue);
 
 }
