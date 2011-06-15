@@ -56,6 +56,10 @@
             <label><spring:message code="editPreferences.emailSettings.serverPort"/></label>
             <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
         </div>
+        <div class="plt-email-row">
+            <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
+            <input type="checkbox" name="markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
+        </div>
     </div>          
 
     <!-- Show radio buttons if multiple authenticationServices are in use -->
@@ -103,7 +107,7 @@
         </div>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.focusOnPreview"/></label>
-            <input type="checkbox" name="focusOnPreview" title="<spring:message code="editPreferences.preferences.focusOnPreview.tooltip"/>" value="true"<c:if test="${renderRequest.preferences.map['focusOnPreview'][0] == true}"> checked="checked"</c:if>/>
+            <input type="checkbox" name="focusOnPreview" title="<spring:message code="editPreferences.preferences.focusOnPreview.tooltip"/>" value="true"<c:if test="${renderRequest.preferences.map['focusOnPreview'][0] eq 'true'}"> checked="checked"</c:if>/>
         </div>
     </div>          
 

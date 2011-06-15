@@ -64,22 +64,22 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
      */
     public MailStoreConfiguration getConfiguration(PortletRequest request) {
         
-        PortletPreferences preferences = request.getPreferences();
+        PortletPreferences prefs = request.getPreferences();
         
         MailStoreConfiguration config = new MailStoreConfiguration();
-        config.setHost(preferences.getValue(MailPreferences.HOST.getKey(), null));
-        config.setInboxFolderName(preferences.getValue(MailPreferences.INBOX_NAME.getKey(), null));
-        config.setProtocol(preferences.getValue(MailPreferences.PROTOCOL.getKey(), null));
-        config.setLinkServiceKey(preferences.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), null));
-        config.setAuthenticationServiceKey(preferences.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
-        String[] authServiceKeys = preferences.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
+        config.setHost(prefs.getValue(MailPreferences.HOST.getKey(), null));
+        config.setInboxFolderName(prefs.getValue(MailPreferences.INBOX_NAME.getKey(), null));
+        config.setProtocol(prefs.getValue(MailPreferences.PROTOCOL.getKey(), null));
+        config.setLinkServiceKey(prefs.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), null));
+        config.setAuthenticationServiceKey(prefs.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
+        String[] authServiceKeys = prefs.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
-        config.setUsernameSuffix(preferences.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
-        config.setMarkMessagesAsRead(Boolean.valueOf(preferences.getValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), "true")));
+        config.setUsernameSuffix(prefs.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
+        config.setMarkMessagesAsRead(Boolean.valueOf(prefs.getValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), "true")));
         
         // set the port number
         try {
-            int port = Integer.parseInt(preferences.getValue(MailPreferences.PORT.getKey(), "25"));
+            int port = Integer.parseInt(prefs.getValue(MailPreferences.PORT.getKey(), "25"));
             config.setPort(port);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -87,7 +87,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
 
         // set the connection timeout
         try {
-            int connectionTimeout = Integer.parseInt(preferences.getValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), "-1"));
+            int connectionTimeout = Integer.parseInt(prefs.getValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), "-1"));
             config.setConnectionTimeout(connectionTimeout);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -95,7 +95,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
 
         // set the timeout
         try {
-            int timeout = Integer.parseInt(preferences.getValue(MailPreferences.TIMEOUT.getKey(), "-1"));
+            int timeout = Integer.parseInt(prefs.getValue(MailPreferences.TIMEOUT.getKey(), "-1"));
             config.setTimeout(timeout);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -121,7 +121,7 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
         }
         
         @SuppressWarnings("unchecked")
-        Map<String, String[]> preferenceMap = preferences.getMap();
+        Map<String, String[]> preferenceMap = prefs.getMap();
         for (Map.Entry<String, String[]> entry : preferenceMap.entrySet()) {
             
             String key = entry.getKey();
@@ -193,6 +193,9 @@ public class PortletPreferencesMailStoreDaoImpl implements IMailStoreDao {
             }
             if (!prefs.isReadOnly(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey())) {
                 prefs.setValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), config.getAuthenticationServiceKey());
+            }
+            if (!prefs.isReadOnly(MailPreferences.MARK_MESSAGES_AS_READ.getKey())) {
+                prefs.setValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), String.valueOf(config.getMarkMessagesAsRead()));
             }
             if (!prefs.isReadOnly(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey())) {
                 prefs.setValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), config.getAllowableAuthenticationServiceKeys().toArray(new String[0]));

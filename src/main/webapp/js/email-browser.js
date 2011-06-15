@@ -66,9 +66,11 @@ var jasig = jasig || {};
         $(".email-message .message-uid").val(message.uid);
         
         if (that.options.markMessagesAsRead || !message.unread) {
+            that.locate("markMessageReadButton").hide();
             that.locate("markMessageUnreadButton").show();
         } else {
             that.locate("markMessageReadButton").show();
+            that.locate("markMessageUnreadButton").hide();
         }
         
         // show the message display

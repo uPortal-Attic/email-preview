@@ -90,7 +90,7 @@
             -->
             <preference>
                 <name>markMessagesAsRead</name>
-                <value>true</value><!-- Left 'false' for now because there's no way for users to choose this setting yet -->
+                <value>true</value>
             </preference>
 
             <!-- 

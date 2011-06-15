@@ -290,22 +290,34 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
     }
 
-    public EmailMessage retrieveMessage(MailStoreConfiguration storeConfig, Authenticator auth, int messageNum) {
+    public EmailMessage retrieveMessage(MailStoreConfiguration config, Authenticator auth, int messageNum) {
 
         Folder inbox = null;
         try {
             
-            int mode = storeConfig.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
+            int mode = config.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
 
             // Retrieve user's inbox
-            inbox = getUserInbox(storeConfig, auth);
+            inbox = getUserInbox(config, auth);
             inbox.open(mode);
 
             Message message = inbox.getMessage(messageNum);
-            if (storeConfig.getMarkMessagesAsRead()) {
+            boolean unread = !message.isSet(Flags.Flag.SEEN);
+            if (config.getMarkMessagesAsRead()) {
                 message.setFlag(Flag.SEEN, true);
             }
             EmailMessage emailMessage = wrapMessage(message, true);
+            if (!config.getMarkMessagesAsRead()) {
+                // NOTE:  This is more than a little bit annoying.  Apparently 
+                // the mere act of accessing the body content of a message in 
+                // Javamail flags the in-memory representation of that message 
+                // as SEEN.  It does *nothing* to the mail server (the message 
+                // is still unread in the SOR), but it wreaks havoc on local 
+                // functions that key off that value and expect it to be 
+                // accurate.  We're obligated, therefore, to restore the value 
+                // to what it was before the call to wrapMessage(). 
+                emailMessage.setUnread(unread);
+            }
 
             inbox.close(false);
 

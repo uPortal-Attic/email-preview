@@ -217,6 +217,15 @@ public final class EditPreferencesController {
             }
         }
         
+        if (!mailStoreDao.isReadOnly(req, MailPreferences.MARK_MESSAGES_AS_READ)) {
+            String markMessagesAsRead = req.getParameter(MailPreferences.MARK_MESSAGES_AS_READ.getKey());
+            // No need to handle missing value because absence will (correctly) be converted to 'false' 
+            if (log.isDebugEnabled()) {
+                log.debug("Receieved the following user input for markMessagesAsRead:  '" + markMessagesAsRead + "'");
+            }
+            form.setMarkMessagesAsRead(Boolean.valueOf(markMessagesAsRead));
+        }
+
         if (!mailStoreDao.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY)) {
             String authKey = req.getParameter(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey());
             authKey = authKey != null ? authKey.trim() : "";
@@ -274,6 +283,7 @@ public final class EditPreferencesController {
             config.setProtocol(form.getProtocol());
             config.setHost(form.getHost());
             config.setPort(form.getPort());
+            config.setMarkMessagesAsRead(form.getMarkMessagesAsRead());
             config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
             
             // username/password

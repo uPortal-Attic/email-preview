@@ -50,7 +50,7 @@ public final class EmailMessage {
     private final String sender;  // Evaluate in constructor to detect errors early
     private final String subject;  // Passed in separately AntiSamy treatment 
     private final Date sentDate;  // Evaluate in constructor to detect errors early
-    private final boolean unread;  // Evaluate in constructor to detect errors early
+    private boolean unread;  // Evaluate in constructor to detect errors early
     private final boolean answered;  // Evaluate in constructor to detect errors early
     private final boolean deleted;  // Evaluate in constructor to detect errors early
     private boolean multipart;
@@ -167,9 +167,12 @@ public final class EmailMessage {
 		return this.subject;
 	}
 
-
     public boolean isUnread() {
         return unread;
+    }
+    
+    public void setUnread(boolean unread) {
+        this.unread = unread;
     }
 
     public boolean isAnswered() {

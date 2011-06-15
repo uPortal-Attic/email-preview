@@ -40,6 +40,7 @@ public class MailStoreConfigurationForm implements Serializable {
     private String host;
     private int port;
     private String inboxFolderName;
+    private Boolean markMessagesAsRead;
 
     private int timeout;
     private int connectionTimeout;
@@ -66,6 +67,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setPort(config.getPort());
         form.setProtocol(config.getProtocol());
         form.setInboxFolderName(config.getInboxFolderName());
+        form.setMarkMessagesAsRead(config.getMarkMessagesAsRead());
         form.setAuthenticationServiceKey(config.getAuthenticationServiceKey());
         form.setAllowableAuthenticationServiceKeys(config.getAllowableAuthenticationServiceKeys());
         form.setUsernameSuffix(config.getUsernameSuffix());
@@ -184,6 +186,14 @@ public class MailStoreConfigurationForm implements Serializable {
 
     public void setJavaMailProperties(Map<String, Attribute> javaMailProperties) {
         this.javaMailProperties = javaMailProperties;
+    }
+
+    public void setMarkMessagesAsRead(Boolean markMessagesAsRead) {
+        this.markMessagesAsRead = markMessagesAsRead;
+    }
+
+    public boolean getMarkMessagesAsRead() {
+        return markMessagesAsRead;
     }
 
 }
