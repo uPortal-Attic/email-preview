@@ -110,8 +110,13 @@ public final class EmailMessage {
             this.contentType = message.getContentType();
         } catch (MessagingException me) {
             // Message was digitally signed and we are unable to read it; 
-            // logging as INFO because the behavior is known & expected
-            log.info("Unable to read message (digitally signed?)", me);
+            // logging as DEBUG because this issue is known/expected, and 
+            // because the user's experience is in no way affected (at this point)
+            log.debug("Message content unabailable (digitally signed?);  " +
+            		    "message will appear in the preview table correctly, " +
+            		    "but the body will not be viewable");
+            log.trace(me.getMessage(), me);
+            // Set these to sensible defaults
             this.multipart = false;
             this.contentType = null;
         }

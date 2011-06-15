@@ -441,11 +441,11 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 }
                 body.setContentString(contentString);
             } catch (MessagingException me) {
-                // Message was digitally signed and we are unable to read it; 
-                // logging as DEBUG because (1) this behavior is known & expected, 
-                // and (2) the problem was (presumably) already acknowledged when
-                // the INBOX table was built.
-                log.debug("Unable to read message (digitally signed?)", me);
+                // Message was digitally signed, and we are therefore unable to 
+                // display the message body (which the user has requested);  
+                // logging as INFO because this behavior is known & expected.
+                log.info("Unable to read message (digitally signed?)");
+                log.debug(me.getMessage(), me);
                 body = new EmailMessageContent("UNABLE TO READ MESSAGE BODY: " + me.getMessage(), false);
             }
         }
