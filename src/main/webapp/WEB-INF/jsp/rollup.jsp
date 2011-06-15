@@ -27,7 +27,7 @@
 </c:if>
 
 <c:set var="n"><portlet:namespace/></c:set>
-<portlet:actionURL var="accountInfoUrl">
+<portlet:actionURL var="accountSummaryUrl">
     <portlet:param name="action" value="accountSummary"/>
 </portlet:actionURL>
 <portlet:actionURL var="showPreviewUrl">
@@ -148,7 +148,7 @@
 
         var account = null;
         $.ajax({
-            url: '${accountInfoUrl}',
+            url: '${accountSummaryUrl}',
             data: { pageStart: 1, numberOfMessages: 0, forceRefresh: false },
             type: 'POST',
             dataType: "json",
@@ -156,11 +156,11 @@
                 if (data.errorMessage != null) {
                     showErrorMessage('900', data.errorMessage);
                 }
-                if (data.accountInfo) {
-                    var count = data.accountInfo.unreadMessageCount;
+                if (data.accountSummary) {
+                    var count = data.accountSummary.unreadMessageCount;
                     $("#${n}splash .unreadCount").text(count);
                     $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
-                    $("#${n}splash .totalCount").text(data.accountInfo.totalMessageCount);
+                    $("#${n}splash .totalCount").text(data.accountSummary.totalMessageCount);
                     $("#${n}splash .unreadContainer").slideDown(500);
                 }
             },

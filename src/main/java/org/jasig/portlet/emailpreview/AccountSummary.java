@@ -35,7 +35,7 @@ import javax.mail.UIDFolder;
  * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
-public class AccountInfo {
+public class AccountSummary {
 
     private final int numUnreadMessages;
     private final int numTotalMessages;
@@ -44,7 +44,7 @@ public class AccountInfo {
     private final int messagesCount;
     private final boolean deleteSupported;
 
-    public AccountInfo(Folder inbox, List<EmailMessage> messages,
+    public AccountSummary(Folder inbox, List<EmailMessage> messages,
                         int messagesStart, int messagesCount) throws MessagingException {
 
         // Instance Members

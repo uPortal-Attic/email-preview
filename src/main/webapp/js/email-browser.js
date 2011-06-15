@@ -96,7 +96,7 @@ var jasig = jasig || {};
         }
         
         $.ajax({
-            url: that.options.accountInfoUrl,
+            url: that.options.accountSummaryUrl,
             async: false,
             data: { pageStart: start, numberOfMessages: size, forceRefresh: clearCache },
             type: 'POST',
@@ -113,7 +113,7 @@ var jasig = jasig || {};
             }
         });
 
-        var messages = account.accountInfo ? account.accountInfo.messages : [];
+        var messages = account.accountSummary ? account.accountSummary.messages : [];
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
         
@@ -300,20 +300,20 @@ var jasig = jasig || {};
                 listeners: that.options.listeners
             },
             dataFunction: getEmailFunction(that),
-            dataLengthFunction: function() { return account.accountInfo ? account.accountInfo.totalMessageCount : 0; }
+            dataLengthFunction: function() { return account.accountSummary ? account.accountSummary.totalMessageCount : 0; }
         };
         
         that.pager = unicon.batchedpager(that.locate("emailList"), batchOptions);
         
-        // The 'accountInfo' key indicates we obtained email info successfully
-        if (account.accountInfo) {
+        // The 'accountSummary' key indicates we obtained email info successfully
+        if (account.accountSummary) {
 
             that.refresh = function() {
                 showLoadingMessage(that);
                 clearCache = "true";  // Server-side cache
                 that.cache = [];      // Client-side cache
                 that.pager.refreshView();
-                that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount);
+                that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
                 showEmailList(that);
             };
             
@@ -380,7 +380,7 @@ var jasig = jasig || {};
             }
     
             that.locate("refreshLink").click(that.refresh);
-            if (account.accountInfo.deleteSupported) {
+            if (account.accountSummary.deleteSupported) {
                 that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
                 that.locate("deleteMessageButton").click(that.deleteShownMessage);
             } else {
@@ -396,7 +396,7 @@ var jasig = jasig || {};
             
             that.locate("selectAll").live("click", that.toggleSelectAll);
     
-            that.locate("unreadMessageCount").html(account.accountInfo.unreadMessageCount);
+            that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
     
             showEmailList(that);
         
@@ -407,7 +407,7 @@ var jasig = jasig || {};
     };
 
     fluid.defaults("jasig.EmailBrowser", {
-        accountInfoUrl: null,
+        accountSummaryUrl: null,
         messageUrl: null,
         deleteUrl: null,
         toggleSeenUrl: null,

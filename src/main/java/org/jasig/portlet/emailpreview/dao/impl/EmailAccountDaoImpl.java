@@ -46,7 +46,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jasig.portlet.emailpreview.AccountInfo;
+import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
@@ -85,7 +85,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
     private final Log log = LogFactory.getLog(getClass());
 
     private Policy policy;
-    
+
     /**
      * Value for the 'mail.debug' setting in JavaMail
      */
@@ -133,16 +133,13 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         // Nothing to do here;  all the work is in the annotations.
     }
 
-    /* (non-Javadoc)
-     * @see org.jasig.portlet.emailpreview.dao.IAccountInfoDAO#retrieveEmailAccountInfo(org.jasig.portlet.emailpreview.MailStoreConfiguration, java.lang.String, java.lang.String, int)
-     */
     @Cacheable(cacheName="inboxCache", selfPopulating=true,
         keyGenerator = @KeyGenerator(
             name="StringCacheKeyGenerator",
             properties = @Property(name="includeMethod", value="false")
         )
     )
-    public AccountInfo fetchAccountInfoFromStore(@PartialCacheKey String username,
+    public AccountSummary fetchAccountSummaryFromStore(@PartialCacheKey String username,
             @PartialCacheKey String mailAccount, MailStoreConfiguration config,
             Authenticator auth, int start, int count) throws EmailPreviewException {
 
@@ -170,7 +167,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             }
 
             // Initialize account information with information retrieved from inbox
-            AccountInfo acountInfo = new AccountInfo(inbox, messages, start, count);
+            AccountSummary acountInfo = new AccountSummary(inbox, messages, start, count);
 
             inbox.close(false);
 
@@ -294,7 +291,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
         Folder inbox = null;
         try {
-            
+
             int mode = config.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
 
             // Retrieve user's inbox
@@ -308,14 +305,14 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             }
             EmailMessage emailMessage = wrapMessage(message, true);
             if (!config.getMarkMessagesAsRead()) {
-                // NOTE:  This is more than a little bit annoying.  Apparently 
-                // the mere act of accessing the body content of a message in 
-                // Javamail flags the in-memory representation of that message 
-                // as SEEN.  It does *nothing* to the mail server (the message 
-                // is still unread in the SOR), but it wreaks havoc on local 
-                // functions that key off that value and expect it to be 
-                // accurate.  We're obligated, therefore, to restore the value 
-                // to what it was before the call to wrapMessage(). 
+                // NOTE:  This is more than a little bit annoying.  Apparently
+                // the mere act of accessing the body content of a message in
+                // Javamail flags the in-memory representation of that message
+                // as SEEN.  It does *nothing* to the mail server (the message
+                // is still unread in the SOR), but it wreaks havoc on local
+                // functions that key off that value and expect it to be
+                // accurate.  We're obligated, therefore, to restore the value
+                // to what it was before the call to wrapMessage().
                 emailMessage.setUnread(unread);
             }
 
@@ -441,8 +438,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 }
                 body.setContentString(contentString);
             } catch (MessagingException me) {
-                // Message was digitally signed, and we are therefore unable to 
-                // display the message body (which the user has requested);  
+                // Message was digitally signed, and we are therefore unable to
+                // display the message body (which the user has requested);
                 // logging as INFO because this behavior is known & expected.
                 log.info("Unable to read message (digitally signed?)");
                 log.debug(me.getMessage(), me);

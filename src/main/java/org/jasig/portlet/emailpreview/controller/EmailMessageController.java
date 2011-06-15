@@ -54,11 +54,11 @@ public class EmailMessageController {
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IEmailAccountDao accountDao;
+    private IEmailAccountDao emailAccountDao;
 
     @Autowired(required = true)
-    public void setAccountInfoDao(IEmailAccountDao accountInfoDao) {
-        this.accountDao = accountInfoDao;
+    public void setEmailAccountDao(IEmailAccountDao emailAccountDao) {
+        this.emailAccountDao = emailAccountDao;
     }
 
     private IMailStoreDao mailStoreDao;
@@ -106,7 +106,7 @@ public class EmailMessageController {
             Authenticator auth = authService.getAuthenticator(request, config);
 
             // Get current user's account information
-            EmailMessage message = accountDao.retrieveMessage(config, auth, messageNum);
+            EmailMessage message = emailAccountDao.retrieveMessage(config, auth, messageNum);
             
             /*
              * A bit of after-market work on messages in certain circumstances
@@ -156,7 +156,7 @@ public class EmailMessageController {
                 }
                 Authenticator auth = authService.getAuthenticator(req, config);
 
-                accountDao.deleteMessages(config, auth, messages);
+                emailAccountDao.deleteMessages(config, auth, messages);
 
             }
 
@@ -194,7 +194,7 @@ public class EmailMessageController {
 
                 // Opportunity for improvement:  respond to return value 
                 // of 'false' with some user-facing message 
-                accountDao.setSeenFlag(config, auth, messages, seenValue);
+                emailAccountDao.setSeenFlag(config, auth, messages, seenValue);
 
             }
 

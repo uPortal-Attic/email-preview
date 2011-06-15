@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jasig.portlet.emailpreview.AccountInfo;
+import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
@@ -58,11 +58,11 @@ public class EmailAccountSummaryController {
 
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IEmailAccountDao accountDao;
+    private IEmailAccountDao emailAccountDao;
 
     @Autowired(required = true)
-    public void setAccountInfoDao(IEmailAccountDao accountInfoDao) {
-        this.accountDao = accountInfoDao;
+    public void setEmailAccountDao(IEmailAccountDao emailAccountDao) {
+        this.emailAccountDao = emailAccountDao;
     }
 
     private IMailStoreDao mailStoreDao;
@@ -130,14 +130,14 @@ public class EmailAccountSummaryController {
 
             // Check if this is a refresh call;  clear cache if it is
             if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
-                accountDao.clearCache(username, mailAccountName);
+                emailAccountDao.clearCache(username, mailAccountName);
             }
 
             // Get current user's account information
-            AccountInfo accountInfo = getAccountInfo(username, mailAccountName,
-                                config, auth, pageStart, numberOfMessages);
+            AccountSummary accountSummary = getAccountSummary(username, mailAccountName,
+                                    config, auth, pageStart, numberOfMessages);
 
-            model.put("accountInfo", accountInfo);
+            model.put("accountSummary", accountSummary);
 
             ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
 
@@ -164,22 +164,22 @@ public class EmailAccountSummaryController {
 
     }
 
-    private AccountInfo getAccountInfo(String username, String mailAccount,
+    private AccountSummary getAccountSummary(String username, String mailAccount,
             MailStoreConfiguration config, Authenticator auth, int start,
             int count) throws EmailPreviewException {
 
         // NB:  The role of this method is to make sure we return the right
-        // AccountInfo based on *all* the parameters, not just the ones
-        // annotated with @PartialCacheKey on fetchAccountInfoFromStore (below).
+        // AccountSummary based on *all* the parameters, not just the ones
+        // annotated with @PartialCacheKey on fetchAccountSummaryFromStore (below).
 
-        AccountInfo rslt = accountDao.fetchAccountInfoFromStore(username,
+        AccountSummary rslt = emailAccountDao.fetchAccountSummaryFromStore(username,
                         mailAccount, config, auth, start, count);
 
         if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != count) {
-            
+
             if (log.isTraceEnabled()) {
                 StringBuilder msg = new StringBuilder();
-                msg.append("Clearing AccountInfo cache for username '")
+                msg.append("Clearing AccountSummary cache for username '")
                                 .append(username).append("', mailAccount '")
                                 .append(mailAccount).append("':  start=[")
                                 .append(rslt.getMessagesStart()).append(" prev, ")
@@ -188,10 +188,10 @@ public class EmailAccountSummaryController {
                                 .append(count).append(" current]");
                 log.trace(msg.toString());
             }
-            
+
             // Clear the cache & try again
-            accountDao.clearCache(username, mailAccount);
-            rslt = accountDao.fetchAccountInfoFromStore(username,
+            emailAccountDao.clearCache(username, mailAccount);
+            rslt = emailAccountDao.fetchAccountSummaryFromStore(username,
                     mailAccount, config, auth, start, count);
         }
 

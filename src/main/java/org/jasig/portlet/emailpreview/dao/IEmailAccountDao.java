@@ -20,7 +20,7 @@ package org.jasig.portlet.emailpreview.dao;
 
 import javax.mail.Authenticator;
 
-import org.jasig.portlet.emailpreview.AccountInfo;
+import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
@@ -38,7 +38,7 @@ public interface IEmailAccountDao {
     public void clearCache(String username, String mailAccount);
 
     /**
-     * Obtains the {@link AccountInfo} object from the email store itself or
+     * Obtains the {@link AccountSummary} object from the email store itself or
      * possibly from cache.  <strong>WARNING:</strong>  the object returned will
      * always correctly reflect the specified 'username' and 'mailAccount'
      * arguments;  the other arguments, however, are more like suggestions.
@@ -55,7 +55,7 @@ public interface IEmailAccountDao {
      * @throws MailAuthenticationException When authentication with the mail server fails
      * @throws EmailPreviewException On other errors
      */
-    public AccountInfo fetchAccountInfoFromStore(String username, String mailAccount,
+    public AccountSummary fetchAccountSummaryFromStore(String username, String mailAccount,
             MailStoreConfiguration storeConfig, Authenticator auth, int start,
             int maxMessages) throws EmailPreviewException;
 
@@ -81,7 +81,7 @@ public interface IEmailAccountDao {
     boolean deleteMessages(MailStoreConfiguration storeConfig, Authenticator auth, long[] uids);
 
     /**
-     * Switch the value of the SEEN flag for the specified messages.  Supported 
+     * Switch the value of the SEEN flag for the specified messages.  Supported
      * for UIDFolder implementations only.
      *
      * @param config
