@@ -25,8 +25,8 @@ import java.net.UnknownHostException;
 import javax.mail.Authenticator;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
 import org.jasig.portlet.emailpreview.dao.impl.EmailAccountDaoImpl;
+import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

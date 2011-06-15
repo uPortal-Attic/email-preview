@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

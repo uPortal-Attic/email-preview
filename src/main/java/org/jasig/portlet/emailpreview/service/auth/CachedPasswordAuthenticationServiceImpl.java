@@ -28,7 +28,6 @@ import javax.portlet.PortletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.SimplePasswordAuthenticator;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.springframework.stereotype.Component;
 
