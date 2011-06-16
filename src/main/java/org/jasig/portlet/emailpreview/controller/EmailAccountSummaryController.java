@@ -33,9 +33,9 @@ import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
-import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -65,11 +65,11 @@ public class EmailAccountSummaryController {
         this.emailAccountDao = emailAccountDao;
     }
 
-    private IMailStoreDao mailStoreDao;
+    private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
-    public void setMailStoreDao(IMailStoreDao mailStoreDao) {
-        this.mailStoreDao = mailStoreDao;
+    public void setServiceBroker(IServiceBroker serviceBroker) {
+        this.serviceBroker = serviceBroker;
     }
 
     private AjaxPortletSupportService ajaxPortletSupportService;
@@ -110,7 +110,7 @@ public class EmailAccountSummaryController {
         String username = request.getRemoteUser();
         try {
 
-            MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+            MailStoreConfiguration config = serviceBroker.getConfiguration(request);
 
             IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
             if (linkService != null) {

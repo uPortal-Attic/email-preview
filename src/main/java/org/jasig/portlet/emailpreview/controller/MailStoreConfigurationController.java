@@ -35,10 +35,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -61,11 +61,11 @@ public class MailStoreConfigurationController {
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IMailStoreDao mailStoreDao;
+    private IServiceBroker serviceBroker;
     
     @Autowired(required = true)
-    public void setAccountDao(IMailStoreDao mailStoreDao) {
-        this.mailStoreDao = mailStoreDao;
+    public void setServiceBroker(IServiceBroker serviceBroker) {
+        this.serviceBroker = serviceBroker;
     }
     
     private List<String> protocols;
@@ -132,7 +132,7 @@ public class MailStoreConfigurationController {
             }
             
             log.debug("Saving new mail store configuration: {" + config.toString() + "}");
-            mailStoreDao.saveConfiguration(request, config);
+            serviceBroker.saveConfiguration(request, config);
         }
         
         response.setPortletMode(PortletMode.VIEW);
@@ -140,7 +140,7 @@ public class MailStoreConfigurationController {
     
     @ModelAttribute("form")
     public MailStoreConfigurationForm getConfigurationForm(PortletRequest req) {
-        return MailStoreConfigurationForm.create(mailStoreDao, req);
+        return MailStoreConfigurationForm.create(serviceBroker, req);
     }
     
     @ModelAttribute("authServices")
@@ -152,7 +152,7 @@ public class MailStoreConfigurationController {
     public Map<String, List<ConfigurationParameter>> getServiceParameters(PortletRequest request) {
         Map<String, List<ConfigurationParameter>> parameters = new HashMap<String, List<ConfigurationParameter>>();
 
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+        MailStoreConfiguration config = serviceBroker.getConfiguration(request);
 
         IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
         if (linkService != null) {

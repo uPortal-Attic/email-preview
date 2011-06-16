@@ -23,10 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 
 /**
  * 
@@ -157,6 +161,11 @@ public final class MailStoreConfiguration {
 
     public void setUsernameSuffix(String usernameSuffix) {
         this.usernameSuffix = usernameSuffix;
+    }
+
+    public boolean isReadOnly(PortletRequest req, MailPreferences mp) {
+        PortletPreferences prefs = req.getPreferences();
+        return prefs.isReadOnly(mp.getKey());
     }
 
     public boolean supportsToggleSeen() {

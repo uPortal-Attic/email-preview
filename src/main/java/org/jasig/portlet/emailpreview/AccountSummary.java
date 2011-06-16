@@ -26,9 +26,8 @@ import javax.mail.MessagingException;
 import javax.mail.UIDFolder;
 
 /**
- * An entity object that abstracts the email account information
- * of a user. Currently, all the information retrieved is related
- * to the user's inbox.
+ * Encapsulates basic information about the email INBOX.  Typicaly sent to the 
+ * browser via AJAX.
  *
  * @author Andreas Christoforides
  * @author Jen Bourey, jbourey@unicon.net

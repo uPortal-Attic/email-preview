@@ -36,10 +36,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
-import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.auth.PortletPreferencesCredentialsAuthenticationServiceImpl;
@@ -58,7 +58,7 @@ public final class EditPreferencesController {
     private static final String FOCUS_ON_PREVIEW_PREFERENCE = "focusOnPreview";
     private static final String DEFAULT_FOCUS_ON_PREVIEW = "true";
 
-    private IMailStoreDao mailStoreDao;
+    private IServiceBroker serviceBroker;
     IEmailAccountDao emailAccountDao;
     private IAuthenticationServiceRegistry authServiceRegistry;
     private List<String> protocols;
@@ -68,23 +68,23 @@ public final class EditPreferencesController {
     public ModelAndView getAccountFormView(RenderRequest req) {
 
         Map<String,Object> model = new HashMap<String,Object>();
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
         
         // form
         PortletSession session = req.getPortletSession(false);
         MailStoreConfigurationForm form = (MailStoreConfigurationForm) session.getAttribute(CONFIG_FORM_KEY);
         if (form == null) {
-            form = MailStoreConfigurationForm.create(mailStoreDao, req);
+            form = MailStoreConfigurationForm.create(serviceBroker, req);
         } else {
             session.removeAttribute(CONFIG_FORM_KEY);
         }
         model.put("form", form);
         
         // Disable some config elements?
-        model.put("disableProtocol", mailStoreDao.isReadOnly(req, MailPreferences.PROTOCOL));
-        model.put("disableHost", mailStoreDao.isReadOnly(req, MailPreferences.HOST));
-        model.put("disablePort", mailStoreDao.isReadOnly(req, MailPreferences.PORT));
-        model.put("disableAuthService", mailStoreDao.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY));
+        model.put("disableProtocol", config.isReadOnly(req, MailPreferences.PROTOCOL));
+        model.put("disableHost", config.isReadOnly(req, MailPreferences.HOST));
+        model.put("disablePort", config.isReadOnly(req, MailPreferences.PORT));
+        model.put("disableAuthService", config.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY));
         
         // Available protocols
         model.put("protocols", protocols);
@@ -168,12 +168,12 @@ public final class EditPreferencesController {
          * Mail Config
          */
         
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
-        MailStoreConfigurationForm form = MailStoreConfigurationForm.create(mailStoreDao, req);
+        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        MailStoreConfigurationForm form = MailStoreConfigurationForm.create(serviceBroker, req);
         String err = null;  // default
         String mailAccountAtStart = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
 
-        if (!mailStoreDao.isReadOnly(req, MailPreferences.PROTOCOL)) {
+        if (!config.isReadOnly(req, MailPreferences.PROTOCOL)) {
             String protocol = req.getParameter(MailPreferences.PROTOCOL.getKey());
             protocol = protocol != null ? protocol.trim() : "";
             if (log.isDebugEnabled()) {
@@ -189,7 +189,7 @@ public final class EditPreferencesController {
             }
         }
         
-        if (!mailStoreDao.isReadOnly(req, MailPreferences.HOST)) {
+        if (!config.isReadOnly(req, MailPreferences.HOST)) {
             String host = req.getParameter(MailPreferences.HOST.getKey());
             host = host != null ? host.trim() : "";
             if (log.isDebugEnabled()) {
@@ -201,7 +201,7 @@ public final class EditPreferencesController {
             }
         }
 
-        if (!mailStoreDao.isReadOnly(req, MailPreferences.PORT)) {
+        if (!config.isReadOnly(req, MailPreferences.PORT)) {
             String port = req.getParameter(MailPreferences.PORT.getKey());
             port = port != null ? port.trim() : "";
             if (log.isDebugEnabled()) {
@@ -217,7 +217,7 @@ public final class EditPreferencesController {
             }
         }
         
-        if (!mailStoreDao.isReadOnly(req, MailPreferences.MARK_MESSAGES_AS_READ)) {
+        if (!config.isReadOnly(req, MailPreferences.MARK_MESSAGES_AS_READ)) {
             String markMessagesAsRead = req.getParameter(MailPreferences.MARK_MESSAGES_AS_READ.getKey());
             // No need to handle missing value because absence will (correctly) be converted to 'false' 
             if (log.isDebugEnabled()) {
@@ -226,7 +226,7 @@ public final class EditPreferencesController {
             form.setMarkMessagesAsRead(Boolean.valueOf(markMessagesAsRead));
         }
 
-        if (!mailStoreDao.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY)) {
+        if (!config.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY)) {
             String authKey = req.getParameter(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey());
             authKey = authKey != null ? authKey.trim() : "";
             if (log.isDebugEnabled()) {
@@ -244,7 +244,7 @@ public final class EditPreferencesController {
         if (PortletPreferencesCredentialsAuthenticationServiceImpl.KEY.equals(form.getAuthenticationServiceKey())) {
             
             // Update username
-            if (!mailStoreDao.isReadOnly(req, MailPreferences.MAIL_ACCOUNT)) {
+            if (!config.isReadOnly(req, MailPreferences.MAIL_ACCOUNT)) {
                 String mailAccount = req.getParameter(MailPreferences.MAIL_ACCOUNT.getKey());
                 mailAccount = mailAccount != null ? mailAccount.trim() : "";
                 if (log.isDebugEnabled()) {
@@ -258,7 +258,7 @@ public final class EditPreferencesController {
             }
 
             // Update password, if entered
-            if (!mailStoreDao.isReadOnly(req, MailPreferences.PASSWORD)) {
+            if (!config.isReadOnly(req, MailPreferences.PASSWORD)) {
                 String password = req.getParameter("ppauth_password");
                 password = password != null ? password.trim() : "";
                 if (log.isDebugEnabled()) {
@@ -300,7 +300,7 @@ public final class EditPreferencesController {
                 config.getAdditionalProperties().remove(MailPreferences.PASSWORD.getKey());
             }
             
-            mailStoreDao.saveConfiguration(req, config);
+            serviceBroker.saveConfiguration(req, config);
             emailAccountDao.clearCache(req.getRemoteUser(), mailAccountAtStart);
             res.setPortletMode(PortletMode.VIEW);
         } else {
@@ -321,8 +321,8 @@ public final class EditPreferencesController {
     }
 
     @Autowired(required = true)
-    public void setMailStoreDao(IMailStoreDao mailStoreDao) {
-        this.mailStoreDao = mailStoreDao;
+    public void setServiceBroker(IServiceBroker serviceBroker) {
+        this.serviceBroker = serviceBroker;
     }
 
     @Resource(name="protocols")

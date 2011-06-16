@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
-import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
@@ -61,11 +61,11 @@ public class EmailMessageController {
         this.emailAccountDao = emailAccountDao;
     }
 
-    private IMailStoreDao mailStoreDao;
+    private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
-    public void setMailStoreDao(IMailStoreDao mailStoreDao) {
-        this.mailStoreDao = mailStoreDao;
+    public void setServiceBroker(IServiceBroker serviceBroker) {
+        this.serviceBroker = serviceBroker;
     }
 
     private AjaxPortletSupportService ajaxPortletSupportService;
@@ -94,7 +94,7 @@ public class EmailMessageController {
 
         try {
 
-            MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+            MailStoreConfiguration config = serviceBroker.getConfiguration(request);
 
             IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
             if (authService == null) {
@@ -145,7 +145,7 @@ public class EmailMessageController {
 
             if (messages != null && messages.length != 0) {
 
-                MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+                MailStoreConfiguration config = serviceBroker.getConfiguration(req);
 
                 IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
                 if (authService == null) {
@@ -181,7 +181,7 @@ public class EmailMessageController {
 
             if (messages != null && messages.length != 0) {
 
-                MailStoreConfiguration config = mailStoreDao.getConfiguration(req);
+                MailStoreConfiguration config = serviceBroker.getConfiguration(req);
 
                 IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
                 if (authService == null) {

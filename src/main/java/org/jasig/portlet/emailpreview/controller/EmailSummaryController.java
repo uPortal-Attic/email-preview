@@ -35,7 +35,7 @@ import javax.portlet.WindowState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IMailStoreDao;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -75,11 +75,11 @@ public class EmailSummaryController {
         this.adminRoleName = adminRoleName;
     }
     
-    private IMailStoreDao mailStoreDao;
+    private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
-    public void setMailStoreDao(IMailStoreDao mailStoreDao) {
-        this.mailStoreDao = mailStoreDao;
+    public void setServiceBroker(IServiceBroker serviceBroker) {
+        this.serviceBroker = serviceBroker;
     }
 
     private IAuthenticationServiceRegistry authServiceRegistry;
@@ -169,7 +169,7 @@ public class EmailSummaryController {
         
         Map<String,Object> model = new HashMap<String,Object>();
         
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+        MailStoreConfiguration config = serviceBroker.getConfiguration(request);
         IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
 
         // Make an intelligent guess about the emailAddress
@@ -227,7 +227,7 @@ public class EmailSummaryController {
                             ALLOW_DELETE_KEY, "false"));
         model.put("allowDelete", allowDelete);
         
-        MailStoreConfiguration config = mailStoreDao.getConfiguration(request);
+        MailStoreConfiguration config = serviceBroker.getConfiguration(request);
         model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
         
         // Check if this mail server supports setting the READ/UNREAD flag
