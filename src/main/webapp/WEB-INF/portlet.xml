@@ -61,6 +61,29 @@
         <portlet-preferences>
         
             <!-- 
+                When the portlet first renders, if user action (config and/or 
+                credentials) is needed to access the mail server, a welcome 
+                screen will appear informing the user.  This preference defines 
+                the title of that screen.
+            -->
+            <preference>
+                <name>welcomeTitle</name>
+                <value>Welcome to Email Preview</value>
+            </preference>
+
+            <!-- 
+                Additional instructions, if any, that should be displayed on the 
+                welcome screen.  This preference supports arbitrary HTML.
+                
+                NOTE:  Some simple, general instructions will appear even if 
+                this preference is blank.
+            -->
+            <preference>
+                <name>welcomeInstructions</name>
+                <value></value>
+            </preference>
+
+            <!-- 
                 Determines which screen appears first when the portlet first 
                 renders.  Available values are:
                 

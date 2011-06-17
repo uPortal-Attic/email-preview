@@ -68,8 +68,8 @@ public class AjaxUpdatePageSizeController {
         // Define view and generate model
         Map<String, Object> model = new HashMap<String, Object>();
 
-        if (!prefs.isReadOnly(EmailSummaryController.PAGE_SIZE_KEY)) {
-            prefs.setValue(EmailSummaryController.PAGE_SIZE_KEY, Integer.toString(newPageSize));
+        if (!prefs.isReadOnly(EmailSummaryController.PAGE_SIZE_PREFERENCE)) {
+            prefs.setValue(EmailSummaryController.PAGE_SIZE_PREFERENCE, Integer.toString(newPageSize));
             prefs.store();
             model.put(STATUS_KEY, true);
             ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);

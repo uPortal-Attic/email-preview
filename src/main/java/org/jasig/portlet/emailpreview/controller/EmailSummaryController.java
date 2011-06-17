@@ -56,49 +56,157 @@ import org.springframework.web.portlet.ModelAndView;
 @RequestMapping("VIEW")
 public class EmailSummaryController {
 
+    public final static String WELCOME_TITLE_PREFERENCE = "welcomeTitle";
+    public final static String WELCOME_INSTRUCTIONS_PREFERENCE = "welcomeInstructions";
     public final static String DEFAULT_VIEW_PREFERENCE = "defaultView";
-    public final static String PAGE_SIZE_KEY = "pageSize";
-    public final static String ALLOW_DELETE_KEY = "allowDelete";
-    public final static String SUPPORTS_TOGGLE_SEEN = "supportsToggleSeen";
-    public final static String VIEW_ROLLUP = "rollup";
-    public final static String VIEW_PREVIEW = "preview";
-
+    public final static String PAGE_SIZE_PREFERENCE = "pageSize";
+    public final static String ALLOW_DELETE_PREFERENCE = "allowDelete";
+    
+    public final static String SUPPORTS_TOGGLE_SEEN_KEY = "supportsToggleSeen";
     private final static String SHOW_CONFIG_LINK_KEY = "showConfigLink";
     
-    private final Pattern domainPattern = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
-
-    private String adminRoleName = "admin";
+    private final static String DEFAULT_WELCOME_TITLE = "Welcome to Email Preview";  
+    private final static String DEFAULT_WELCOME_INSTRUCTIONS = "";  
 
     private final Log log = LogFactory.getLog(this.getClass());
+    private String adminRoleName = "admin";
+
+    @Autowired(required = true)
+    private IServiceBroker serviceBroker;
+
+    @Autowired(required = true)
+    private IAuthenticationServiceRegistry authServiceRegistry;
+
+    @Autowired(required = true)
+    private ILinkServiceRegistry linkServiceRegistry;
+    
+    @Resource
+    private Map<String,String> jsErrorMessages;
+
+    /**
+     * Three possible views for this controller.
+     */
+    public enum View {
+        
+        /**
+         * Indicates the portlet is not yet (completely) configured
+         */
+        WELCOME("welcome") {
+            @Override
+            public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
+                PortletPreferences prefs = req.getPreferences();
+                Map<String,Object> model = new HashMap<String,Object>();
+                model.put(WELCOME_TITLE_PREFERENCE, prefs.getValue(WELCOME_TITLE_PREFERENCE, DEFAULT_WELCOME_TITLE));
+                model.put(WELCOME_INSTRUCTIONS_PREFERENCE, prefs.getValue(WELCOME_INSTRUCTIONS_PREFERENCE, DEFAULT_WELCOME_INSTRUCTIONS));
+                return new ModelAndView(getKey(), model);
+            }
+        },
+        
+        /**
+         * Indicates the portlet is not yet (completely) configured
+         */
+        ROLLUP("rollup") {
+            private final Pattern domainPattern = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
+
+            @Override
+            public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
+                Map<String,Object> model = new HashMap<String,Object>();
+                
+                MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
+                IAuthenticationService authService = controller.authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+
+                // Make an intelligent guess about the emailAddress
+                String emailAddress = null;
+                String mailAccount = authService.getMailAccountName(req, config);
+                String nameSuffix = config.getUsernameSuffix();
+                String serverName = config.getHost();
+                if (mailAccount.contains("@")) {
+                    emailAddress = mailAccount;
+                } else if (nameSuffix != null && nameSuffix.length() != 0) {
+                    emailAddress = mailAccount + nameSuffix;
+                } else {
+                    emailAddress = mailAccount;
+                    Matcher m = domainPattern.matcher(serverName);
+                    if (m.find()) {
+                        emailAddress = emailAddress + "@" + m.group(1);
+                    }
+                }
+                model.put("emailAddress", emailAddress);
+                
+                IEmailLinkService linkService = controller.linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
+                if (linkService != null) {
+                    String inboxUrl = linkService.getInboxUrl(req, config);
+                    model.put("inboxUrl", inboxUrl);
+                }
+
+                return new ModelAndView(getKey(), model);
+            }
+        },
+        
+        /**
+         * Tabular view of the INBOX with lots of features
+         */
+        PREVIEW("preview") {
+            @Override
+            public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
+                Map<String,Object> model = new HashMap<String,Object>();
+
+                PortletPreferences prefs = req.getPreferences();
+
+                // PageSize:  this value can be set by administrators as a publish-time 
+                // portlet preference, and (normally) overridden by users as a 
+                // user-defined portlet preference.
+                int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_PREFERENCE, "10"));
+                model.put(PAGE_SIZE_PREFERENCE, pageSize);
+                
+                // Check to see if the portlet is configured to display a link
+                // to config mode and if it applies to this user
+                boolean showConfigLink = Boolean.valueOf(prefs.getValue(
+                                    SHOW_CONFIG_LINK_KEY, "false"));
+                if (showConfigLink) {
+                    showConfigLink = req.isUserInRole(controller.adminRoleName);
+                }
+                model.put("showConfigLink", showConfigLink);
+
+                // Also see if the portlet is configured
+                // to permit users to delete messages
+                boolean allowDelete = Boolean.valueOf(prefs.getValue(
+                                    ALLOW_DELETE_PREFERENCE, "false"));
+                model.put("allowDelete", allowDelete);
+                
+                MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
+                model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
+                
+                // Check if this mail server supports setting the READ/UNREAD flag
+                model.put(SUPPORTS_TOGGLE_SEEN_KEY, config.supportsToggleSeen());
+
+                return new ModelAndView(getKey(), model);
+            }
+        };
+        
+        private final String key;
+        
+        public static View getInstance(String key) {
+            for (View v : View.values()) {
+                if (v.getKey().equals(key)) {
+                    return v;
+                }
+            }
+            throw new RuntimeException("Unrecognized view:  " + key);
+        }
+        
+        private View(String key) { this.key = key; }
+        
+        public String getKey() { return key; }
+        
+        public abstract ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller);
+        
+    }
     
     public void setAdminRoleName(String adminRoleName) {
         this.adminRoleName = adminRoleName;
     }
-    
-    private IServiceBroker serviceBroker;
 
-    @Autowired(required = true)
-    public void setServiceBroker(IServiceBroker serviceBroker) {
-        this.serviceBroker = serviceBroker;
-    }
-
-    private IAuthenticationServiceRegistry authServiceRegistry;
-
-    @Autowired(required = true)
-    public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
-        this.authServiceRegistry = authServiceRegistry;
-    }
-
-    private ILinkServiceRegistry linkServiceRegistry;
-
-    @Autowired(required = true)
-    public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
-        this.linkServiceRegistry = linkServiceRegistry;
-    }
-    
-    @Resource
-    private Map<String,String> jsErrorMessages;
-    
     /*
      * Action Phase
      */
@@ -107,7 +215,7 @@ public class EmailSummaryController {
     public void switchToRollup(ActionRequest req, ActionResponse res) {
         PortletPreferences prefs = req.getPreferences();
         try {
-            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, View.ROLLUP.getKey());
             prefs.store();
         } catch (Throwable t) {
             log.error("Failed to update " + DEFAULT_VIEW_PREFERENCE + " for user " + req.getRemoteUser(), t);
@@ -119,7 +227,7 @@ public class EmailSummaryController {
     public void switchToPreview(ActionRequest req, ActionResponse res) {
         PortletPreferences prefs = req.getPreferences();
         try {
-            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, VIEW_PREVIEW);
+            prefs.setValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, View.PREVIEW.getKey());
             prefs.store();
         } catch (Throwable t) {
             log.error("Failed to update " + DEFAULT_VIEW_PREFERENCE + " for user " + req.getRemoteUser(), t);
@@ -135,105 +243,33 @@ public class EmailSummaryController {
     @SuppressWarnings("unchecked")
     public ModelAndView chooseView(RenderRequest req, RenderResponse res) throws Exception {
         
-        String showView = null;
+        View showView = null;
         
-        // Rule #1:  WindowState trumps other factors
-        if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
-            showView = VIEW_PREVIEW;
-        }
-        
-        // Rule #2:  Use the defaultView preference;  this setting gets updated 
-        // every time the user changes from one to the other
-        if (showView == null) {
+        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+        if (!authService.isConfigured(req, config)) {
+            // Rule #1:  If we're not configured for authentication, 
+            // show the 'welcome' view so the user knows what to do
+            showView = View.WELCOME;
+        } else if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
+            // Rule #2:  We don't show the rollup in MAXIMIZED state
+            showView = View.PREVIEW;
+        } else {
+            // Rule #3:  Use the defaultView preference;  this setting gets updated 
+            // every time the user changes from one to the other (it's sticky)
             PortletPreferences prefs = req.getPreferences();
-            showView = prefs.getValue(DEFAULT_VIEW_PREFERENCE, VIEW_ROLLUP);
+            String viewName = prefs.getValue(DEFAULT_VIEW_PREFERENCE, View.ROLLUP.getKey());
+            showView = View.getInstance(viewName);
         }
 
         // Now render the choice...
-        ModelAndView rslt = null;
-        if (VIEW_PREVIEW.equals(showView)) {
-            rslt = showPreview(req, res);
-        } else {
-            rslt = showRollup(req, res);
-        }
+        ModelAndView rslt = showView.show(req, res, this);
         
         // Add common model stuff...
         rslt.getModel().put("jsErrorMessages", jsErrorMessages);
         rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
         
         return rslt;
-
-    }
-
-    private ModelAndView showRollup(RenderRequest request, RenderResponse response) throws Exception {
-        
-        Map<String,Object> model = new HashMap<String,Object>();
-        
-        MailStoreConfiguration config = serviceBroker.getConfiguration(request);
-        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-
-        // Make an intelligent guess about the emailAddress
-        String emailAddress = null;
-        String mailAccount = authService.getMailAccountName(request, config);
-        String nameSuffix = config.getUsernameSuffix();
-        String serverName = config.getHost();
-        if (mailAccount.contains("@")) {
-            emailAddress = mailAccount;
-        } else if (nameSuffix != null && nameSuffix.length() != 0) {
-            emailAddress = mailAccount + nameSuffix;
-        } else {
-            emailAddress = mailAccount;
-            Matcher m = domainPattern.matcher(serverName);
-            if (m.find()) {
-                emailAddress = emailAddress + "@" + m.group(1);
-            }
-        }
-        model.put("emailAddress", emailAddress);
-        
-        IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
-        if (linkService != null) {
-            String inboxUrl = linkService.getInboxUrl(request, config);
-            model.put("inboxUrl", inboxUrl);
-        }
-
-        return new ModelAndView("rollup", model);
-
-    }
-
-    private ModelAndView showPreview(RenderRequest request, RenderResponse response) throws Exception {
-
-        Map<String,Object> model = new HashMap<String,Object>();
-
-        PortletPreferences prefs = request.getPreferences();
-
-        // PageSize:  this value can be set by administrators as a publish-time 
-        // portlet preference, and (normally) overridden by users as a 
-        // user-defined portlet preference.
-        int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_KEY, "10"));
-        model.put(PAGE_SIZE_KEY, pageSize);
-        
-        // Check to see if the portlet is configured to display a link
-        // to config mode and if it applies to this user
-        boolean showConfigLink = Boolean.valueOf(prefs.getValue(
-                            SHOW_CONFIG_LINK_KEY, "false"));
-        if (showConfigLink) {
-            showConfigLink = request.isUserInRole(this.adminRoleName);
-        }
-        model.put("showConfigLink", showConfigLink);
-
-        // Also see if the portlet is configured
-        // to permit users to delete messages
-        boolean allowDelete = Boolean.valueOf(prefs.getValue(
-                            ALLOW_DELETE_KEY, "false"));
-        model.put("allowDelete", allowDelete);
-        
-        MailStoreConfiguration config = serviceBroker.getConfiguration(request);
-        model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
-        
-        // Check if this mail server supports setting the READ/UNREAD flag
-        model.put(SUPPORTS_TOGGLE_SEEN, config.supportsToggleSeen());
-
-        return new ModelAndView("preview", model);
 
     }
 

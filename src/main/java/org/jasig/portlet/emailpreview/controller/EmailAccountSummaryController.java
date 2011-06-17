@@ -58,46 +58,20 @@ public class EmailAccountSummaryController {
 
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IEmailAccountDao emailAccountDao;
+    @Autowired(required = true)
+    private IEmailAccountDao accountDao;
 
     @Autowired(required = true)
-    public void setEmailAccountDao(IEmailAccountDao emailAccountDao) {
-        this.emailAccountDao = emailAccountDao;
-    }
-
     private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
-    public void setServiceBroker(IServiceBroker serviceBroker) {
-        this.serviceBroker = serviceBroker;
-    }
-
     private AjaxPortletSupportService ajaxPortletSupportService;
 
-    /**
-     * Set the service for handling portlet AJAX requests.
-     *
-     * @param ajaxPortletSupportService
-     */
     @Autowired(required = true)
-    public void setAjaxPortletSupportService(
-                    AjaxPortletSupportService ajaxPortletSupportService) {
-            this.ajaxPortletSupportService = ajaxPortletSupportService;
-    }
-
     private ILinkServiceRegistry linkServiceRegistry;
 
     @Autowired(required = true)
-    public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
-        this.linkServiceRegistry = linkServiceRegistry;
-    }
-
     private IAuthenticationServiceRegistry authServiceRegistry;
-
-    @Autowired(required = true)
-    public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
-        this.authServiceRegistry = authServiceRegistry;
-    }
 
     @RequestMapping(params = "action=accountSummary")
     public void getAccountSummary(ActionRequest request, ActionResponse response,
@@ -130,12 +104,12 @@ public class EmailAccountSummaryController {
 
             // Check if this is a refresh call;  clear cache if it is
             if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
-                emailAccountDao.clearCache(username, mailAccountName);
+                accountDao.clearCache(username, mailAccountName);
             }
 
             // Get current user's account information
             AccountSummary accountSummary = getAccountSummary(username, mailAccountName,
-                                    config, auth, pageStart, numberOfMessages);
+                                config, auth, pageStart, numberOfMessages);
 
             model.put("accountSummary", accountSummary);
 
@@ -172,7 +146,7 @@ public class EmailAccountSummaryController {
         // AccountSummary based on *all* the parameters, not just the ones
         // annotated with @PartialCacheKey on fetchAccountSummaryFromStore (below).
 
-        AccountSummary rslt = emailAccountDao.fetchAccountSummaryFromStore(username,
+        AccountSummary rslt = accountDao.fetchAccountSummaryFromStore(username,
                         mailAccount, config, auth, start, count);
 
         if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != count) {
@@ -190,8 +164,8 @@ public class EmailAccountSummaryController {
             }
 
             // Clear the cache & try again
-            emailAccountDao.clearCache(username, mailAccount);
-            rslt = emailAccountDao.fetchAccountSummaryFromStore(username,
+            accountDao.clearCache(username, mailAccount);
+            rslt = accountDao.fetchAccountSummaryFromStore(username,
                     mailAccount, config, auth, start, count);
         }
 

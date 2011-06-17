@@ -71,18 +71,25 @@ public class PortletPreferencesCredentialsAuthenticationServiceImpl implements I
         return configParams;
     }
 
+    @Override
+    public boolean isConfigured(PortletRequest req, MailStoreConfiguration config) {
+        String mailAccount = getMailAccountName(req, config);
+        String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
+        return (mailAccount != null && password != null);
+    }
+
     public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
         return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
     }
     
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
-        String username = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
-        String usernameSuffix = config.getUsernameSuffix();
-        if (!StringUtils.isBlank(usernameSuffix)) {
-            username = username.concat(usernameSuffix);
+        String rslt = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+        String suffix = config.getUsernameSuffix();
+        if (rslt != null && !StringUtils.isBlank(suffix)) {
+            rslt = rslt.concat(suffix);
         }
-        return username;
+        return rslt;
     }
 
     public String getKey() {

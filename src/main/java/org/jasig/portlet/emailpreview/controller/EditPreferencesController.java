@@ -129,7 +129,7 @@ public final class EditPreferencesController {
 
         if (!prefs.isReadOnly(EmailSummaryController.DEFAULT_VIEW_PREFERENCE)) {
             String defaultViewParam = req.getParameter(EmailSummaryController.DEFAULT_VIEW_PREFERENCE);
-            String currentDefaultView = prefs.getValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, EmailSummaryController.VIEW_ROLLUP);
+            String currentDefaultView = prefs.getValue(EmailSummaryController.DEFAULT_VIEW_PREFERENCE, EmailSummaryController.View.ROLLUP.getKey());
             if (defaultViewParam != null && !currentDefaultView.equals(defaultViewParam)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Changing users default view for user '" + req.getRemoteUser() 

@@ -54,39 +54,17 @@ public class EmailMessageController {
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IEmailAccountDao emailAccountDao;
+    @Autowired(required = true)
+    private IEmailAccountDao accountDao;
 
     @Autowired(required = true)
-    public void setEmailAccountDao(IEmailAccountDao emailAccountDao) {
-        this.emailAccountDao = emailAccountDao;
-    }
-
     private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
-    public void setServiceBroker(IServiceBroker serviceBroker) {
-        this.serviceBroker = serviceBroker;
-    }
-
     private AjaxPortletSupportService ajaxPortletSupportService;
 
-    /**
-     * Set the service for handling portlet AJAX requests.
-     *
-     * @param ajaxPortletSupportService
-     */
     @Autowired(required = true)
-    public void setAjaxPortletSupportService(
-                    AjaxPortletSupportService ajaxPortletSupportService) {
-            this.ajaxPortletSupportService = ajaxPortletSupportService;
-    }
-
     private IAuthenticationServiceRegistry authServiceRegistry;
-
-    @Autowired(required = true)
-    public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
-        this.authServiceRegistry = authServiceRegistry;
-    }
 
     @RequestMapping(params = "action=emailMessage")
     public void showMessage(ActionRequest request, ActionResponse response,
@@ -106,7 +84,7 @@ public class EmailMessageController {
             Authenticator auth = authService.getAuthenticator(request, config);
 
             // Get current user's account information
-            EmailMessage message = emailAccountDao.retrieveMessage(config, auth, messageNum);
+            EmailMessage message = accountDao.retrieveMessage(config, auth, messageNum);
             
             /*
              * A bit of after-market work on messages in certain circumstances
@@ -137,7 +115,7 @@ public class EmailMessageController {
 
         try {
 
-            String deletePermitted = req.getPreferences().getValue(EmailSummaryController.ALLOW_DELETE_KEY, "true");
+            String deletePermitted = req.getPreferences().getValue(EmailSummaryController.ALLOW_DELETE_PREFERENCE, "true");
             if (!Boolean.valueOf(deletePermitted)) {
                 String msg = "The delete function is not permitted for this portlet";
                 throw new RuntimeException(msg);
@@ -156,7 +134,7 @@ public class EmailMessageController {
                 }
                 Authenticator auth = authService.getAuthenticator(req, config);
 
-                emailAccountDao.deleteMessages(config, auth, messages);
+                accountDao.deleteMessages(config, auth, messages);
 
             }
 
@@ -194,7 +172,7 @@ public class EmailMessageController {
 
                 // Opportunity for improvement:  respond to return value 
                 // of 'false' with some user-facing message 
-                emailAccountDao.setSeenFlag(config, auth, messages, seenValue);
+                accountDao.setSeenFlag(config, auth, messages, seenValue);
 
             }
 

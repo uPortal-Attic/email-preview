@@ -61,32 +61,29 @@ public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationS
         return configParams;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jasig.portlet.emailpreview.service.IAuthenticationService#getAuthenticator(javax.portlet.PortletRequest, org.jasig.portlet.emailpreview.MailStoreConfiguration)
-     */
-    public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
-        
-        @SuppressWarnings("unchecked")
-        Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
-        String password = userInfo.get(PASSWORD_ATTRIBUTE);
+    @Override
+    public boolean isConfigured(PortletRequest req, MailStoreConfiguration config) {
+        String mailAccount = getMailAccountName(req, config);
+        String password = getPassword(req);
+        return (mailAccount != null && password != null);
+    }
 
-        return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
-
+    public Authenticator getAuthenticator(PortletRequest req, MailStoreConfiguration config) {
+        return new SimplePasswordAuthenticator(getMailAccountName(req, config), getPassword(req));
     }
 
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
 
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
-        String username = userInfo.get(USERNAME_ATTRIBUTE);
+        String rslt = userInfo.get(USERNAME_ATTRIBUTE);
         
         String usernameSuffix = config.getUsernameSuffix();
-        if (!StringUtils.isBlank(usernameSuffix)) {
-            username = username.concat(usernameSuffix);
+        if (rslt != null && !StringUtils.isBlank(usernameSuffix)) {
+            rslt = rslt.concat(usernameSuffix);
         }
         
-        return username;
+        return rslt;
 
     }
 
@@ -112,6 +109,12 @@ public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationS
      */
     public List<ConfigurationParameter> getUserConfigurationParameters() {
         return Collections.<ConfigurationParameter>emptyList();
+    }
+    
+    private String getPassword(PortletRequest req) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);
+        return userInfo.get(PASSWORD_ATTRIBUTE);
     }
 
 }

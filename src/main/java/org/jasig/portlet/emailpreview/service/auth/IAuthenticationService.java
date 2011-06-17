@@ -36,6 +36,17 @@ public interface IAuthenticationService {
      * @return
      */
     String getKey();
+    
+    /**
+     * <code>True</code> if the specified parameters contain enough information 
+     * to build a valid <code>Authenticator</code> if they were passed to the 
+     * {@link #getAuthenticator(PortletRequest, MailStoreConfiguration)} method.
+     * 
+     * @param request
+     * @param config
+     * @return
+     */
+    boolean isConfigured(PortletRequest request, MailStoreConfiguration config);
 
     /**
      * 
