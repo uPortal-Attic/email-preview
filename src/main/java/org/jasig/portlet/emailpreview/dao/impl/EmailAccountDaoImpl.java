@@ -18,6 +18,7 @@
  */
 package org.jasig.portlet.emailpreview.dao.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -40,7 +41,9 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
 import javax.mail.Flags.Flag;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.SharedByteArrayInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -151,10 +154,11 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         try {
 
             // Retrieve user's inbox
-            inbox = getUserInbox(config, auth);
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
-            List<EmailMessage> messages = getEmailMessages(inbox, start, count);
+            List<EmailMessage> messages = getEmailMessages(inbox, start, count, session);
 
             if ( log.isDebugEnabled() ) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
@@ -199,50 +203,71 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
 
     }
+    
+    private Session openMailSession(MailStoreConfiguration config, Authenticator auth) {
+        
+        // Assertions.
+        if (config == null) {
+            String msg = "Argument 'config' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
+        if (auth == null) {
+            String msg = "Argument 'auth' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
+        
+        // Initialize connection properties
+        Properties mailProperties = new Properties();
+        mailProperties.put("mail.store.protocol", config.getProtocol());
+        mailProperties.put("mail.host", config.getHost());
+        mailProperties.put("mail.port", config.getPort());
+        mailProperties.put("mail.debug", debug ? "true" : "false");
 
-    private Folder getUserInbox(MailStoreConfiguration storeConfig, Authenticator authenticator)
+        String protocolPropertyPrefix = "mail." + config.getProtocol() + ".";
+
+        // Set connection timeout property
+        int connectionTimeout = config.getConnectionTimeout();
+        if (connectionTimeout >= 0) {
+            mailProperties.put(protocolPropertyPrefix +
+                    "connectiontimeout", connectionTimeout);
+        }
+
+        // Set timeout property
+        int timeout = config.getTimeout();
+        if (timeout >= 0) {
+            mailProperties.put(protocolPropertyPrefix + "timeout", timeout);
+        }
+
+        // add each additional property
+        for (Map.Entry<String, String> property : config.getJavaMailProperties().entrySet()) {
+            mailProperties.put(property.getKey(), property.getValue());
+        }
+
+        // Connect/authenticate to the configured store
+        return Session.getInstance(mailProperties, auth);
+
+    }
+
+    private Folder getUserInbox(Session session, String folderName)
             throws MessagingException {
 
+        // Assertions.
+        if (session == null) {
+            String msg = "Argument 'session' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
+
         try {
-            // Initialize connection properties
-            Properties mailProperties = new Properties();
-            mailProperties.put("mail.store.protocol", storeConfig.getProtocol());
-            mailProperties.put("mail.host", storeConfig.getHost());
-            mailProperties.put("mail.port", storeConfig.getPort());
-            mailProperties.put("mail.debug", debug ? "true" : "false");
-
-            String protocolPropertyPrefix = "mail." + storeConfig.getProtocol() + ".";
-
-            // Set connection timeout property
-            int connectionTimeout = storeConfig.getConnectionTimeout();
-            if (connectionTimeout >= 0) {
-                mailProperties.put(protocolPropertyPrefix +
-                        "connectiontimeout", connectionTimeout);
-            }
-
-            // Set timeout property
-            int timeout = storeConfig.getTimeout();
-            if (timeout >= 0) {
-                mailProperties.put(protocolPropertyPrefix + "timeout", timeout);
-            }
-
-            // add each additional property
-            for (Map.Entry<String, String> property : storeConfig.getJavaMailProperties().entrySet()) {
-                mailProperties.put(property.getKey(), property.getValue());
-            }
-
-            // Connect/authenticate to the configured store
-            Session session = Session.getInstance(mailProperties, authenticator);
             Store store = session.getStore();
             store.connect();
 
             if (log.isDebugEnabled()) {
-                log.debug("Mail store created");
+                log.debug("Mail store connection established");
             }
 
             // Retrieve user's inbox folder
             Folder root = store.getDefaultFolder();
-            Folder inboxFolder = root.getFolder(storeConfig.getInboxFolderName());
+            Folder inboxFolder = root.getFolder(folderName);
 
             return inboxFolder;
         } catch (AuthenticationFailedException e) {
@@ -251,7 +276,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
     }
 
     protected List<EmailMessage> getEmailMessages(Folder mailFolder, int pageStart,
-            int messageCount) throws MessagingException, IOException, ScanException, PolicyException {
+            int messageCount, Session session) throws MessagingException, IOException, ScanException, PolicyException {
 
         int totalMessageCount = mailFolder.getMessageCount();
         int start = Math.max(1, totalMessageCount - pageStart - (messageCount - 1));
@@ -277,7 +302,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
         List<EmailMessage> emails = new LinkedList<EmailMessage>();
         for (Message currentMessage : messages) {
-            EmailMessage emailMessage = wrapMessage(currentMessage, false);
+            EmailMessage emailMessage = wrapMessage(currentMessage, false, session);
             emails.add(emailMessage);
         }
 
@@ -295,7 +320,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             int mode = config.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
 
             // Retrieve user's inbox
-            inbox = getUserInbox(config, auth);
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
             inbox.open(mode);
 
             Message message = inbox.getMessage(messageNum);
@@ -303,7 +329,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             if (config.getMarkMessagesAsRead()) {
                 message.setFlag(Flag.SEEN, true);
             }
-            EmailMessage emailMessage = wrapMessage(message, true);
+            EmailMessage emailMessage = wrapMessage(message, true, session);
             if (!config.getMarkMessagesAsRead()) {
                 // NOTE:  This is more than a little bit annoying.  Apparently
                 // the mere act of accessing the body content of a message in
@@ -338,13 +364,14 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         return null;
     }
 
-    public boolean deleteMessages(MailStoreConfiguration storeConfig, Authenticator auth, long[] uids) {
+    public boolean deleteMessages(MailStoreConfiguration config, Authenticator auth, long[] uids) {
 
         Folder inbox = null;
         try {
 
             // Retrieve user's inbox
-            inbox = getUserInbox(storeConfig, auth);
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
 
             // Verify that we can even perform this operation
             if (!(inbox instanceof UIDFolder)) {
@@ -382,7 +409,8 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         try {
 
             // Retrieve user's inbox
-            inbox = getUserInbox(config, auth);
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
 
             // Verify that we can even perform this operation
             if (!(inbox instanceof UIDFolder)) {
@@ -413,7 +441,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
     }
 
-    protected EmailMessage wrapMessage(Message msg, boolean populateContent) throws MessagingException, IOException, ScanException, PolicyException {
+    protected EmailMessage wrapMessage(Message msg, boolean populateContent, Session session) throws MessagingException, IOException, ScanException, PolicyException {
 
         // Prepare subject
         String subject = msg.getSubject();
@@ -424,27 +452,40 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
         }
 
         // Prepare content if requested
-        EmailMessageContent body = null;  // default...
-        // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
+        EmailMessageContent msgContent = null;  // default...
         if (populateContent) {
+            // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
             try {
-                Object content = msg.getContent();
-                body = getContentString(content, msg.getContentType());
-                String contentString = body.getContentString();
-                if (!StringUtils.isBlank(contentString)) {
-                    AntiSamy as = new AntiSamy();
-                    CleanResults cr = as.scan(contentString, policy);
-                    contentString = cr.getCleanHTML();
-                }
-                body.setContentString(contentString);
+                msgContent = getMessageContent(msg.getContent(), msg.getContentType());
             } catch (MessagingException me) {
-                // Message was digitally signed, and we are therefore unable to
-                // display the message body (which the user has requested);
-                // logging as INFO because this behavior is known & expected.
-                log.info("Unable to read message (digitally signed?)");
-                log.debug(me.getMessage(), me);
-                body = new EmailMessageContent("UNABLE TO READ MESSAGE BODY: " + me.getMessage(), false);
+                // We are unable to read digitally-signed messages (perhaps 
+                // others?) in the API-standard way;  we have to use a work around.
+                // See: http://www.oracle.com/technetwork/java/faq-135477.html#imapserverbug
+                // Logging as DEBUG because this behavior is known & expected.
+                log.debug("Difficulty reading a message (digitally signed?). Attempting workaround...");
+                try {
+                    MimeMessage mm = (MimeMessage) msg;
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    mm.writeTo(bos);
+                    bos.close();
+                    SharedByteArrayInputStream bis = new SharedByteArrayInputStream(bos.toByteArray());
+                    MimeMessage copy = new MimeMessage(session, bis);
+                    bis.close();
+                    msgContent = getMessageContent(copy.getContent(), copy.getContentType());
+                } catch (Throwable t) {
+                    log.error("Failed to read message body", t);
+                    msgContent = new EmailMessageContent("UNABLE TO READ MESSAGE BODY: " + t.getMessage(), false);
+                }
             }
+
+            // Sanitize with AntiSamy
+            String content = msgContent.getContentString();
+            if (!StringUtils.isBlank(content)) {
+                AntiSamy as = new AntiSamy();
+                CleanResults cr = as.scan(content, policy);
+                content = cr.getCleanHTML();
+            }
+            msgContent.setContentString(content);
         }
 
         // Prepare the UID if present
@@ -453,11 +494,11 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
             uid = ((UIDFolder) msg.getFolder()).getUID(msg);
         }
 
-        return new EmailMessage(msg, uid, subject, body);
+        return new EmailMessage(msg, uid, subject, msgContent);
 
     }
 
-    protected EmailMessageContent getContentString(Object content, String mimeType) throws IOException, MessagingException {
+    protected EmailMessageContent getMessageContent(Object content, String mimeType) throws IOException, MessagingException {
 
         // if this content item is a String, simply return it.
         if (content instanceof String) {
@@ -489,7 +530,7 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
                 }
 
                 else if (partContent instanceof MimeMultipart) {
-                    result = getContentString(partContent, contentType);
+                    result = getMessageContent(partContent, contentType);
                 }
 
                 if (result != null) {
