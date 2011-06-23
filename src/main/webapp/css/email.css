@@ -39,6 +39,7 @@
 .email-portlet-table th, .email-portlet-table td {
     border: 1px solid #CCC;
     cursor: auto;
+    word-wrap: break-word;
 }
 .email-portlet-table td div, .email-portlet-table td div a {
     white-space: nowrap;
