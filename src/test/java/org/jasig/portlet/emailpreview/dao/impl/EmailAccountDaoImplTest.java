@@ -23,10 +23,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +41,7 @@ public class EmailAccountDaoImplTest {
 
     @Mock Folder folder;
     EmailAccountDaoImpl accountDao;
+    private Session session = Session.getDefaultInstance(new Properties());
     
     @Before
     public void setUp() throws MessagingException {
@@ -57,26 +60,26 @@ public class EmailAccountDaoImplTest {
         when(folder.getMessageCount()).thenReturn(93);
         int pageStart = 20;
         int number = 30;
-        accountDao.getEmailMessages(folder, pageStart, number);
+        accountDao.getEmailMessages(folder, pageStart, number, session);
         verify(folder).getMessages(44, 73);
         
         // test the beginning of the paging set
         pageStart = 0;
         number = 30;
-        accountDao.getEmailMessages(folder, pageStart, number);
+        accountDao.getEmailMessages(folder, pageStart, number, session);
         verify(folder).getMessages(64, 93);
         
         // test the end of the paging set
         pageStart = 63;
         number = 30;
-        accountDao.getEmailMessages(folder, pageStart, number);
+        accountDao.getEmailMessages(folder, pageStart, number, session);
         verify(folder).getMessages(1, 30);
 
         // test a paging window that is greater than the number of messages
         // available
         pageStart = 73;
         number = 30;
-        accountDao.getEmailMessages(folder, pageStart, number);
+        accountDao.getEmailMessages(folder, pageStart, number, session);
         verify(folder).getMessages(1, 20);
 
     }
