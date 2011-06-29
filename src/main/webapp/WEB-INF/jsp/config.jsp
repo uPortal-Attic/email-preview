@@ -40,57 +40,57 @@
     
             <!-- General Configuration Section -->
             <div class="portlet-section" role="region">
-                <h3 class="portlet-section-header" role="heading">Basic Account Configuration</h3>
+                <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.basic"/></h3>
     
                 <div class="portlet-section-body">
 
                     <table>
                         <thead>
                             <tr>
-                                <th>Preference Name</th>
-                                <th>Value</th>
+                                <th><spring:message code="config.preferences.prefName"/></th>
+                                <th><spring:message code="config.preferences.value"/></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="host">Host:</form:label>
+                                    <form:label path="host"><spring:message code="config.preferences.host"/>:</form:label>
                                 </td>
                                 <td class="value"><form:input path="host"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="port">Port:</form:label>
+                                    <form:label path="port"><spring:message code="config.preferences.port"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="port"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="protocol">Protocol:</form:label>
+                                    <form:label path="protocol"><spring:message code="config.preferences.protocol"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="protocol"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="inboxFolderName">Inbox folder name:</form:label>
+                                    <form:label path="inboxFolderName"><spring:message code="config.preferences.inbox"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="inboxFolderName"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="timeout">Timeout:</form:label>
+                                    <form:label path="timeout"><spring:message code="config.preferences.timeout"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="timeout"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="connectionTimeout">Connection Timeout:</form:label>
+                                    <form:label path="connectionTimeout"><spring:message code="config.preferences.connTimeout"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="connectionTimeout"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="usernameSuffix">Username Suffix:</form:label>
+                                    <form:label path="usernameSuffix"><spring:message code="config.preferences.suffix"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="usernameSuffix"/></td>
                             </tr>
@@ -101,9 +101,9 @@
             </div>
             
             <div class="portlet-section" role="region">
-                <h3 class="portlet-section-header" role="heading">Linking</h3>
+                <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.linking"/></h3>
                 <div class="portlet-section-body">
-                    <form:label path="linkServiceKey">Link Service:</form:label>
+                    <form:label path="linkServiceKey"><spring:message code="config.preferences.service"/></form:label>
                     <form:select path="linkServiceKey" cssClass="link-service-input">
                         <c:forEach items="${ linkServices }" var="service">
                             <form:option value="${ service.key }"/>
@@ -113,8 +113,8 @@
                     <table class="link-service-parameters">
                         <thead>
                             <tr>
-                                <th>Preference Name</th>
-                                <th>Value</th>
+                                <th><spring:message code="config.preferences.prefName"/></th>
+                                <th><spring:message code="config.preferences.value"/></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,11 +134,11 @@
             </div>
     
             <div class="portlet-section" role="region">
-                <h3 class="portlet-section-header" role="heading">Authentication</h3>
-                <p>Choose at least one Authentication Service.  Enabling more than one service is supported, but is uncommon and may be confusing to users.</p>
+                <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.authentication"/></h3>
+                <p><spring:message code="config.preferences.comment"/></p>
                 <div class="portlet-section-body">
                     <!--
-                    <form:label path="authenticationServiceKey">Authentication Service:</form:label>
+                    <form:label path="authenticationServiceKey"><spring:message code="config.preferences.authentication.service"/></form:label>
                     <form:select path="authenticationServiceKey" cssClass="auth-service-input">
                         <c:forEach items="${ authServices }" var="service">
                             <form:option value="${ service.key }"/>
@@ -151,8 +151,8 @@
                     <table class="auth-service-parameters">
                         <thead>
                             <tr>
-                                <th><c:out value="${auth.key}"/> Parameter</th>
-                                <th>Value</th>
+                                <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>
+                                <th><spring:message code="config.preferences.value"/></th>
                             </tr>
                         </thead>
                         <tbody>
