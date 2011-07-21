@@ -110,15 +110,25 @@ public class EmailAccountSummaryController {
             // Get current user's account information
             AccountSummary accountSummary = getAccountSummary(username, mailAccountName,
                                 config, auth, pageStart, numberOfMessages);
+            
+            // Check for AuthN failure...
+            if (accountSummary.isValid()) {
+                model.put("accountSummary", accountSummary);
+                ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+            } else {
+                Throwable cause = accountSummary.getErrorCause();
+                if (MailAuthenticationException.class.isAssignableFrom(cause.getClass())) {
+                    model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
+                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
+                    log.info( "Authentication Failure (username='" + username + "') : " + cause.getMessage() );
+                } else {
+                    // See note below...
+                    model.put( "errorMessage", cause.getMessage() );
+                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+                    log.error( "Unanticipated Error", cause);
+                }
+            }
 
-            model.put("accountSummary", accountSummary);
-
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
-
-        } catch (MailAuthenticationException ex) {
-            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
-            log.info( "Authentication Failure (username='" + username + "') : " + ex.getMessage() );
         } catch (MailTimeoutException ex) {
             model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
             ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);

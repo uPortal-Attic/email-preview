@@ -181,6 +181,12 @@ public class EmailAccountDaoImpl implements IEmailAccountDao, InitializingBean, 
 
             return acountInfo;
 
+        } catch (MailAuthenticationException mae) {
+            // We used just to allow this exception to percolate up the chain, 
+            // but we learned that the entire stack trace gets written to 
+            // Catalina.out (by 3rd party code).  Since this is a common 
+            // occurrence, it causes space issues.
+            return new AccountSummary(mae);
         } catch (MessagingException me) {
             log.error("Exception encountered while retrieving account info", me);
             throw new EmailPreviewException(me);

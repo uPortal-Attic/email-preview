@@ -42,6 +42,7 @@ public class AccountSummary {
     private final int messagesStart;
     private final int messagesCount;
     private final boolean deleteSupported;
+    private final Throwable errorCause;
 
     public AccountSummary(Folder inbox, List<EmailMessage> messages,
                         int messagesStart, int messagesCount) throws MessagingException {
@@ -53,7 +54,51 @@ public class AccountSummary {
         this.messagesStart = messagesStart;
         this.messagesCount = messagesCount;
         this.deleteSupported = inbox instanceof UIDFolder;
+        this.errorCause = null;
 
+    }
+    
+    /**
+     * Indicates the account fetch did not succeed and provides the cause.  
+     * Previously we would communicate this fact by throwing an exception, but 
+     * we learned that (1) the caching API we use writes these exceptions to 
+     * Catalina.out, and (2) occurances of {@link MailAuthenticationException} 
+     * are very common, and the logs were being flooded with them.
+     * 
+     * @param errorCause
+     */
+    public AccountSummary(Throwable errorCause) {
+        
+        // Assertions.
+        if (errorCause == null) {
+            String msg = "Argument 'errorCause' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
+        
+        // Instance Members
+        this.numUnreadMessages = -1;
+        this.numTotalMessages = -1;
+        this.messages = null;
+        this.messagesStart = -1;
+        this.messagesCount = -1;
+        this.deleteSupported = false;
+        this.errorCause = errorCause;
+
+    }
+    
+    /**
+     * Indicates if this object contains valid account details.  Otherwise, it 
+     * will contain an error payload. 
+     * 
+     * @return False if this object represents an error condition instead of an 
+     * account summary
+     */
+    public boolean isValid() {
+        return errorCause == null;
+    }
+    
+    public Throwable getErrorCause() {
+        return errorCause;
     }
 
     /**
