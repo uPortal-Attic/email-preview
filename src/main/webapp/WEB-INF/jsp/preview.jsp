@@ -71,15 +71,15 @@
         <form name="inboxForm">
         
             <p>
-                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="preview.toolbar.inbox"/></a> 
+                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/></a> 
                 (<span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>)
-                | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/> <spring:message code="preview.toolbar.refresh"/></a>
+                | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/>&nbsp;<spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
-                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/> <spring:message code="preview.toolbar.deleteSelected"/></a>
+                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/>&nbsp;<spring:message code="preview.toolbar.deleteSelected"/></a>
                 </c:if>
-                | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/> <spring:message code="preview.toolbar.closePreview"/></a>
+                | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/>&nbsp;<spring:message code="preview.toolbar.closePreview"/></a>
                 <c:if test="${supportsEdit}">
-                | <a class="email-action-link" href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="preview.toolbar.preferences"/></a>
+                | <a class="email-action-link" href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/>&nbsp;<spring:message code="preview.toolbar.preferences"/></a>
                 </c:if>
             </p>
 

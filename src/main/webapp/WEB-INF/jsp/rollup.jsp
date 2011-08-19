@@ -70,7 +70,7 @@
         display: block;
     }
     .emailSplash .text {
-        top: 25px;
+        top: 0px;
         left: 118px;
         line-height: 20px;
     }
@@ -103,7 +103,11 @@
     </div>
     <div class="text">
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
-        <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>"><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></a> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/></p>
+        <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <b><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></b> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
+        <c:if test="${inboxUrl ne null}">
+            &bull; <a href="${inboxUrl}" target="_blank"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
+        </c:if>
+        &bull; <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>"><spring:message code="rollup.summary.previewLink"/></a> <spring:message code="rollup.summary.previewPostLink"/></p>
     </div>
     <div class="inbox">
         <c:if test="${inboxUrl ne null}">
