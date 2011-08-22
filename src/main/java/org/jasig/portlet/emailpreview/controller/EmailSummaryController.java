@@ -268,6 +268,7 @@ public class EmailSummaryController {
         // Add common model stuff...
         rslt.getModel().put("jsErrorMessages", jsErrorMessages);
         rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
+        rslt.getModel().put("supportsHelp", req.isPortletModeAllowed(PortletMode.HELP));
         
         return rslt;
 

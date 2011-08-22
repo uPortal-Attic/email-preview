@@ -451,6 +451,7 @@
                                 <include>rs/famfamfam/silk/1.3/door_out.png</include>
                                 <include>rs/famfamfam/silk/1.3/email.png</include>
                                 <include>rs/famfamfam/silk/1.3/flag_red.png</include>
+								<include>rs/famfamfam/silk/1.3/help.png</include>
                             </includes>
                         </overlay>
                     </overlays>

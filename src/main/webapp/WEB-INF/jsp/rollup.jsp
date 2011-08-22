@@ -105,16 +105,19 @@
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
         <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <b><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></b> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
         <c:if test="${inboxUrl ne null}">
-            &bull; <a href="${inboxUrl}" target="_blank"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
+            &bull; <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.summary.inboxLink.tooltip"/>"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
         </c:if>
-        &bull; <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>"><spring:message code="rollup.summary.previewLink"/></a> <spring:message code="rollup.summary.previewPostLink"/></p>
+        &bull; <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>" title="<spring:message code="rollup.summary.previewLink.tooltip"/>"><spring:message code="rollup.summary.previewLink"/></a> <spring:message code="rollup.summary.previewPostLink"/></p>
     </div>
     <div class="inbox">
         <c:if test="${inboxUrl ne null}">
-            <a href="${inboxUrl}" target="_blank"><img alt="<spring:message code="rollup.inbox.linkText"/>" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a><br/>
+            <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.inbox.linkText.tooltip"/>"><img alt="<spring:message code="rollup.inbox.linkText"/>" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a><br/>
         </c:if>
         <c:if test="${supportsEdit}">
-            <a href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="rollup.inbox.preferences"/></a>
+            <a href="<portlet:renderURL portletMode="EDIT"/>" title="<spring:message code="rollup.inbox.preferences.tooltip"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="rollup.inbox.preferences"/></a><br/>
+        </c:if>
+        <c:if test="${supportsHelp}">
+           <a href="<portlet:renderURL portletMode="HELP"/>" title="<spring:message code="rollup.inbox.help.tooltip"/>"><img alt="Help" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/help.png"/>"/> <spring:message code="rollup.inbox.help"/></a>
         </c:if>
     </div>
 </div>

@@ -49,6 +49,7 @@
             <mime-type>text/html</mime-type>
             <portlet-mode>view</portlet-mode>
             <portlet-mode>edit</portlet-mode>
+            <portlet-mode>help</portlet-mode>
             <portlet-mode>config</portlet-mode>
         </supports>
         <supported-locale>en</supported-locale>
@@ -189,6 +190,30 @@
                 <name>allowableAuthenticationServiceKeys</name>
                 <value>portletPreferences</value>
             </preference>
+            
+            
+            <!-- 
+                When the help mode of the portlet is selected, the following title is displayed
+            -->
+            <preference>
+                <name>helpTitle</name>
+                <value>Email Preview Help</value>
+            </preference>
+
+            <!-- 
+                Additional instructions, if any, that should be displayed on the 
+                help screen.  This preference supports arbitrary HTML (which must be encoded).
+                
+                Override this text with custom help instructions or disable HELP mode in the Portlet Manager.               
+            -->
+            <preference>
+                <name>helpInstructions</name>
+                <value>
+&lt;p&gt;This portlet will let you see if you have new email and peek at messages in your IMAP- or POP-enabled mail account.&lt;/p&gt;
+&lt;p&gt;You can read the message, see if the message has any attachments, and delete unwanted messages. You &lt;em&gt;cannot&lt;/em&gt; send or reply to messages using this portlet.&lt;/p&gt;
+&lt;p&gt;For a fully-featured email client, click on the "Inbox" link.&lt;/p&gt;
+                </value>
+            </preference>   
 
         </portlet-preferences>
         

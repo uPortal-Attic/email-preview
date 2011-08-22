@@ -81,6 +81,9 @@
                 <c:if test="${supportsEdit}">
                 | <a class="email-action-link" href="<portlet:renderURL portletMode="EDIT"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/>&nbsp;<spring:message code="preview.toolbar.preferences"/></a>
                 </c:if>
+                <c:if test="${supportsHelp}">
+                | <a class="email-action-link" href="<portlet:renderURL portletMode="HELP"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/help.png"/>"/> <spring:message code="preview.toolbar.help"/></a>
+                </c:if>
             </p>
 
             <div class="fl-pager">
