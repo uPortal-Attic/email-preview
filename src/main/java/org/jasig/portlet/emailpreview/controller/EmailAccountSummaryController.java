@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.mail.Authenticator;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -30,16 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountSummary;
-import org.jasig.portlet.emailpreview.EmailPreviewException;
-import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
-import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
-import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.jasig.portlet.emailpreview.servlet.HttpErrorResponseController;
 import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,79 +51,59 @@ public class EmailAccountSummaryController {
     protected final Log log = LogFactory.getLog(getClass());
 
     @Autowired(required = true)
-    private IEmailAccountDao accountDao;
-
-    @Autowired(required = true)
-    private IServiceBroker serviceBroker;
+    private IEmailAccountService accountDao;
 
     @Autowired(required = true)
     private AjaxPortletSupportService ajaxPortletSupportService;
-
-    @Autowired(required = true)
-    private ILinkServiceRegistry linkServiceRegistry;
-
-    @Autowired(required = true)
-    private IAuthenticationServiceRegistry authServiceRegistry;
+    
+    public static final String FORCE_REFRESH_PARAMETER = "forceRefresh";
 
     @RequestMapping(params = "action=accountSummary")
-    public void getAccountSummary(ActionRequest request, ActionResponse response,
-            @RequestParam("pageStart") int pageStart,
-            @RequestParam("numberOfMessages") int numberOfMessages) throws IOException {
+    public void getAccountSummary(ActionRequest req, ActionResponse res,
+            @RequestParam("pageStart") int start,
+            @RequestParam("numberOfMessages") int max) throws IOException {
 
         // Define view and generate model
         Map<String, Object> model = new HashMap<String, Object>();
 
-        String username = request.getRemoteUser();
+        String username = req.getRemoteUser();
         try {
 
-            MailStoreConfiguration config = serviceBroker.getConfiguration(request);
-
-            IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
-            if (linkService != null) {
-                String inboxUrl = linkService.getInboxUrl(request, config);
-                model.put("inboxUrl", inboxUrl);
-            }
-
-            IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-            if (authService == null) {
-                String msg = "Unrecognized authentication service:  "
-                                + config.getAuthenticationServiceKey();
-                log.error(msg);
-                throw new RuntimeException(msg);
-            }
-            Authenticator auth = authService.getAuthenticator(request, config);
-            String mailAccountName = authService.getMailAccountName(request, config);
-
-            // Check if this is a refresh call;  clear cache if it is
-            if (Boolean.parseBoolean(request.getParameter("forceRefresh"))) {
-                accountDao.clearCache(username, mailAccountName);
+            // Force a re-load from the data source if called for by the UI.
+            boolean refresh = Boolean.valueOf(req.getParameter(FORCE_REFRESH_PARAMETER));
+            
+            // Or because of a change in settings.
+            if (req.getPortletSession().getAttribute(FORCE_REFRESH_PARAMETER) != null) {
+                // Doesn't matter what the value is;  this calles for a refresh...
+                refresh = true;
+                req.getPortletSession().removeAttribute(FORCE_REFRESH_PARAMETER);
             }
 
             // Get current user's account information
-            AccountSummary accountSummary = getAccountSummary(username, mailAccountName,
-                                config, auth, pageStart, numberOfMessages);
+            AccountSummary accountSummary = accountDao.getAccountSummary(req, start, max, refresh);
             
             // Check for AuthN failure...
             if (accountSummary.isValid()) {
                 model.put("accountSummary", accountSummary);
-                ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+                model.put("inboxUrl", accountSummary.getInboxUrl());
+                ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
             } else {
                 Throwable cause = accountSummary.getErrorCause();
                 if (MailAuthenticationException.class.isAssignableFrom(cause.getClass())) {
                     model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
+                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
                     log.info( "Authentication Failure (username='" + username + "') : " + cause.getMessage() );
                 } else {
                     // See note below...
                     model.put( "errorMessage", cause.getMessage() );
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
                     log.error( "Unanticipated Error", cause);
                 }
             }
 
         } catch (MailTimeoutException ex) {
             model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, request, response);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
             log.error( "Mail Service Timeout", ex);
         } catch (Exception ex) {
             /* ********************************************************
@@ -142,44 +114,9 @@ public class EmailAccountSummaryController {
             ******************************************************** */
 
             model.put( "errorMessage", ex.getMessage() );
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
             log.error( "Unanticipated Error", ex);
         }
-
-    }
-
-    private AccountSummary getAccountSummary(String username, String mailAccount,
-            MailStoreConfiguration config, Authenticator auth, int start,
-            int count) throws EmailPreviewException {
-
-        // NB:  The role of this method is to make sure we return the right
-        // AccountSummary based on *all* the parameters, not just the ones
-        // annotated with @PartialCacheKey on fetchAccountSummaryFromStore (below).
-
-        AccountSummary rslt = accountDao.fetchAccountSummaryFromStore(username,
-                        mailAccount, config, auth, start, count);
-
-        if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != count) {
-
-            if (log.isTraceEnabled()) {
-                StringBuilder msg = new StringBuilder();
-                msg.append("Clearing AccountSummary cache for username '")
-                                .append(username).append("', mailAccount '")
-                                .append(mailAccount).append("':  start=[")
-                                .append(rslt.getMessagesStart()).append(" prev, ")
-                                .append(start).append(" current] ").append("count=[")
-                                .append(rslt.getMessagesCount()).append(" prev, ")
-                                .append(count).append(" current]");
-                log.trace(msg.toString());
-            }
-
-            // Clear the cache & try again
-            accountDao.clearCache(username, mailAccount);
-            rslt = accountDao.fetchAccountSummaryFromStore(username,
-                    mailAccount, config, auth, start, count);
-        }
-
-        return rslt;
 
     }
 

@@ -23,57 +23,24 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao" />
     <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
-    
-    <ehcache:annotation-driven />
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
-    
-    <!-- EhCache management and statistics -->
-    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetClass" value="net.sf.ehcache.management.ManagementService" />
-        <property name="targetMethod" value="registerMBeans" />
-        <property name="arguments">
-            <list>
-                <ref bean="cacheManager" />
-                <ref bean="mbeanServer" />
-                <value>true</value>
-                <value>true</value>
-                <value>true</value>
-                <value>true</value>
-            </list>
-        </property>
-    </bean>
-    
-    <!-- Ref to the mbean server -->
-    <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
-        <property name="locateExistingServerIfPossible" value="true" />
-    </bean>
-    
-    <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
-
-    <util:list id="protocols">
-        <value>imap</value>
-        <value>imaps</value>
-        <value>pop3</value>
-        <value>pop3s</value>
-    </util:list>
-    
-    <util:list id="linkServices">
-        <ref bean="simpleEmailLinkService"/>
-    </util:list>
 
     <util:list id="authServices">
         <ref bean="cachedPasswordAuthenticationService"/>
         <ref bean="portletPreferencesCredentialsAuthenticationService"/>
     </util:list>
+
+    <util:list id="linkServices">
+        <ref bean="simpleEmailLinkService"/>
+    </util:list>
+
+    <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
 
     <!-- 
      | View resolvers, look for a named view bean before going to JSP resolution

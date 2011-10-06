@@ -50,7 +50,6 @@ import org.springframework.web.portlet.ModelAndView;
  *
  * @author Jen Bourey, jbourey@unicon.net
  * @author Drew Wills, drew@unicon.net
- * @version $Revision$
  */
 @Controller
 @RequestMapping("VIEW")
@@ -61,12 +60,12 @@ public class EmailSummaryController {
     public final static String DEFAULT_VIEW_PREFERENCE = "defaultView";
     public final static String PAGE_SIZE_PREFERENCE = "pageSize";
     public final static String ALLOW_DELETE_PREFERENCE = "allowDelete";
-    
+
     public final static String SUPPORTS_TOGGLE_SEEN_KEY = "supportsToggleSeen";
     private final static String SHOW_CONFIG_LINK_KEY = "showConfigLink";
-    
-    private final static String DEFAULT_WELCOME_TITLE = "Welcome to Email Preview";  
-    private final static String DEFAULT_WELCOME_INSTRUCTIONS = "";  
+
+    private final static String DEFAULT_WELCOME_TITLE = "Welcome to Email Preview";
+    private final static String DEFAULT_WELCOME_INSTRUCTIONS = "";
 
     private final Log log = LogFactory.getLog(this.getClass());
     private String adminRoleName = "admin";
@@ -79,7 +78,7 @@ public class EmailSummaryController {
 
     @Autowired(required = true)
     private ILinkServiceRegistry linkServiceRegistry;
-    
+
     @Resource
     private Map<String,String> jsErrorMessages;
 
@@ -87,7 +86,7 @@ public class EmailSummaryController {
      * Three possible views for this controller.
      */
     public enum View {
-        
+
         /**
          * Indicates the portlet is not yet (completely) configured
          */
@@ -101,7 +100,7 @@ public class EmailSummaryController {
                 return new ModelAndView(getKey(), model);
             }
         },
-        
+
         /**
          * Indicates the portlet is not yet (completely) configured
          */
@@ -111,7 +110,7 @@ public class EmailSummaryController {
             @Override
             public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
                 Map<String,Object> model = new HashMap<String,Object>();
-                
+
                 MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
                 IAuthenticationService authService = controller.authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
 
@@ -132,17 +131,17 @@ public class EmailSummaryController {
                     }
                 }
                 model.put("emailAddress", emailAddress);
-                
+
                 IEmailLinkService linkService = controller.linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
                 if (linkService != null) {
-                    String inboxUrl = linkService.getInboxUrl(req, config);
+                    String inboxUrl = linkService.getInboxUrl(config);
                     model.put("inboxUrl", inboxUrl);
                 }
 
                 return new ModelAndView(getKey(), model);
             }
         },
-        
+
         /**
          * Tabular view of the INBOX with lots of features
          */
@@ -153,12 +152,12 @@ public class EmailSummaryController {
 
                 PortletPreferences prefs = req.getPreferences();
 
-                // PageSize:  this value can be set by administrators as a publish-time 
-                // portlet preference, and (normally) overridden by users as a 
+                // PageSize:  this value can be set by administrators as a publish-time
+                // portlet preference, and (normally) overridden by users as a
                 // user-defined portlet preference.
                 int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_PREFERENCE, "10"));
                 model.put(PAGE_SIZE_PREFERENCE, pageSize);
-                
+
                 // Check to see if the portlet is configured to display a link
                 // to config mode and if it applies to this user
                 boolean showConfigLink = Boolean.valueOf(prefs.getValue(
@@ -173,19 +172,19 @@ public class EmailSummaryController {
                 boolean allowDelete = Boolean.valueOf(prefs.getValue(
                                     ALLOW_DELETE_PREFERENCE, "false"));
                 model.put("allowDelete", allowDelete);
-                
+
                 MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
                 model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
-                
+
                 // Check if this mail server supports setting the READ/UNREAD flag
                 model.put(SUPPORTS_TOGGLE_SEEN_KEY, config.supportsToggleSeen());
 
                 return new ModelAndView(getKey(), model);
             }
         };
-        
+
         private final String key;
-        
+
         public static View getInstance(String key) {
             for (View v : View.values()) {
                 if (v.getKey().equals(key)) {
@@ -194,15 +193,15 @@ public class EmailSummaryController {
             }
             throw new RuntimeException("Unrecognized view:  " + key);
         }
-        
+
         private View(String key) { this.key = key; }
-        
+
         public String getKey() { return key; }
-        
+
         public abstract ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller);
-        
+
     }
-    
+
     public void setAdminRoleName(String adminRoleName) {
         this.adminRoleName = adminRoleName;
     }
@@ -234,28 +233,28 @@ public class EmailSummaryController {
             throw new RuntimeException(t);
         }
     }
-    
+
     /*
      * Render Phase
      */
-    
+
     @RequestMapping
     @SuppressWarnings("unchecked")
     public ModelAndView chooseView(RenderRequest req, RenderResponse res) throws Exception {
-        
+
         View showView = null;
-        
+
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
         IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
         if (!authService.isConfigured(req, config)) {
-            // Rule #1:  If we're not configured for authentication, 
+            // Rule #1:  If we're not configured for authentication,
             // show the 'welcome' view so the user knows what to do
             showView = View.WELCOME;
         } else if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
             // Rule #2:  We don't show the rollup in MAXIMIZED state
             showView = View.PREVIEW;
         } else {
-            // Rule #3:  Use the defaultView preference;  this setting gets updated 
+            // Rule #3:  Use the defaultView preference;  this setting gets updated
             // every time the user changes from one to the other (it's sticky)
             PortletPreferences prefs = req.getPreferences();
             String viewName = prefs.getValue(DEFAULT_VIEW_PREFERENCE, View.ROLLUP.getKey());
@@ -264,12 +263,12 @@ public class EmailSummaryController {
 
         // Now render the choice...
         ModelAndView rslt = showView.show(req, res, this);
-        
+
         // Add common model stuff...
         rslt.getModel().put("jsErrorMessages", jsErrorMessages);
         rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
         rslt.getModel().put("supportsHelp", req.isPortletModeAllowed(PortletMode.HELP));
-        
+
         return rslt;
 
     }

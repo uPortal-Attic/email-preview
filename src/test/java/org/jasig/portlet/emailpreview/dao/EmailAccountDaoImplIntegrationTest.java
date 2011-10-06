@@ -21,12 +21,7 @@ package org.jasig.portlet.emailpreview.dao;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import javax.mail.Authenticator;
-
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
-import org.jasig.portlet.emailpreview.dao.impl.EmailAccountDaoImpl;
-import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +34,6 @@ public class EmailAccountDaoImplIntegrationTest {
     GreenMail greenMail;
 
     private MailStoreConfiguration testMailStore;
-    private EmailAccountDaoImpl accountDao;
 
     @Before
     public void setUp() throws InterruptedException {
@@ -48,8 +42,6 @@ public class EmailAccountDaoImplIntegrationTest {
         testMailStore.setHost("localhost");
         testMailStore.setPort(3993);
         testMailStore.setProtocol("imaps");
-
-        accountDao = new EmailAccountDaoImpl();
 
         greenMail = new GreenMail(); //uses test ports by default
         greenMail.start();

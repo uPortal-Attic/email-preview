@@ -156,7 +156,7 @@
         var account = null;
         $.ajax({
             url: '${accountSummaryUrl}',
-            data: { pageStart: 1, numberOfMessages: 0, forceRefresh: false },
+            data: { pageStart: 0, numberOfMessages: 20 /* matches batchSize elsewhere to increase cache hits */, forceRefresh: false },
             type: 'POST',
             dataType: "json",
             success: function(data) { 

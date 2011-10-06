@@ -22,18 +22,13 @@ package org.jasig.portlet.emailpreview.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.mail.Authenticator;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.EmailMessage;
-import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,36 +50,19 @@ public class EmailMessageController {
     protected final Log log = LogFactory.getLog(getClass());
 
     @Autowired(required = true)
-    private IEmailAccountDao accountDao;
-
-    @Autowired(required = true)
-    private IServiceBroker serviceBroker;
+    private IEmailAccountService accountDao;
 
     @Autowired(required = true)
     private AjaxPortletSupportService ajaxPortletSupportService;
 
-    @Autowired(required = true)
-    private IAuthenticationServiceRegistry authServiceRegistry;
-
     @RequestMapping(params = "action=emailMessage")
-    public void showMessage(ActionRequest request, ActionResponse response,
+    public void showMessage(ActionRequest req, ActionResponse res,
             @RequestParam("messageNum") int messageNum){
 
         try {
 
-            MailStoreConfiguration config = serviceBroker.getConfiguration(request);
-
-            IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-            if (authService == null) {
-                String msg = "Unrecognized authentication service:  "
-                                + config.getAuthenticationServiceKey();
-                log.error(msg);
-                throw new RuntimeException(msg);
-            }
-            Authenticator auth = authService.getAuthenticator(request, config);
-
             // Get current user's account information
-            EmailMessage message = accountDao.retrieveMessage(config, auth, messageNum);
+            EmailMessage message = accountDao.getMessage(req, messageNum);
             
             /*
              * A bit of after-market work on messages in certain circumstances
@@ -101,7 +79,7 @@ public class EmailMessageController {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("message", message);
 
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, request, response);
+            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
 
         } catch (Exception ex) {
             log.error("Error encountered while attempting to retrieve message", ex);
@@ -111,7 +89,7 @@ public class EmailMessageController {
 
     @RequestMapping(params = "action=deleteMessages")
     public void deleteMessages(ActionRequest req, ActionResponse res,
-                @RequestParam(value="selectMessage", required=false) long[] messages) {
+                @RequestParam(value="selectMessage", required=false) long[] uids) {
 
         try {
 
@@ -121,21 +99,8 @@ public class EmailMessageController {
                 throw new RuntimeException(msg);
             }
 
-            if (messages != null && messages.length != 0) {
-
-                MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-
-                IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-                if (authService == null) {
-                    String msg = "Unrecognized authentication service:  "
-                                    + config.getAuthenticationServiceKey();
-                    log.error(msg);
-                    throw new RuntimeException(msg);
-                }
-                Authenticator auth = authService.getAuthenticator(req, config);
-
-                accountDao.deleteMessages(config, auth, messages);
-
+            if (uids != null && uids.length != 0) {
+                accountDao.deleteMessages(req, uids);
             }
 
             // Define view and generate model
@@ -159,20 +124,9 @@ public class EmailMessageController {
 
             if (messages != null && messages.length != 0) {
 
-                MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-
-                IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-                if (authService == null) {
-                    String msg = "Unrecognized authentication service:  "
-                                    + config.getAuthenticationServiceKey();
-                    log.error(msg);
-                    throw new RuntimeException(msg);
-                }
-                Authenticator auth = authService.getAuthenticator(req, config);
-
                 // Opportunity for improvement:  respond to return value 
                 // of 'false' with some user-facing message 
-                accountDao.setSeenFlag(config, auth, messages, seenValue);
+                accountDao.setSeenFlag(req, messages, seenValue);
 
             }
 

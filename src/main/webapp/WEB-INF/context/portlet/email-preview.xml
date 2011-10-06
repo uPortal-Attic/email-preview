@@ -24,12 +24,39 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+            http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail" />
     <context:annotation-config />
+
+    <ehcache:annotation-driven />
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+    
+    <!-- Ref to the mbean server -->
+    <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+        <property name="locateExistingServerIfPossible" value="true" />
+    </bean>
+
+    <!-- EhCache management and statistics -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="net.sf.ehcache.management.ManagementService" />
+        <property name="targetMethod" value="registerMBeans" />
+        <property name="arguments">
+            <list>
+                <ref bean="cacheManager" />
+                <ref bean="mbeanServer" />
+                <value>true</value>
+                <value>true</value>
+                <value>true</value>
+                <value>true</value>
+            </list>
+        </property>
+    </bean>
 
     <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
         <!-- 
@@ -60,5 +87,12 @@
         <entry key="900" value="ajax.errorMessage.900"/>
         <entry key="default" value="ajax.errorMessage.default"/>
     </util:map>
+
+    <util:list id="protocols">
+        <value>imap</value>
+        <value>imaps</value>
+        <value>pop3</value>
+        <value>pop3s</value>
+    </util:list>
 
 </beans>

@@ -35,7 +35,7 @@ import javax.portlet.RenderRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountDao;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
@@ -59,7 +59,7 @@ public final class EditPreferencesController {
     private static final String DEFAULT_FOCUS_ON_PREVIEW = "true";
 
     private IServiceBroker serviceBroker;
-    IEmailAccountDao emailAccountDao;
+    IEmailAccountService emailAccountDao;
     private IAuthenticationServiceRegistry authServiceRegistry;
     private List<String> protocols;
     private final Log log = LogFactory.getLog(getClass());
@@ -171,7 +171,6 @@ public final class EditPreferencesController {
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
         MailStoreConfigurationForm form = MailStoreConfigurationForm.create(serviceBroker, req);
         String err = null;  // default
-        String mailAccountAtStart = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
 
         if (!config.isReadOnly(req, MailPreferences.PROTOCOL)) {
             String protocol = req.getParameter(MailPreferences.PROTOCOL.getKey());
@@ -210,7 +209,7 @@ public final class EditPreferencesController {
             try {
                 form.setPort(Integer.parseInt(port));
             } catch (NumberFormatException nfe) {
-                log.debug(nfe);
+                log.debug("The specified value is not a number:  " + port, nfe);
             }
             if (port.length() == 0 && err == null) {
                 err = "Server Port is required";
@@ -301,7 +300,7 @@ public final class EditPreferencesController {
             }
             
             serviceBroker.saveConfiguration(req, config);
-            emailAccountDao.clearCache(req.getRemoteUser(), mailAccountAtStart);
+            req.getPortletSession().setAttribute(EmailAccountSummaryController.FORCE_REFRESH_PARAMETER, Boolean .TRUE);
             res.setPortletMode(PortletMode.VIEW);
         } else {
             res.setRenderParameter("errorMessage", err);
@@ -316,7 +315,7 @@ public final class EditPreferencesController {
     }
     
     @Autowired(required = true)
-    public void setEmailAccountDao(IEmailAccountDao emailAccountDao) {
+    public void setEmailAccountDao(IEmailAccountService emailAccountDao) {
         this.emailAccountDao = emailAccountDao;
     }
 

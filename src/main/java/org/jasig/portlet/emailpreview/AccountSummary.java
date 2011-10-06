@@ -26,15 +26,14 @@ import javax.mail.MessagingException;
 import javax.mail.UIDFolder;
 
 /**
- * Encapsulates basic information about the email INBOX.  Typicaly sent to the 
+ * Encapsulates basic information about the email INBOX.  Typicaly sent to the
  * browser via AJAX.
  *
  * @author Andreas Christoforides
  * @author Jen Bourey, jbourey@unicon.net
  * @author Drew Wills, drew@unicon.net
- * @version $Revision$
  */
-public class AccountSummary {
+public final class AccountSummary {
 
     private final int numUnreadMessages;
     private final int numTotalMessages;
@@ -42,6 +41,7 @@ public class AccountSummary {
     private final int messagesStart;
     private final int messagesCount;
     private final boolean deleteSupported;
+    private String inboxUrl;
     private final Throwable errorCause;
 
     public AccountSummary(Folder inbox, List<EmailMessage> messages,
@@ -57,24 +57,24 @@ public class AccountSummary {
         this.errorCause = null;
 
     }
-    
+
     /**
-     * Indicates the account fetch did not succeed and provides the cause.  
-     * Previously we would communicate this fact by throwing an exception, but 
-     * we learned that (1) the caching API we use writes these exceptions to 
-     * Catalina.out, and (2) occurances of {@link MailAuthenticationException} 
+     * Indicates the account fetch did not succeed and provides the cause.
+     * Previously we would communicate this fact by throwing an exception, but
+     * we learned that (1) the caching API we use writes these exceptions to
+     * Catalina.out, and (2) occurances of {@link MailAuthenticationException}
      * are very common, and the logs were being flooded with them.
-     * 
+     *
      * @param errorCause
      */
     public AccountSummary(Throwable errorCause) {
-        
+
         // Assertions.
         if (errorCause == null) {
             String msg = "Argument 'errorCause' cannot be null";
             throw new IllegalArgumentException(msg);
         }
-        
+
         // Instance Members
         this.numUnreadMessages = -1;
         this.numTotalMessages = -1;
@@ -86,17 +86,25 @@ public class AccountSummary {
 
     }
     
+    public String getInboxUrl() {
+        return inboxUrl;
+    }
+    
+    public void setInboxUrl(String inboxUrl) {
+        this.inboxUrl = inboxUrl;
+    }
+
     /**
-     * Indicates if this object contains valid account details.  Otherwise, it 
-     * will contain an error payload. 
-     * 
-     * @return False if this object represents an error condition instead of an 
+     * Indicates if this object contains valid account details.  Otherwise, it
+     * will contain an error payload.
+     *
+     * @return False if this object represents an error condition instead of an
      * account summary
      */
     public boolean isValid() {
         return errorCause == null;
     }
-    
+
     public Throwable getErrorCause() {
         return errorCause;
     }
