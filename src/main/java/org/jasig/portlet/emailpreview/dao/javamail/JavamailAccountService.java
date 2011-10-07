@@ -102,7 +102,7 @@ public final class JavamailAccountService implements IEmailAccountService {
         // AccountSummary based on *all* the parameters, not just the ones
         // annotated with @PartialCacheKey on fetchAccountSummaryFromStore.
         
-        if (rslt.getMessagesStart() != start || rslt.getMessagesCount() != max) {
+        if (rslt.getMessagesStart() != start || rslt.getMessagesMax() != max) {
 
             if (log.isDebugEnabled()) {
                 StringBuilder msg = new StringBuilder();
@@ -111,7 +111,7 @@ public final class JavamailAccountService implements IEmailAccountService {
                                 .append(mailAccount).append("':  start=[")
                                 .append(rslt.getMessagesStart()).append(" prev, ")
                                 .append(start).append(" current] ").append("count=[")
-                                .append(rslt.getMessagesCount()).append(" prev, ")
+                                .append(rslt.getMessagesMax()).append(" prev, ")
                                 .append(max).append(" current]");
                 log.debug(msg.toString());
             }

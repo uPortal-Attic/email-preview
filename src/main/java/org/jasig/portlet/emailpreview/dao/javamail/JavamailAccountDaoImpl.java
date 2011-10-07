@@ -176,18 +176,21 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
                         " Time per displayed message: " + (messagesToDisplayCount == 0 ? 0 : (elapsedTime / messagesToDisplayCount)) + "ms");
             }
 
+            IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
+            String inboxUrl = null;
+            if (linkService != null) {
+                inboxUrl = linkService.getInboxUrl(config);
+            }
+
             // Initialize account information with information retrieved from inbox
-            AccountSummary rslt = new AccountSummary(inbox, messages, start, max);
+            AccountSummary rslt = new AccountSummary(inboxUrl, messages, 
+                    inbox.getUnreadMessageCount(), inbox.getMessageCount(), 
+                    start, max, isDeleteSupported(inbox));
 
             inbox.close(false);
 
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved email AccountSummary");
-            }
-
-            IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
-            if (linkService != null) {
-                rslt.setInboxUrl(linkService.getInboxUrl(config));
             }
 
             return rslt;
@@ -447,7 +450,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
      * @param mimeType
      * @return
      */
-    protected boolean isHtml(String mimeType) {
+    private boolean isHtml(String mimeType) {
 
         // if the mime-type is null, assume the content is not HTML
         if (mimeType == null) {
@@ -461,6 +464,10 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         }
 
         return false;
+    }
+
+    private boolean isDeleteSupported(Folder f) {
+        return f instanceof UIDFolder;
     }
 
 }

@@ -18,12 +18,9 @@
  */
 package org.jasig.portlet.emailpreview;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.mail.Folder;
-import javax.mail.MessagingException;
-import javax.mail.UIDFolder;
 
 /**
  * Encapsulates basic information about the email INBOX.  Typicaly sent to the
@@ -35,25 +32,33 @@ import javax.mail.UIDFolder;
  */
 public final class AccountSummary {
 
+    private final String inboxUrl;
+    private final List<EmailMessage> messages;
     private final int numUnreadMessages;
     private final int numTotalMessages;
-    private final List<EmailMessage> messages;
     private final int messagesStart;
-    private final int messagesCount;
+    private final int messagesMax;
     private final boolean deleteSupported;
-    private String inboxUrl;
     private final Throwable errorCause;
 
-    public AccountSummary(Folder inbox, List<EmailMessage> messages,
-                        int messagesStart, int messagesCount) throws MessagingException {
+    public AccountSummary(String inboxUrl, List<EmailMessage> messages, 
+            int numUnreadMessages, int numTotalMessages, int messagesStart, 
+            int messagesMax, boolean deleteSupported) {
+        
+        // Assertions
+        if (messages == null) {
+            String msg = "Argument 'messages' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
 
         // Instance Members
-        this.numUnreadMessages = inbox.getUnreadMessageCount();
-        this.numTotalMessages = inbox.getMessageCount();
-        this.messages = Collections.unmodifiableList(messages);
+        this.inboxUrl = inboxUrl;  // NB:  May be null
+        this.messages = Collections.unmodifiableList(new ArrayList<EmailMessage>(messages));
+        this.numUnreadMessages = numUnreadMessages;
+        this.numTotalMessages = numTotalMessages;
         this.messagesStart = messagesStart;
-        this.messagesCount = messagesCount;
-        this.deleteSupported = inbox instanceof UIDFolder;
+        this.messagesMax = messagesMax;
+        this.deleteSupported = deleteSupported;
         this.errorCause = null;
 
     }
@@ -76,22 +81,15 @@ public final class AccountSummary {
         }
 
         // Instance Members
+        this.inboxUrl = null;
         this.numUnreadMessages = -1;
         this.numTotalMessages = -1;
         this.messages = null;
         this.messagesStart = -1;
-        this.messagesCount = -1;
+        this.messagesMax = -1;
         this.deleteSupported = false;
         this.errorCause = errorCause;
 
-    }
-    
-    public String getInboxUrl() {
-        return inboxUrl;
-    }
-    
-    public void setInboxUrl(String inboxUrl) {
-        this.inboxUrl = inboxUrl;
     }
 
     /**
@@ -107,6 +105,15 @@ public final class AccountSummary {
 
     public Throwable getErrorCause() {
         return errorCause;
+    }
+
+    /**
+     * Provides the URL to the full-featured web-based mail client, if available.
+     * 
+     * @return A valid web address or <code>null</code>
+     */
+    public String getInboxUrl() {
+        return inboxUrl;
     }
 
     /**
@@ -154,8 +161,8 @@ public final class AccountSummary {
      *
      * @return
      */
-    public int getMessagesCount() {
-        return this.messagesCount;
+    public int getMessagesMax() {
+        return this.messagesMax;
     }
 
     public boolean isDeleteSupported() {
