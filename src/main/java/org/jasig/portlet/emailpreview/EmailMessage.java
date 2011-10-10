@@ -20,15 +20,7 @@ package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Flags.Flag;
-import javax.mail.internet.InternetAddress;
-
 import org.apache.commons.lang.time.FastDateFormat;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * An entity abstraction for representing information
@@ -42,90 +34,49 @@ import org.apache.commons.logging.LogFactory;
 public final class EmailMessage {
 
     private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
-    private static final String CONTENT_TYPE_ATTACHMENTS_PATTERN = "multipart/mixed;";
-    private static final String INTERNET_ADDRESS_TYPE = "rfc822";
     
-    private final Message message;
+    // Instance Members
+    private final int messageNumber;
     private final Long uid;
-    private final String sender;  // Evaluate in constructor to detect errors early
+    private final String sender;
     private final String subject;  // Passed in separately AntiSamy treatment 
-    private final Date sentDate;  // Evaluate in constructor to detect errors early
-    private boolean unread;  // Evaluate in constructor to detect errors early
-    private final boolean answered;  // Evaluate in constructor to detect errors early
-    private final boolean deleted;  // Evaluate in constructor to detect errors early
+    private final Date sentDate;
+    private boolean unread;
+    private final boolean answered;
+    private final boolean deleted;
     private boolean multipart;
     private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
 
-    private final Log log = LogFactory.getLog(getClass());
-
 	/*
 	 * Public API.
 	 */
-	
-    /**
-     * Creates a new {@link EmailMessage} based on the specified 
-     * <code>Message</code> with content of <code>null</code>.
-     */
-    public EmailMessage(Message message, Long uid, String subject) throws MessagingException {
-        this(message, uid, subject, null);
-    }
 
     /**
      * Creates a new {@link EmailMessage} based on the specified 
      * <code>Message</code> and {@link EmailMessageContent}.
      */
-    public EmailMessage(Message message, Long uid, String subject, EmailMessageContent content) throws MessagingException {
-	    
-	    // Assertions.
-	    if (message == null) {
-	        String msg = "Argument 'message' cannot be null";
-	        throw new IllegalArgumentException(msg);
-	    }
-	    // NB:  Argument 'uid' may be null
-	    
+    public EmailMessage(int messageNumber, Long uid, String sender, String subject, 
+                Date sentDate, boolean unread, boolean answered, boolean deleted, 
+                boolean multipart, String contentType, EmailMessageContent content) {
+	    	    
 	    // Instance Members.
-        this.message = message;
-        this.uid = uid;
-        Address[] addr = message.getFrom();
-        String sdr = null;
-        if (addr != null && addr.length != 0) {
-            Address a = addr[0];
-            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
-                InternetAddress inet = (InternetAddress) a;
-                sdr = inet.toUnicodeString();
-            } else {
-                sdr = a.toString();
-            }
-        }
-        this.sender = sdr;
+        this.messageNumber = messageNumber;
+        this.uid = uid;  // NB:  may be null
+        this.sender = sender;
         this.subject = subject;
-        this.sentDate = message.getSentDate();
-        this.unread = !message.isSet(Flag.SEEN);
-        this.answered = message.isSet(Flag.ANSWERED);
-        this.deleted = message.isSet(Flag.DELETED);
-        // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
-        try {
-            this.multipart = message.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
-            this.contentType = message.getContentType();
-        } catch (MessagingException me) {
-            // Message was digitally signed and we are unable to read it; 
-            // logging as DEBUG because this issue is known/expected, and 
-            // because the user's experience is in no way affected (at this point)
-            log.debug("Message content unabailable (digitally signed?);  " +
-            		    "message will appear in the preview table correctly, " +
-            		    "but the body will not be viewable");
-            log.trace(me.getMessage(), me);
-            // Set these to sensible defaults
-            this.multipart = false;
-            this.contentType = null;
-        }
+        this.sentDate = sentDate;
+        this.unread = unread;
+        this.answered = answered;
+        this.deleted = deleted;
+        this.multipart = multipart;
+        this.contentType = contentType;  // NB:  may be null
         this.content = content;
 	    
 	}
 	
 	public int getMessageNumber() {
-        return message.getMessageNumber();
+        return messageNumber;
     }
 
 	/**

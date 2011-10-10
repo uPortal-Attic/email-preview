@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
@@ -39,6 +41,8 @@ import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
+import javax.mail.Flags.Flag;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.SharedByteArrayInputStream;
@@ -81,6 +85,9 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
  */
 @Component
 public final class JavamailAccountDaoImpl implements IJavamailAccountDao, InitializingBean, ApplicationContextAware {
+
+    private static final String CONTENT_TYPE_ATTACHMENTS_PATTERN = "multipart/mixed;";
+    private static final String INTERNET_ADDRESS_TYPE = "rfc822";
 
     @Autowired(required = true)
     private ILinkServiceRegistry linkServiceRegistry;
@@ -345,13 +352,47 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             msgContent.setContentString(content);
         }
 
+        int messageNumber = msg.getMessageNumber();
+        
         // Prepare the UID if present
         Long uid = null;  // default
         if (msg.getFolder() instanceof UIDFolder) {
             uid = ((UIDFolder) msg.getFolder()).getUID(msg);
         }
 
-        return new EmailMessage(msg, uid, subject, msgContent);
+        Address[] addr = msg.getFrom();
+        String sender = null;
+        if (addr != null && addr.length != 0) {
+            Address a = addr[0];
+            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
+                InternetAddress inet = (InternetAddress) a;
+                sender = inet.toUnicodeString();
+            } else {
+                sender = a.toString();
+            }
+        }
+        Date sentDate = msg.getSentDate();
+        boolean unread = !msg.isSet(Flag.SEEN);
+        boolean answered = msg.isSet(Flag.ANSWERED);
+        boolean deleted = msg.isSet(Flag.DELETED);
+        // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
+        boolean multipart = false;  // sensible default;
+        String contentType = null;  // sensible default
+        try {
+            multipart = msg.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
+            contentType = msg.getContentType();
+        } catch (MessagingException me) {
+            // Message was digitally signed and we are unable to read it; 
+            // logging as DEBUG because this issue is known/expected, and 
+            // because the user's experience is in no way affected (at this point)
+            log.debug("Message content unabailable (digitally signed?);  " +
+                        "message will appear in the preview table correctly, " +
+                        "but the body will not be viewable");
+            log.trace(me.getMessage(), me);
+        }
+
+        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, 
+                unread, answered, deleted, multipart, contentType, msgContent);
 
     }
 

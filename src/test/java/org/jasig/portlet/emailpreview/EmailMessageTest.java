@@ -20,49 +20,27 @@ package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Flags.Flag;
-
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 
 public class EmailMessageTest {
 
     @Test
-    public void testSenderNamePruneEmail() throws MessagingException {
+    public void testSenderNamePruneEmail() throws Exception {
 
-        Address addr = mock(Address.class);
-        when(addr.toString()).thenReturn("Test User <testuser@nowhere.net>");
-        Message msg = mock(Message.class);
-        when(msg.getFrom()).thenReturn(new Address[] {addr});
-        when(msg.getSentDate()).thenReturn(new Date());
-        when(msg.isSet(Flag.SEEN)).thenReturn(false);
-        when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
-        when(msg.isSet(Flag.DELETED)).thenReturn(false);
-        when(msg.getContentType()).thenReturn("text/plain");
-
-        EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
+        EmailMessage message = new EmailMessage(0, 0L, 
+                    "Test User <testuser@nowhere.net>", null, new Date(), false, 
+                    false, false, false, null, null);
 
         assert "Test User".equals(message.getSenderName());
 
     }
 
     @Test
-    public void testSenderNameNoEmail() throws MessagingException {
+    public void testSenderNameNoEmail() throws Exception {
 
-        Address addr = mock(Address.class);
-        when(addr.toString()).thenReturn("Test User");
-        Message msg = mock(Message.class);
-        when(msg.getFrom()).thenReturn(new Address[] {addr});
-        when(msg.getSentDate()).thenReturn(new Date());
-        when(msg.isSet(Flag.SEEN)).thenReturn(false);
-        when(msg.isSet(Flag.ANSWERED)).thenReturn(false);
-        when(msg.isSet(Flag.DELETED)).thenReturn(false);
-        when(msg.getContentType()).thenReturn("text/plain");
-
-        EmailMessage message = new EmailMessage(msg, null, "Test Subject", null);
+        EmailMessage message = new EmailMessage(0, 0L, 
+                "Test User <testuser@nowhere.net>", null, new Date(), false, 
+                false, false, false, null, null);
 
         assert "Test User".equals(message.getSenderName());
 
