@@ -13,12 +13,12 @@
 
     <name>Email Preview Portlet</name>
     <description>Read-only email portlet.</description>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0</version>
 
     <scm>
-        <connection>scm:svn:https://source.jasig.org/portlets/email-preview/trunk</connection>
-        <developerConnection>scm:svn:https://source.jasig.org/portlets/email-preview/trunk</developerConnection>
-        <url>http://developer.jasig.org/source/browse/jasigsvn/portlets/email-preview/trunk</url>
+        <connection>scm:svn:https://source.jasig.org/portlets/email-preview/tags/email-preview-1.1.0</connection>
+        <developerConnection>scm:svn:https://source.jasig.org/portlets/email-preview/tags/email-preview-1.1.0</developerConnection>
+        <url>http://developer.jasig.org/source/browse/jasigsvn/portlets/email-preview/tags/email-preview-1.1.0</url>
     </scm>
 
     <properties>
