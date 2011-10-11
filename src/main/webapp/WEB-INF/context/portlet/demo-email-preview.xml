@@ -31,43 +31,18 @@
             http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail" />
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo" />
     <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
 
     <util:list id="authServices">
-        <ref bean="cachedPasswordAuthenticationService"/>
-        <ref bean="portletPreferencesCredentialsAuthenticationService"/>
+        <ref bean="demoAuthenticationService"/>
     </util:list>
 
     <util:list id="linkServices">
         <ref bean="simpleEmailLinkService"/>
     </util:list>
-
-    <ehcache:annotation-driven />
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
     
-    <!-- Ref to the mbean server -->
-    <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
-        <property name="locateExistingServerIfPossible" value="true" />
-    </bean>
-
-    <!-- EhCache management and statistics -->
-    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetClass" value="net.sf.ehcache.management.ManagementService" />
-        <property name="targetMethod" value="registerMBeans" />
-        <property name="arguments">
-            <list>
-                <ref bean="cacheManager" />
-                <ref bean="mbeanServer" />
-                <value>true</value>
-                <value>true</value>
-                <value>true</value>
-                <value>true</value>
-            </list>
-        </property>
-    </bean>
-
     <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
         <!-- 
          | Always declare an 'exceptionResolver' bean with a 'defaultErrorView' 
@@ -80,29 +55,12 @@
         <property name="defaultErrorView" value="error"/>
     </bean>
     
-    <!-- 
-     | This bean maps error codes to UI messages that will be shown to users.  
-     | The keys are numeric HTTP codes (e.g. 401 for "not authorized"), and the 
-     | values are used to pull UI strings from the messageSource bean.  This way 
-     | all UI customization and internationalization can be managed in one place.
-     |
-     | In addition to numeric keys, provide also a 'default' key, which will be 
-     | used for any error code that doesn't have it's own entry.  Lastly, the 
-     | controller may also add a custom message by sending an HTTP 200 together 
-     | with an 'errorMessage' property in the returned JSON.
-     +-->
     <util:map id="jsErrorMessages">
-        <entry key="401" value="ajax.errorMessage.401"/>
-        <entry key="504" value="ajax.errorMessage.504"/>
-        <entry key="900" value="ajax.errorMessage.900"/>
         <entry key="default" value="ajax.errorMessage.default"/>
     </util:map>
-
+    
     <util:list id="protocols">
-        <value>imap</value>
-        <value>imaps</value>
-        <value>pop3</value>
-        <value>pop3s</value>
+        <value>JSON</value>
     </util:list>
-
+    
 </beans>

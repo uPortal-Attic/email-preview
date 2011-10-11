@@ -223,6 +223,103 @@
         </security-role-ref>
 
     </portlet>
+    
+    <portlet>
+        <portlet-name>demo-email-preview</portlet-name>
+        <display-name>Email Preview Demo</display-name>
+        <portlet-class>org.springframework.web.portlet.DispatcherPortlet</portlet-class>
+
+        <init-param>
+            <name>contextClass</name>
+            <value>org.springframework.web.portlet.context.XmlPortletApplicationContext</value>
+        </init-param>
+
+        <init-param>
+            <name>contextConfigLocation</name>
+            <value>/WEB-INF/context/portlet/demo-email-preview.xml</value>
+        </init-param>
+
+        <init-param>
+            <name>namespace</name>
+            <value>demo-email-preview-portlet</value>
+        </init-param>
+
+        <init-param>
+            <name>viewRendererUrl</name>
+            <value>/WEB-INF/servlet/view</value>
+        </init-param>
+
+        <expiration-cache>0</expiration-cache>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+            <portlet-mode>edit</portlet-mode>
+            <portlet-mode>help</portlet-mode>
+        </supports>
+        <supported-locale>en</supported-locale>
+        <portlet-info>
+            <title>Demo Email preview</title>
+            <short-title>Demo Email</short-title>
+            <keywords>Demo, Email, preview, Portlet</keywords>
+        </portlet-info>
+        
+        <portlet-preferences>
+            <preference>
+                <name>defaultView</name>
+                <value>rollup</value>
+            </preference>
+            <preference>
+                <name>focusOnPreview</name>
+                <value>true</value>
+            </preference>
+            <preference>
+                <name>markMessagesAsRead</name>
+                <value>true</value>
+            </preference>
+            <preference>
+                <name>pageSize</name>
+                <value>10</value>
+            </preference>
+            <preference>
+                <name>includeJQuery</name>
+                <value>true</value>
+            </preference>
+            <preference>
+                <name>showConfigLink</name>
+                <value>false</value>
+            </preference>
+            <preference>
+                <name>allowDelete</name>
+                <value>true</value>
+            </preference>
+            <preference>
+                <name>allowableAuthenticationServiceKeys</name>
+                <value>demoAuthService</value>
+            </preference>
+            <preference>
+                <name>authenticationServiceKey</name>
+                <value>demoAuthService</value>
+            </preference>
+            <preference>
+                <name>host</name>
+                <value>jasig.org</value>
+            </preference>
+            <preference>
+                <name>protocol</name>
+                <value>imap</value><!-- This is a fib, but it's necessary to convince the controllers we support toggleSeen -->
+            </preference>
+            <preference>
+                <name>inboxUrl</name>
+                <value>http://www.jasig.org/</value>
+            </preference>
+        </portlet-preferences>
+        
+        <security-role-ref>
+            <role-name>Portal_Administrators</role-name>
+            <role-link>local.2</role-link>
+        </security-role-ref>
+
+    </portlet>
 
     <user-attribute>
         <description>Username attribute name for uPortal user</description>
