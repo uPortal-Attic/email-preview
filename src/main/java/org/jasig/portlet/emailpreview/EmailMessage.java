@@ -65,7 +65,7 @@ public final class EmailMessage {
         this.uid = uid;  // NB:  may be null
         this.sender = sender;
         this.subject = subject;
-        this.sentDate = sentDate;
+        this.sentDate = sentDate;  // NB:  possibly null in some circumstances
         this.unread = unread;
         this.answered = answered;
         this.deleted = deleted;
@@ -90,15 +90,18 @@ public final class EmailMessage {
 	}
 	
     /**
-	 * Returns the date the email message was sent.
-	 * @return The sent date of the email message as a <code>java.util.Date</code>.
+	 * Returns the date the email message was sent or <code>null</code> if the 
+	 * server did not provide one.
+	 * 
+	 * @return Date the email message was sent or <code>null</code>
+     * @throws MessagingException 
 	 */
 	public Date getSentDate() {
-		return new Date(sentDate.getTime());
+		return sentDate != null ? new Date(sentDate.getTime()) : null;
 	}
 
 	public String getSentDateString() {
-	    return DATE_FORMAT.format(this.sentDate);
+	    return sentDate != null ? DATE_FORMAT.format(sentDate) : "";
 	}
 
 	/**
