@@ -20,11 +20,28 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
+    <context:annotation-config />
+
+    <util:list id="authServices">
+        <ref bean="cachedPasswordAuthenticationService"/>
+        <ref bean="portletPreferencesCredentialsAuthenticationService"/>
+        <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
+        <ref bean="demoAuthenticationService"/>
+    </util:list>
+
+    <util:list id="linkServices">
+        <ref bean="simpleEmailLinkService"/>
+    </util:list>
 
     <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
 

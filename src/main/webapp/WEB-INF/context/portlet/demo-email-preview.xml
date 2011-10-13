@@ -32,16 +32,7 @@
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo" />
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
-
-    <util:list id="authServices">
-        <ref bean="demoAuthenticationService"/>
-    </util:list>
-
-    <util:list id="linkServices">
-        <ref bean="simpleEmailLinkService"/>
-    </util:list>
     
     <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
         <!-- 

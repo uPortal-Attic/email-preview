@@ -32,17 +32,7 @@
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail" />
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
-
-    <util:list id="authServices">
-        <ref bean="cachedPasswordAuthenticationService"/>
-        <ref bean="portletPreferencesCredentialsAuthenticationService"/>
-    </util:list>
-
-    <util:list id="linkServices">
-        <ref bean="simpleEmailLinkService"/>
-    </util:list>
 
     <ehcache:annotation-driven />
     <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
