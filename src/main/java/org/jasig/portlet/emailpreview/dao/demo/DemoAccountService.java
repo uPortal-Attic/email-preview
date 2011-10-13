@@ -41,6 +41,8 @@ import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,6 +62,9 @@ public final class DemoAccountService implements IEmailAccountService {
 
     private String jsonLocation = "/SampleJSON.json";
 
+    @Autowired(required = true)
+    private IServiceBroker serviceBroker;
+
     /*
      * Public API
      */
@@ -76,6 +81,7 @@ public final class DemoAccountService implements IEmailAccountService {
         AccountSummary rslt = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
 
         if (rslt == null) {
+            // First time;  build from scratch...
             List<EmailMessage> messages = getEmailMessages(req);
             rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
                                                 messages.size(), start, max, true);
@@ -87,18 +93,44 @@ public final class DemoAccountService implements IEmailAccountService {
     }
 
     public EmailMessage getMessage(PortletRequest req, int messageNum) {
-
-        AccountSummary summary = (AccountSummary) req.getPortletSession().getAttribute(ACCOUNT_SUMMARY_KEY);
+        
+        PortletSession session = req.getPortletSession();
+        AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
         if (summary == null) {
             // Probably shouldn't happen...
             summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false);
         }
+        
+        EmailMessage rslt = null;
 
         List<EmailMessage> messages = summary.getMessages();
-        if (!(messages.size() > messageNum)) {
+        for (EmailMessage m : messages) {
+            if (m.getMessageNumber() == messageNum) {
+                rslt = m;
+                break;
+            }
+        }
+
+        if (rslt == null) {
             throw new RuntimeException("No such message:  " + messageNum);
         }
-        return messages.get(messageNum);
+
+        // Set the SEEN flag if configured to do so
+        if(serviceBroker.getConfiguration(req).getMarkMessagesAsRead()) {
+            List<EmailMessage> newList = new ArrayList<EmailMessage>();
+            for (EmailMessage m : messages) {
+                EmailMessage msg = !m.equals(rslt) ? m
+                        : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
+                            m.getSentDate(), false, m.isAnswered(), m.isDeleted(),
+                            m.isMultipart(), m.getContentType(), m.getContent());
+                newList.add(msg);
+            }
+            session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
+                    newList, getUnreadMessageCount(newList), newList.size(),
+                    0, DEFAULT_BATCH_SIZE, true));
+        }
+        
+        return rslt;
 
     }
 
@@ -144,7 +176,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         for (EmailMessage m : messages) {
             EmailMessage msg = !changed.contains(m.getUid()) ? m
-                    : new EmailMessage(newList.size(), m.getUid(), m.getSender(), m.getSubject(),
+                    : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                         m.getSentDate(), !seenValue, m.isAnswered(), m.isDeleted(),
                         m.isMultipart(), m.getContentType(), m.getContent());
             newList.add(msg);
