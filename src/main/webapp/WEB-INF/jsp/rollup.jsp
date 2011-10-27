@@ -144,6 +144,13 @@
         };
 
         var showErrorMessage = function(httpStatus, customMessage) {
+            if (httpStatus == 200) {
+                /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal 
+                 * this event means the ACTION timed out and improperly went to 
+                 * RENDER, where it should have resulted in a redirect).
+                 */
+                httpStatus = 504;
+            }
             var errorText = jsErrorMessages[httpStatus] || jsErrorMessages['default'];
             if (customMessage) {
                 // Add a server-specified custom message to the end

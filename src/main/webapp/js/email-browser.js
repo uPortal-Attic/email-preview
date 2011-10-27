@@ -173,6 +173,13 @@ var jasig = jasig || {};
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
+        if (httpStatus == 200) {
+            /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal 
+             * this event means the ACTION timed out and improperly went to 
+             * RENDER, where it should have resulted in a redirect).
+             */
+            httpStatus = 504;
+        }
         var errorText = that.options.jsErrorMessages[httpStatus] || that.options.jsErrorMessages['default'];
         if (customMessage) {
             // Add a server-specified custom message to the end
