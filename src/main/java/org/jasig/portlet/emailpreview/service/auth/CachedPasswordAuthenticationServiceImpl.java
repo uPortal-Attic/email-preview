@@ -40,8 +40,8 @@ import org.springframework.stereotype.Component;
 public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationService {
     
     private static final String KEY = "cachedPassword";
-    private static final String USERNAME_ATTRIBUTE = "user.login.id";
-    private static final String PASSWORD_ATTRIBUTE = "password";
+    public static final String USERNAME_ATTRIBUTE = "user.login.id";
+    public static final String PASSWORD_ATTRIBUTE = "password";
     
     private Map<String,ConfigurationParameter> configParams;
     
