@@ -50,8 +50,8 @@ public class CachedPasswordAuthenticationServiceImplTest {
         configuration = new MailStoreConfiguration();
         
         Map<String, String> userInfo = new HashMap<String, String>();
-        userInfo.put("user.login.id", "testuser");
-        userInfo.put("password", "pass");
+        userInfo.put(CachedPasswordAuthenticationServiceImpl.USERNAME_ATTRIBUTE, "testuser");
+        userInfo.put(CachedPasswordAuthenticationServiceImpl.PASSWORD_ATTRIBUTE, "pass");
         
         when(request.getAttribute(PortletRequest.USER_INFO)).thenReturn(userInfo);
     }

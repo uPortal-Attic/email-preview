@@ -20,8 +20,6 @@ package org.jasig.portlet.emailpreview.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.portlet.ActionRequest;
@@ -40,6 +38,7 @@ import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
 import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
+import org.jasig.portlet.emailpreview.util.EmailAccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,8 +104,7 @@ public class EmailSummaryController {
          * Indicates the portlet is not yet (completely) configured
          */
         ROLLUP("rollup") {
-            private final Pattern domainPattern = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
-
+            
             @Override
             public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
                 Map<String,Object> model = new HashMap<String,Object>();
@@ -114,22 +112,7 @@ public class EmailSummaryController {
                 MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
                 IAuthenticationService authService = controller.authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
 
-                // Make an intelligent guess about the emailAddress
-                String emailAddress = null;
-                String mailAccount = authService.getMailAccountName(req, config);
-                String nameSuffix = config.getUsernameSuffix();
-                String serverName = config.getHost();
-                if (mailAccount.contains("@")) {
-                    emailAddress = mailAccount;
-                } else if (nameSuffix != null && nameSuffix.length() != 0) {
-                    emailAddress = mailAccount + nameSuffix;
-                } else {
-                    emailAddress = mailAccount;
-                    Matcher m = domainPattern.matcher(serverName);
-                    if (m.find()) {
-                        emailAddress = emailAddress + "@" + m.group(1);
-                    }
-                }
+                String emailAddress = EmailAccountUtils.determineUserEmailAddress(req, config, authService);
                 model.put("emailAddress", emailAddress);
 
                 IEmailLinkService linkService = controller.linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
