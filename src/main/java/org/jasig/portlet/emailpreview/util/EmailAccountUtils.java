@@ -38,17 +38,18 @@ public final class EmailAccountUtils {
     final String mailAccount = authService.getMailAccountName(req, config);
     final String nameSuffix = config.getUsernameSuffix();
     final String serverName = config.getHost();
-    if (mailAccount.contains("@"))
+    if (mailAccount.contains("@")) {
       emailAddress = mailAccount;
-    else if (nameSuffix != null && nameSuffix.length() != 0)
+    } else if (nameSuffix != null && nameSuffix.length() != 0)  {
       emailAddress = mailAccount + nameSuffix;
-    else if (IP_ADDRESS_PATTERN.matcher(serverName).find()) 
+    } else if (IP_ADDRESS_PATTERN.matcher(serverName).find()) { 
         emailAddress = mailAccount;
-    else {
+    } else {
       emailAddress = mailAccount;
       final Matcher m = DOMAIN_PATTERN.matcher(serverName);
-      if (m.find())
+      if (m.find()) {
         emailAddress = emailAddress + "@" + m.group(1);
+      }
     }
     return emailAddress;
   }
