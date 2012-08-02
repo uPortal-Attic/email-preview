@@ -31,9 +31,7 @@
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
-<portlet:actionURL var="accountSummaryUrl">
-    <portlet:param name="action" value="accountSummary"/>
-</portlet:actionURL>
+<portlet:resourceURL id="accountSummary" var="accountSummaryUrl" />
 <portlet:actionURL var="showRollupUrl" windowState="normal">
     <portlet:param name="action" value="showRollup"/>
 </portlet:actionURL>

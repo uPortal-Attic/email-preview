@@ -222,7 +222,6 @@ public class EmailSummaryController {
      */
 
     @RequestMapping
-    @SuppressWarnings("unchecked")
     public ModelAndView chooseView(RenderRequest req, RenderResponse res) throws Exception {
 
         View showView = null;

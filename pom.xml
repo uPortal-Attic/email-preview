@@ -22,7 +22,7 @@
     </scm>
    
     <properties>
-        <spring.version>2.5.6</spring.version>
+        <spring.version>3.0.5.RELEASE</spring.version>
         <resource-server.version>1.0.12</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>javax.portlet</groupId>
                 <artifactId>portlet-api</artifactId>
-                <version>1.0</version>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -181,6 +181,8 @@
                 <artifactId>antisamy</artifactId>
                 <version>1.4</version>
             </dependency>
+
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
@@ -198,20 +200,25 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc-portlet</artifactId>
-                <version>${spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc-portlet</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>taglibs</groupId>
                 <artifactId>standard</artifactId>

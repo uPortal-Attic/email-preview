@@ -27,9 +27,7 @@
 </c:if>
 
 <c:set var="n"><portlet:namespace/></c:set>
-<portlet:actionURL var="accountSummaryUrl">
-    <portlet:param name="action" value="accountSummary"/>
-</portlet:actionURL>
+<portlet:resourceURL id="accountSummary" var="accountSummaryUrl" />
 <portlet:actionURL var="showPreviewUrl">
     <portlet:param name="action" value="showPreview"/>
 </portlet:actionURL>

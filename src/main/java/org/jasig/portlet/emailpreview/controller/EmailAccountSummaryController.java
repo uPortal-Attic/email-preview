@@ -24,6 +24,8 @@ import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 /**
  *
@@ -58,8 +62,8 @@ public class EmailAccountSummaryController {
     
     public static final String FORCE_REFRESH_PARAMETER = "forceRefresh";
 
-    @RequestMapping(params = "action=accountSummary")
-    public void getAccountSummary(ActionRequest req, ActionResponse res,
+    @ResourceMapping(value = "accountSummary")
+    public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
             @RequestParam("pageStart") int start,
             @RequestParam("numberOfMessages") int max) throws IOException {
 
@@ -86,26 +90,30 @@ public class EmailAccountSummaryController {
             if (accountSummary.isValid()) {
                 model.put("accountSummary", accountSummary);
                 model.put("inboxUrl", accountSummary.getInboxUrl());
-                ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+                return new ModelAndView("jsonView", model);
             } else {
                 Throwable cause = accountSummary.getErrorCause();
                 if (MailAuthenticationException.class.isAssignableFrom(cause.getClass())) {
-                    model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
-                    log.info( "Authentication Failure (username='" + username + "') : " + cause.getMessage() );
+                    throw new RuntimeException();  // TODO!
+//                    model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
+//                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
+//                    log.info( "Authentication Failure (username='" + username + "') : " + cause.getMessage() );
                 } else {
-                    // See note below...
-                    model.put( "errorMessage", cause.getMessage() );
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
-                    log.error( "Unanticipated Error", cause);
+                    throw new RuntimeException();  // TODO!
+//                    // See note below...
+//                    model.put( "errorMessage", cause.getMessage() );
+//                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+//                    log.error( "Unanticipated Error", cause);
                 }
             }
 
         } catch (MailTimeoutException ex) {
-            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
-            log.error( "Mail Service Timeout", ex);
+            throw new RuntimeException();  // TODO!
+//            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
+//            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
+//            log.error( "Mail Service Timeout", ex);
         } catch (Exception ex) {
+            throw new RuntimeException();  // TODO!
             /* ********************************************************
                 In the case of an unknown error we want to send the
                 exception's message back to the portlet. This will
@@ -113,9 +121,9 @@ public class EmailAccountSummaryController {
                 their service desks to follow for specific errors.
             ******************************************************** */
 
-            model.put( "errorMessage", ex.getMessage() );
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
-            log.error( "Unanticipated Error", ex);
+//            model.put( "errorMessage", ex.getMessage() );
+//            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+//            log.error( "Unanticipated Error", ex);
         }
 
     }
