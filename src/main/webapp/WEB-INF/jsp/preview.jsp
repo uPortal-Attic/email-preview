@@ -35,18 +35,10 @@
 <portlet:actionURL var="showRollupUrl" windowState="normal">
     <portlet:param name="action" value="showRollup"/>
 </portlet:actionURL>
-<portlet:actionURL var="messageUrl">
-    <portlet:param name="action" value="emailMessage"/>
-</portlet:actionURL>
-<portlet:actionURL var="deleteUrl">
-    <portlet:param name="action" value="deleteMessages"/>
-</portlet:actionURL>
-<portlet:actionURL var="toggleSeenUrl">
-    <portlet:param name="action" value="toggleSeen"/>
-</portlet:actionURL>
-<portlet:actionURL var="updatePageSizeUrl">
-    <portlet:param name="action" value="updatePageSize"/>
-</portlet:actionURL>
+<portlet:resourceURL id="emailMessage" var="messageUrl" />
+<portlet:resourceURL id="deleteMessages" var="deleteUrl" />
+<portlet:resourceURL id="toggleSeen" var="toggleSeenUrl" />
+<portlet:resourceURL id="updatePageSize" var="updatePageSizeUrl" />
 
 <c:if test="${showConfigLink}">
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>

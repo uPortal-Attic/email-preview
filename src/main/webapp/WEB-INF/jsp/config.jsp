@@ -28,15 +28,17 @@
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
-<portlet:actionURL var="formUrl"><portlet:param name="action" value="updateConfiguration"/></portlet:actionURL>
-<c:url var="parametersUrl" value="/ajax/parameters"><c:param name="action" value="getParameters"/></c:url>
+<portlet:actionURL var="formUrl">
+    <portlet:param name="action" value="updateConfiguration"/>
+</portlet:actionURL>
+<portlet:resourceURL id="parameters" var="parametersUrl" />
 
 <div class="fl-widget portlet" role="section">
 
     <!-- Portlet Body -->
     <div class="fl-widget-content portlet-body" role="main">
 
-        <form:form action="${ formUrl }" method="POST" commandName="form">
+        <form:form action="${ formUrl }" method="POST" commandName="form" htmlEscape="false">
     
             <!-- General Configuration Section -->
             <div class="portlet-section" role="region">
@@ -54,7 +56,7 @@
                         <tbody>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="host"><spring:message code="config.preferences.host"/>:</form:label>
+                                    <form:label path="host"><spring:message code="config.preferences.host"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="host"/></td>
                             </tr>
@@ -137,38 +139,28 @@
                 <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.authentication"/></h3>
                 <p><spring:message code="config.preferences.comment"/></p>
                 <div class="portlet-section-body">
-                    <!--
-                    <form:label path="authenticationServiceKey"><spring:message code="config.preferences.authentication.service"/></form:label>
-                    <form:select path="authenticationServiceKey" cssClass="auth-service-input">
-                        <c:forEach items="${ authServices }" var="service">
-                            <form:option value="${ service.key }"/>
-                        </c:forEach>
-                    </form:select>
-                    -->
-                    
-                <c:forEach items="${authServices}" var="auth">
-                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/>
-                    <table class="auth-service-parameters">
-                        <thead>
-                            <tr>
-                                <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>
-                                <th><spring:message code="config.preferences.value"/></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${auth.adminConfigurationParameters}" var="parameter">
-                                <c:set var="path" value="additionalProperties['${ parameter.key }'].value"/>
-                                <tr class="parameter-row">
-                                    <td class="preference-name">
-                                        <form:label path="${ path }">${ parameter.label }</form:label>
-                                    </td>
-                                    <td class="value"><form:input path="${ path }"/></td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </c:forEach>
-                    
+	                <c:forEach items="${authServices}" var="auth">
+	                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/>
+	                    <table class="auth-service-parameters">
+	                        <thead>
+	                            <tr>
+	                                <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>
+	                                <th><spring:message code="config.preferences.value"/></th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <c:forEach items="${auth.adminConfigurationParameters}" var="parameter">
+	                                <c:set var="path" value="additionalProperties['${ parameter.key }'].value"/>
+	                                <tr class="parameter-row">
+	                                    <td class="preference-name">
+	                                        <form:label path="${ path }">${ parameter.label }</form:label>
+	                                    </td>
+	                                    <td class="value"><form:input path="${ path }"/></td>
+	                                </tr>
+	                            </c:forEach>
+	                        </tbody>
+	                    </table>
+	                </c:forEach>
                 </div>
             </div>
 

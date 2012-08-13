@@ -19,9 +19,6 @@
 package org.jasig.portlet.emailpreview.dao.demo;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,13 +27,12 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
@@ -198,26 +194,22 @@ public final class DemoAccountService implements IEmailAccountService {
         File jsonFile = new File(getClass().getResource(jsonLocation).getFile());
         List<EmailMessage> messages = new ArrayList<EmailMessage>();
 
-        InputStream inpt = null;
         try {
-
-            inpt = new FileInputStream(jsonFile);
-
-            JSONArray returnedFiles = JSONArray.fromObject(IOUtils.toString(inpt));
+            
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayNode json = mapper.readValue(jsonFile, ArrayNode.class);
 
             // Creates a Mime Message because Email Message depends on a "message" variable.
-            for (int i=0; i < returnedFiles.size(); i++) {
+            for (JsonNode msg : json) {
 
-                JSONObject msg = returnedFiles.getJSONObject(i);
-
-                long uid = msg.getLong("uid");
-                String sender = msg.getString("from");
-                String subject = msg.getString("subject");
-                Date sentDate = new Date(msg.getLong("sentDate"));
-                boolean unread = msg.getBoolean("unread");
+                long uid = msg.path("uid").getLongValue();
+                String sender = msg.path("from").getTextValue();
+                String subject = msg.path("subject").getTextValue();
+                Date sentDate = new Date(msg.path("sentDate").getLongValue());
+                boolean unread = msg.path("unread").getBooleanValue();
                 boolean answered = false; // didn't consider to change this
                 boolean deleted = false; // more testing is available here
-                EmailMessageContent content = new EmailMessageContent(msg.getString("body"), true);
+                EmailMessageContent content = new EmailMessageContent(msg.path("body").getTextValue(), true);
 
                 messages.add(new EmailMessage(messages.size(), uid,
                         sender, subject, sentDate, unread, answered, deleted,
@@ -226,12 +218,6 @@ public final class DemoAccountService implements IEmailAccountService {
             }
         } catch (Exception e) {
             log.error("Failed to load messages collection", e);
-        } finally {
-            try {
-                inpt.close();
-            } catch (IOException ioe) {
-                log.error("Failed to close input stream", ioe);
-            }
         }
 
         return messages;

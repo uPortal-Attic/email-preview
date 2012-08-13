@@ -20,9 +20,10 @@ package org.jasig.portlet.emailpreview.service;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
@@ -116,7 +117,6 @@ public class SimpleServiceBroker implements IServiceBroker {
             allParams = authServ.getConfigurationParametersMap();
         }
         
-        @SuppressWarnings("unchecked")
         Map<String, String[]> preferenceMap = prefs.getMap();
         for (Map.Entry<String, String[]> entry : preferenceMap.entrySet()) {
             
@@ -141,7 +141,6 @@ public class SimpleServiceBroker implements IServiceBroker {
         return config;
     }
     
-    @SuppressWarnings("unchecked")
     public void saveConfiguration(ActionRequest request, MailStoreConfiguration config) {
         
         PortletPreferences prefs = request.getPreferences();
@@ -149,8 +148,8 @@ public class SimpleServiceBroker implements IServiceBroker {
         try {
             
             // Start with a clean slate
-            for (Enumeration<String> prefNames = prefs.getNames(); prefNames.hasMoreElements();) {
-                String name = prefNames.nextElement();
+            Set<String> prefNames = new HashSet<String>(prefs.getMap().keySet());
+            for (String name : prefNames) {
                 if (!prefs.isReadOnly(name)) {
                     prefs.reset(name);
                 }
