@@ -22,19 +22,20 @@ package org.jasig.portlet.emailpreview.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
-import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 /**
  *
@@ -52,12 +53,11 @@ public class EmailMessageController {
     @Autowired(required = true)
     private IEmailAccountService accountDao;
 
-    @Autowired(required = true)
-    private AjaxPortletSupportService ajaxPortletSupportService;
-
-    @RequestMapping(params = "action=emailMessage")
-    public void showMessage(ActionRequest req, ActionResponse res,
+    @ResourceMapping(value = "emailMessage")
+    public ModelAndView showMessage(ResourceRequest req, ResourceResponse res,
             @RequestParam("messageNum") int messageNum){
+
+        Map<String, Object> model = new HashMap<String, Object>();
 
         try {
 
@@ -75,21 +75,21 @@ public class EmailMessageController {
                 message.getContent().setContentString(MessageUtils.addClickableUrlsToMessageBody(messageBody));
             }
 
-            // Define view and generate model
-            Map<String, Object> model = new HashMap<String, Object>();
             model.put("message", message);
-
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
 
         } catch (Exception ex) {
             log.error("Error encountered while attempting to retrieve message", ex);
         }
+        
+        return new ModelAndView("json", model);
 
     }
 
-    @RequestMapping(params = "action=deleteMessages")
-    public void deleteMessages(ActionRequest req, ActionResponse res,
+    @ResourceMapping(value = "deleteMessages")
+    public ModelAndView deleteMessages(ResourceRequest req, ResourceResponse res,
                 @RequestParam(value="selectMessage", required=false) long[] uids) {
+
+        Map<String, Object> model = new HashMap<String, Object>();
 
         try {
 
@@ -103,22 +103,22 @@ public class EmailMessageController {
                 accountDao.deleteMessages(req, uids);
             }
 
-            // Define view and generate model
-            Map<String, Object> model = new HashMap<String, Object>();
             model.put("success", "success");
-
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete specified messages", e);
         }
 
+        return new ModelAndView("json", model);
+
     }
 
-    @RequestMapping(params = "action=toggleSeen")
-    public void toggleSeen(ActionRequest req, ActionResponse res,
+    @ResourceMapping(value = "toggleSeen")
+    public ModelAndView toggleSeen(ResourceRequest req, ResourceResponse res,
                 @RequestParam(value="selectMessage", required=false) long[] messages,
                 @RequestParam("seenValue") boolean seenValue) {
+
+        Map<String, Object> model = new HashMap<String, Object>();
 
         try {
 
@@ -130,15 +130,13 @@ public class EmailMessageController {
 
             }
 
-            // Define view and generate model
-            Map<String, Object> model = new HashMap<String, Object>();
             model.put("success", "success");
 
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
-
         } catch (Exception e) {
-            throw new RuntimeException("Failed to delete specified messages", e);
+            throw new RuntimeException("Failed to update the seen flag for specified messages", e);
         }
+
+        return new ModelAndView("json", model);
 
     }
 

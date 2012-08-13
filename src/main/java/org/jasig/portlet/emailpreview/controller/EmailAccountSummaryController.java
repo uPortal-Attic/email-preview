@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -32,12 +32,12 @@ import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
-import org.jasig.portlet.emailpreview.servlet.HttpErrorResponseController;
-import org.jasig.web.service.AjaxPortletSupportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 /**
  *
@@ -53,13 +53,14 @@ public class EmailAccountSummaryController {
     @Autowired(required = true)
     private IEmailAccountService accountDao;
 
-    @Autowired(required = true)
-    private AjaxPortletSupportService ajaxPortletSupportService;
-    
     public static final String FORCE_REFRESH_PARAMETER = "forceRefresh";
 
-    @RequestMapping(params = "action=accountSummary")
-    public void getAccountSummary(ActionRequest req, ActionResponse res,
+    public static final String KEY_ACCOUNT_SUMMARY = "accountSummary";
+    public static final String KEY_INBOX_URL = "inboxUrl";
+    public static final String KEY_ERROR = "error";
+
+    @ResourceMapping(value = "accountSummary")
+    public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
             @RequestParam("pageStart") int start,
             @RequestParam("numberOfMessages") int max) throws IOException {
 
@@ -71,7 +72,7 @@ public class EmailAccountSummaryController {
 
             // Force a re-load from the data source if called for by the UI.
             boolean refresh = Boolean.valueOf(req.getParameter(FORCE_REFRESH_PARAMETER));
-            
+
             // Or because of a change in settings.
             if (req.getPortletSession().getAttribute(FORCE_REFRESH_PARAMETER) != null) {
                 // Doesn't matter what the value is;  this calles for a refresh...
@@ -81,30 +82,28 @@ public class EmailAccountSummaryController {
 
             // Get current user's account information
             AccountSummary accountSummary = accountDao.getAccountSummary(req, start, max, refresh);
-            
+
             // Check for AuthN failure...
             if (accountSummary.isValid()) {
-                model.put("accountSummary", accountSummary);
-                model.put("inboxUrl", accountSummary.getInboxUrl());
-                ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
+                model.put(KEY_ACCOUNT_SUMMARY, accountSummary);
+                model.put(KEY_INBOX_URL, accountSummary.getInboxUrl());
             } else {
                 Throwable cause = accountSummary.getErrorCause();
                 if (MailAuthenticationException.class.isAssignableFrom(cause.getClass())) {
-                    model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_UNAUTHORIZED);
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
-                    log.info( "Authentication Failure (username='" + username + "') : " + cause.getMessage() );
+                    log.info("Authentication Failure (username='" + username + "') : " + cause.getMessage());
+                    res.setProperty(ResourceResponse.HTTP_STATUS_CODE, Integer.toString(HttpServletResponse.SC_UNAUTHORIZED));
+                    model.put(KEY_ERROR, "Not authorized");
                 } else {
-                    // See note below...
-                    model.put( "errorMessage", cause.getMessage() );
-                    ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
-                    log.error( "Unanticipated Error", cause);
+                    log.error("Unanticipated Error", cause);
+                    res.setProperty(ResourceResponse.HTTP_STATUS_CODE, Integer.toString(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+                    model.put(KEY_ERROR, "Unanticipated Error");
                 }
             }
 
         } catch (MailTimeoutException ex) {
-            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, HttpServletResponse.SC_GATEWAY_TIMEOUT);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
-            log.error( "Mail Service Timeout", ex);
+            log.error("Mail Service Timeout", ex);
+            res.setProperty(ResourceResponse.HTTP_STATUS_CODE, Integer.toString(HttpServletResponse.SC_GATEWAY_TIMEOUT));
+            model.put(KEY_ERROR, "Mail Service Timeout");
         } catch (Exception ex) {
             /* ********************************************************
                 In the case of an unknown error we want to send the
@@ -112,11 +111,12 @@ public class EmailAccountSummaryController {
                 let implementers write specific instructions for
                 their service desks to follow for specific errors.
             ******************************************************** */
-
-            model.put( "errorMessage", ex.getMessage() );
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
             log.error( "Unanticipated Error", ex);
+            res.setProperty(ResourceResponse.HTTP_STATUS_CODE, Integer.toString(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+            model.put(KEY_ERROR, "ex.getMessage()");
         }
+
+        return new ModelAndView("json", model);
 
     }
 

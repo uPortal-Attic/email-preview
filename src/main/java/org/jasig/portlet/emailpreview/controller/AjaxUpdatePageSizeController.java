@@ -21,18 +21,18 @@ package org.jasig.portlet.emailpreview.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jasig.portlet.emailpreview.servlet.HttpErrorResponseController;
-import org.jasig.web.service.AjaxPortletSupportService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 /**
  * Responsible for remembering the user's pageSize selection with 
@@ -46,21 +46,10 @@ public class AjaxUpdatePageSizeController {
     
     private static final String STATUS_KEY = "success";
 
-    private AjaxPortletSupportService ajaxPortletSupportService;
     private final Log log = LogFactory.getLog(this.getClass());
 
-    /**
-     * Set the service for handling portlet AJAX requests.
-     *
-     * @param ajaxPortletSupportService
-     */
-    @Autowired(required = true)
-    public void setAjaxPortletSupportService(AjaxPortletSupportService ajaxPortletSupportService) {
-            this.ajaxPortletSupportService = ajaxPortletSupportService;
-    }
-
-    @RequestMapping(params = "action=updatePageSize")
-    public void updatePageSize(ActionRequest req, ActionResponse res, 
+    @ResourceMapping(value = "updatePageSize")
+    public ModelAndView updatePageSize(ResourceRequest req, ResourceResponse res, 
                 @RequestParam("newPageSize") int newPageSize) throws Exception {
 
         PortletPreferences prefs = req.getPreferences();
@@ -72,17 +61,18 @@ public class AjaxUpdatePageSizeController {
             prefs.setValue(EmailSummaryController.PAGE_SIZE_PREFERENCE, Integer.toString(newPageSize));
             prefs.store();
             model.put(STATUS_KEY, true);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/json", model, req, res);
         } else {
             if (log.isDebugEnabled()) {
-                String msg = "Ignoring chanhe to pageSize for the following " 
+                String msg = "Ignoring change to pageSize for the following " 
                         + "user because the preference is read only:  " 
                         + req.getRemoteUser();
                 log.debug(msg);
             }
-            model.put(HttpErrorResponseController.HTTP_ERROR_CODE, 500);
-            ajaxPortletSupportService.redirectAjaxResponse("ajax/error", model, req, res);
+            res.setProperty(ResourceResponse.HTTP_STATUS_CODE, Integer.toString(HttpServletResponse.SC_UNAUTHORIZED));
+            model.put("error", "Not authorized");
         }
+        
+        return new ModelAndView("json", model);
 
     }
 

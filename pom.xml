@@ -13,7 +13,7 @@
 
     <name>Email Preview Portlet</name>
     <description>Read-only email portlet.</description>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <scm>
         <connection>scm:git:git@github.com:Jasig/email-preview.git</connection>
@@ -22,7 +22,7 @@
     </scm>
    
     <properties>
-        <spring.version>2.5.6</spring.version>
+        <spring.version>3.1.2.RELEASE</spring.version>
         <resource-server.version>1.0.12</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
@@ -112,7 +112,7 @@
             <dependency>
                 <groupId>javax.portlet</groupId>
                 <artifactId>portlet-api</artifactId>
-                <version>1.0</version>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -151,9 +151,14 @@
                 <version>1.0-rc-3</version>
             </dependency>
             <dependency>
-                <groupId>org.jasig</groupId>
-                <artifactId>AjaxPortletSupport</artifactId>
-                <version>1.0.9</version> 
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.6.2</version>
             </dependency>
             <dependency>
                 <groupId>org.jasig.resourceserver</groupId>
@@ -198,18 +203,22 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc-portlet</artifactId>
+                <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc-portlet</artifactId>
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
@@ -257,8 +266,12 @@
             <artifactId>jstl</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jasig</groupId>
-            <artifactId>AjaxPortletSupport</artifactId>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
         <dependency> 
             <groupId>org.jasypt</groupId> 
