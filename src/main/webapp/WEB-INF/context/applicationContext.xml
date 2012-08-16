@@ -43,8 +43,6 @@
         <ref bean="simpleEmailLinkService"/>
     </util:list>
 
-    <bean class="org.jasig.web.service.AjaxPortletSupportService"/>
-
     <!-- 
      | View resolvers, look for a named view bean before going to JSP resolution
      +-->
