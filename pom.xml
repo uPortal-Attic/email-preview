@@ -13,7 +13,7 @@
 
     <name>Email Preview Portlet</name>
     <description>Read-only email portlet.</description>
-    <version>2.0.1</version>
+    <version>2.0.2-SNAPSHOT</version>
 
     <scm>
         <connection>scm:git:git@github.com:Jasig/email-preview.git</connection>
