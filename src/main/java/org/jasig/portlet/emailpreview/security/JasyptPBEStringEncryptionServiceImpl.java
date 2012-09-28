@@ -19,7 +19,9 @@
 
 package org.jasig.portlet.emailpreview.security;
 
+import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
+import org.jasypt.exceptions.EncryptionInitializationException;
 
 /**
  * JasyptPBEStringEncryptionServiceImpl is an implementation of 
@@ -45,14 +47,26 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
 	 * {@inheritDoc}
 	 */
 	public String encrypt(String plaintext) {
-		return this.encryptor.encrypt(plaintext);
+        try {
+		    return this.encryptor.encrypt(plaintext);
+        } catch (EncryptionInitializationException e) {
+            throw new EmailPreviewException("Encryption error. Verify an encryption password"
+                    + " is configured in the email preview portlet's"
+                    + " stringEncryptionService bean in applicationContent.xml", e);
+        }
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	public String decrypt(String cryptotet) {
-		return this.encryptor.decrypt(cryptotet);
-	}
+        try {
+		    return this.encryptor.decrypt(cryptotet);
+        } catch (EncryptionInitializationException e) {
+            throw new EmailPreviewException("Decryption error. Was encryption password"
+                    + " changed in the email preview portlet's"
+                    + " stringEncryptionService bean in applicationContent.xml?", e);
+        }
+    }
 	
 }

@@ -58,11 +58,15 @@
     <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
         <property name="stringEncryptor">
             <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
-                
+
                 <!-- Before using the string encryption service you must
-                    first set a password
-                <property name="password" value="changeMe!"/> -->
-                
+                 first set a password.
+
+                 NOTE:  Do NOT change this password after a user has entered
+                 their password into the portlet configuration. The system
+                 won't be able to decrypt it and the portlet will fail.
+             <property name="password" value="changeMe!"/> -->
+
                 <!-- 
                     Example BouncyCastle-powered AES encryption
                     
