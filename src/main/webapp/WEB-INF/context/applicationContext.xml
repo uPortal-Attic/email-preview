@@ -37,6 +37,7 @@
         <ref bean="portletPreferencesCredentialsAuthenticationService"/>
         <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
         <ref bean="demoAuthenticationService"/>
+        <ref bean="casAuthenticationService"/>
     </util:list>
 
     <util:list id="linkServices">
@@ -88,5 +89,7 @@
             </list>
         </property>
     </bean>
+    
+    <import resource="casContext.xml"/>
 
 </beans>
