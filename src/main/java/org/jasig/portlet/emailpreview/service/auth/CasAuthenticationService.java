@@ -33,7 +33,7 @@ import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
 public class CasAuthenticationService implements IAuthenticationService {
     
-    public static final String KEY = "cas";
+    protected String key = "cas";
     
     protected ICASProxyTicketService casTicketService;
     protected String serviceUrl;  
@@ -91,7 +91,11 @@ public class CasAuthenticationService implements IAuthenticationService {
     }
 
     public String getKey() {
-        return KEY;
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public List<ConfigurationParameter> getAdminConfigurationParameters() {
