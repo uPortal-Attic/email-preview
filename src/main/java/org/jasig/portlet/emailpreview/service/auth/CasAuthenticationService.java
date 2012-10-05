@@ -55,7 +55,7 @@ public class CasAuthenticationService implements IAuthenticationService {
 	}
 		
 	protected Assertion getCasAssertion(PortletRequest request) {
-		PortletSession session = request.getPortletSession(false);
+		PortletSession session = request.getPortletSession(true);
 	    Assertion casAssertion = (Assertion) session.getAttribute(CAS_ASSERTION_KEY);
 	    if(casAssertion == null) {
 	    	casAssertion = casTicketService.getProxyTicket(request);
