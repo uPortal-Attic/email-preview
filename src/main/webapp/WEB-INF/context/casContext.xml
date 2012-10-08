@@ -22,7 +22,7 @@
 	<!-- Ticket validation filter -->
 	<bean id="ticketValidationFilter"
 		class="org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter"
-		p:serverName="http://localhost:8080" p:redirectAfterValidation="false"
+		p:serverName="${cas-config.serverName}" p:redirectAfterValidation="false"
 		p:proxyReceptorUrl="/proxy/receptor" p:ticketValidator-ref="ticketValidator"
 		p:proxyGrantingTicketStorage-ref="proxyGrantingTicketStorage" />
 
@@ -30,15 +30,15 @@
 	<!-- CAS proxy ticket validator -->
 	<bean id="ticketValidator"
 		class="org.jasig.cas.client.validation.Cas20ProxyTicketValidator"
-		p:proxyCallbackUrl="http://localhost:8080/email-preview/proxy/receptor"
+		p:proxyCallbackUrl="${cas-config.serverName}/${cas-config.emailpreviewContext}/proxy/receptor"
 		p:proxyGrantingTicketStorage-ref="proxyGrantingTicketStorage"
 		p:acceptAnyProxy="true">
-		<constructor-arg index="0" value="http://localhost:8080/cas" />
+		<constructor-arg index="0" value="${cas-config.casServerUrl}" />
 	</bean>
 
 	<!-- CAS Proxy service bean -->
 	<bean id="casTicketService" class="org.jasig.portlet.cas.CASProxyTicketServiceUserInfoImpl"
-		p:serviceUrl="http://localhost:8080/email-preview"
+		p:serviceUrl="${cas-config.serviceServerName}/${cas-config.emailpreviewContext}"
 		p:ticketValidator-ref="ticketValidator" />
 
 	<bean id="proxyGrantingTicketStorage"
@@ -49,6 +49,6 @@
 	<bean id="casAuthenticationService"
 		class="org.jasig.portlet.emailpreview.service.auth.CasAuthenticationService"
 		p:casTicketService-ref="casTicketService" 
-		p:serviceUrl="imap://mail.jasig.org" />
+		p:serviceUrl="${cas-config.serviceUrl}" />
 
 </beans>

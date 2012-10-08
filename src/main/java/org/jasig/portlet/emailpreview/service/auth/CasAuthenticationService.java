@@ -60,7 +60,7 @@ public class CasAuthenticationService implements IAuthenticationService {
 	    if(casAssertion == null) {
 	    	casAssertion = casTicketService.getProxyTicket(request);
 			if(casAssertion == null)
-				throw new RuntimeException("CasAssertion is null : Auth ProxyCAS failed ??");
+				throw new RuntimeException("CasAssertion is null : Auth ProxyCAS failed ? Please check yours CAS configurations.");
 		    session.setAttribute(CAS_ASSERTION_KEY, casAssertion);     
 	    }
 	    return casAssertion;
