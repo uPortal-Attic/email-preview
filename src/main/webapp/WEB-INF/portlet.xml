@@ -330,5 +330,11 @@
         <description>Password attribute name for uPortal user</description>
         <name>password</name>
     </user-attribute>
+    
+    <user-attribute>
+        <description>casProxyTicket</description>
+        <name>casProxyTicket</name>
+    </user-attribute>
+    
 
 </portlet-app>
