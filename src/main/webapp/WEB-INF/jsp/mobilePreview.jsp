@@ -52,7 +52,7 @@
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
     <p style="text-align: right;"><a href="${ configUrl }">Configure portlet</a></p>
 </c:if>
-
+<div class="email-preview">
 <div data-role="content" id="${n}container" class="email-container portlet" xmlns:rsf="http://ponder.org.uk">
     <div class="loading-message"></div>
     <div class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
@@ -130,6 +130,7 @@
             </c:if>
         </form>
     </div>    
+</div>
 </div>
 
 <script type="text/javascript">
