@@ -58,7 +58,6 @@
             <short-title>Email preview</short-title>
             <keywords>Email, preview, Portlet</keywords>
         </portlet-info>
-        
         <portlet-preferences>
         
             <!-- 
@@ -216,12 +215,6 @@
             </preference>   
 
         </portlet-preferences>
-        
-        <security-role-ref>
-            <role-name>Portal_Administrators</role-name>
-            <role-link>local.2</role-link>
-        </security-role-ref>
-
     </portlet>
     
     <portlet>
@@ -262,7 +255,6 @@
             <short-title>Demo Email</short-title>
             <keywords>Demo, Email, preview, Portlet</keywords>
         </portlet-info>
-        
         <portlet-preferences>
             <preference>
                 <name>defaultView</name>
@@ -313,12 +305,6 @@
                 <value>http://www.jasig.org/</value>
             </preference>
         </portlet-preferences>
-        
-        <security-role-ref>
-            <role-name>Portal_Administrators</role-name>
-            <role-link>local.2</role-link>
-        </security-role-ref>
-
     </portlet>
 
     <user-attribute>
