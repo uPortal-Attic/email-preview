@@ -32,11 +32,25 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
 
+    <!-- Properties configuration -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+          lazy-init="false">
+        <property name="locations">
+            <list>
+                <value>classpath:configuration.properties</value>
+            </list>
+        </property>
+    </bean>
+
+
+
     <util:list id="authServices">
         <ref bean="cachedPasswordAuthenticationService"/>
         <ref bean="portletPreferencesCredentialsAuthenticationService"/>
         <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
         <ref bean="demoAuthenticationService"/>
+        <ref bean="casAuthenticationService"/>
     </util:list>
 
     <util:list id="linkServices">

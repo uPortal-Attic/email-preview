@@ -29,7 +29,10 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/context/applicationContext.xml</param-value>
+        <param-value>
+            /WEB-INF/context/applicationContext.xml
+            /WEB-INF/context/casContext.xml
+        </param-value>
     </context-param>
 
     <context-param>
@@ -48,6 +51,21 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+
+    <filter>
+        <filter-name>CAS Validation Filter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>ticketValidationFilter</param-value>
+        </init-param>
+    </filter>
+
+	<filter-mapping>
+        <filter-name>CAS Validation Filter</filter-name>
+        <url-pattern>/proxy/receptor</url-pattern>
+    </filter-mapping>
+
 
     <servlet>
         <servlet-name>ViewRendererServlet</servlet-name>

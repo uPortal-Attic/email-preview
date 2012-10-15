@@ -26,6 +26,7 @@
         <resource-server.version>1.0.12</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
+        <cas.version>3.2.1</cas.version>
     </properties>
 
     <licenses>
@@ -226,6 +227,11 @@
                 <artifactId>standard</artifactId>
                 <version>1.1.2</version>
             </dependency>
+            <dependency>
+                <groupId>org.jasig.cas.client</groupId>
+                <artifactId>cas-client-core</artifactId>
+                <version>${cas.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -297,6 +303,10 @@
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jasig.cas.client</groupId>
+            <artifactId>cas-client-core</artifactId>
         </dependency>
 
 
