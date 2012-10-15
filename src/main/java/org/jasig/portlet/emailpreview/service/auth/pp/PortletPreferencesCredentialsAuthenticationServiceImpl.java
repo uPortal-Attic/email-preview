@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview.service.auth;
+package org.jasig.portlet.emailpreview.service.auth.pp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +31,8 @@ import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 import org.springframework.stereotype.Component;
 
 @Component("portletPreferencesCredentialsAuthenticationService")

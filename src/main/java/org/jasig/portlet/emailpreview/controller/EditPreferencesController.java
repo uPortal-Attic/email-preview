@@ -42,7 +42,7 @@ import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
-import org.jasig.portlet.emailpreview.service.auth.PortletPreferencesCredentialsAuthenticationServiceImpl;
+import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
