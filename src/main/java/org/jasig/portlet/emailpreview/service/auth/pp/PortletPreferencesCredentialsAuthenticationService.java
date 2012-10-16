@@ -36,16 +36,25 @@ import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 import org.springframework.stereotype.Component;
 
 @Component("portletPreferencesCredentialsAuthenticationService")
-public class PortletPreferencesCredentialsAuthenticationServiceImpl implements IAuthenticationService {
-    
+public class PortletPreferencesCredentialsAuthenticationService implements IAuthenticationService {
+
     public static final String KEY = "portletPreferences";
-    
+
+    private static final String ACCOUNT_NAME_ATTRIBUTE_KEY = "PortletPreferencesCredentialsAuthenticationService.ACCOUNT_NAME_ATTRIBUTE";
+    private static final String ACCOUNT_NAME_ATTRIBUTE_LABEL = "If specified, use this user attribute as the mail account name (users won't be able to edit it)";
+    private static final ConfigurationParameter ACCOUNT_NAME_ATTRIBUTE = new ConfigurationParameter(
+                ACCOUNT_NAME_ATTRIBUTE_KEY,    // key
+                ACCOUNT_NAME_ATTRIBUTE_LABEL,  // label
+                null,                          // defaultValue
+                false                          // requiresEncryption
+            );
+
     private final List<ConfigurationParameter> userParameters;
     private Map<String,ConfigurationParameter> configParams;
-    
-    public PortletPreferencesCredentialsAuthenticationServiceImpl() {
+
+    public PortletPreferencesCredentialsAuthenticationService() {
         List<ConfigurationParameter> params = new ArrayList<ConfigurationParameter>();
-        
+
         ConfigurationParameter usernameParam = new ConfigurationParameter();
         usernameParam.setKey(MailPreferences.MAIL_ACCOUNT.getKey());
         usernameParam.setLabel("Inbox folder name");
@@ -57,7 +66,7 @@ public class PortletPreferencesCredentialsAuthenticationServiceImpl implements I
         passwordParam.setLabel("Inbox folder name");
         passwordParam.setEncryptionRequired(true);
         params.add(passwordParam);
-        
+
         this.userParameters = Collections.unmodifiableList(params);
 
         Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
@@ -84,14 +93,33 @@ public class PortletPreferencesCredentialsAuthenticationServiceImpl implements I
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
         return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
     }
-    
-    public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
-        String rslt = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
-        String suffix = config.getUsernameSuffix();
+
+    public String getMailAccountName(PortletRequest req, MailStoreConfiguration config) {
+
+        String rslt = null;
+
+        /*
+         * Does the account name come from user input or an attribute chosen by the admin?
+         */
+        final String accountNameAttribute = config.getAdditionalProperties().get(ACCOUNT_NAME_ATTRIBUTE_KEY);
+        if (!StringUtils.isBlank(accountNameAttribute)) {
+            // Chosen attribute
+            @SuppressWarnings("unchecked")
+            final Map<String,String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);
+            rslt = userInfo.get(accountNameAttribute);
+        } else {
+            // User input
+            rslt = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+        }
+
+        // Use a suffix?
+        final String suffix = config.getUsernameSuffix();
         if (rslt != null && !StringUtils.isBlank(suffix)) {
             rslt = rslt.concat(suffix);
         }
+
         return rslt;
+
     }
 
     public String getKey() {
@@ -99,7 +127,7 @@ public class PortletPreferencesCredentialsAuthenticationServiceImpl implements I
     }
 
     public List<ConfigurationParameter> getAdminConfigurationParameters() {
-        return Collections.<ConfigurationParameter>emptyList();
+        return Collections.<ConfigurationParameter>singletonList(ACCOUNT_NAME_ATTRIBUTE);
     }
 
     public List<ConfigurationParameter> getUserConfigurationParameters() {

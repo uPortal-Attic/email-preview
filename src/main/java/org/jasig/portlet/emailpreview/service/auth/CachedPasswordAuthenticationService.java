@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * @version $Revision$
  */
 @Component("cachedPasswordAuthenticationService")
-public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationService {
+public class CachedPasswordAuthenticationService implements IAuthenticationService {
     
     private static final String KEY = "cachedPassword";
     public static final String USERNAME_ATTRIBUTE = "user.login.id";
@@ -45,7 +45,7 @@ public class CachedPasswordAuthenticationServiceImpl implements IAuthenticationS
     
     private Map<String,ConfigurationParameter> configParams;
     
-    public CachedPasswordAuthenticationServiceImpl() {
+    public CachedPasswordAuthenticationService() {
         Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
         for (ConfigurationParameter param : getAdminConfigurationParameters()) {
             m.put(param.getKey(), param);

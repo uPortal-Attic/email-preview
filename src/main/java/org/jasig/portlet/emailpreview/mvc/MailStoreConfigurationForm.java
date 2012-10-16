@@ -29,7 +29,6 @@ import javax.portlet.PortletRequest;
 
 import org.apache.commons.collections.map.LazyMap;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
 
 public class MailStoreConfigurationForm implements Serializable {
 
@@ -58,10 +57,8 @@ public class MailStoreConfigurationForm implements Serializable {
     private Map<String, Attribute> javaMailProperties = LazyMap.decorate(
             new HashMap<String, Attribute>(), new AttributeFactory());
 
-    public static MailStoreConfigurationForm create(IServiceBroker serviceBroker, PortletRequest req) {
+    public static MailStoreConfigurationForm create(final MailStoreConfiguration config, final PortletRequest req) {
         
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-
         MailStoreConfigurationForm form = new MailStoreConfigurationForm();
         form.setHost(config.getHost());
         form.setPort(config.getPort());

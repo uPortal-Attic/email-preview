@@ -21,7 +21,7 @@ package org.jasig.portlet.emailpreview;
 import org.jasig.portlet.emailpreview.dao.EmailAccountDaoImplIntegrationTest;
 import org.jasig.portlet.emailpreview.dao.SimpleServiceBrokerTest;
 import org.jasig.portlet.emailpreview.service.auth.AuthenticationServiceRegistryImplTest;
-import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationServiceImplTest;
+import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationServiceTest;
 import org.jasig.portlet.emailpreview.service.link.LinkServiceRegistryImplTest;
 import org.jasig.portlet.emailpreview.service.link.SimpleEmailLinkServiceImplTest;
 import org.jasig.portlet.emailpreview.util.EmailAccountUtilsTest;
@@ -36,7 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
                  SimpleServiceBrokerTest.class,
                  AuthenticationServiceRegistryImplTest.class, 
                  SimpleServiceBrokerTest.class,
-                 CachedPasswordAuthenticationServiceImplTest.class,
+                 CachedPasswordAuthenticationServiceTest.class,
                  LinkServiceRegistryImplTest.class,
                  SimpleEmailLinkServiceImplTest.class,
                  EmailAccountUtilsTest.class

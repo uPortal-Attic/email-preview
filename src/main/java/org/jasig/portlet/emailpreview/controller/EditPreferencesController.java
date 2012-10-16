@@ -29,6 +29,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 
@@ -42,7 +43,7 @@ import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
-import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationServiceImpl;
+import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
@@ -74,7 +75,7 @@ public final class EditPreferencesController {
         PortletSession session = req.getPortletSession(false);
         MailStoreConfigurationForm form = (MailStoreConfigurationForm) session.getAttribute(CONFIG_FORM_KEY);
         if (form == null) {
-            form = MailStoreConfigurationForm.create(serviceBroker, req);
+            form = MailStoreConfigurationForm.create(config, req);
         } else {
             session.removeAttribute(CONFIG_FORM_KEY);
         }
@@ -108,6 +109,9 @@ public final class EditPreferencesController {
         if (form.getAdditionalProperties().containsKey(MailPreferences.PASSWORD.getKey())) {
             model.put("unchangedPassword", UNCHANGED_PASSWORD);
         }
+        
+        // Make the PortletRequest.USER_INFO available
+        model.put("userInfo", req.getAttribute(PortletRequest.USER_INFO));
         
         // Pass the errorMessage, if present
         if (req.getParameter("errorMessage") != null) {
@@ -169,7 +173,7 @@ public final class EditPreferencesController {
          */
         
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-        MailStoreConfigurationForm form = MailStoreConfigurationForm.create(serviceBroker, req);
+        MailStoreConfigurationForm form = MailStoreConfigurationForm.create(config, req);
         String err = null;  // default
 
         if (!config.isReadOnly(req, MailPreferences.PROTOCOL)) {
@@ -240,7 +244,7 @@ public final class EditPreferencesController {
         // bit hackish;  look for an opportunity to refactor 
         // toward abstractions.
         String ppPassword = null;  // default
-        if (PortletPreferencesCredentialsAuthenticationServiceImpl.KEY.equals(form.getAuthenticationServiceKey())) {
+        if (PortletPreferencesCredentialsAuthenticationService.KEY.equals(form.getAuthenticationServiceKey())) {
             
             // Update username
             if (!config.isReadOnly(req, MailPreferences.MAIL_ACCOUNT)) {
@@ -286,7 +290,7 @@ public final class EditPreferencesController {
             config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
             
             // username/password
-            if (PortletPreferencesCredentialsAuthenticationServiceImpl.KEY.equals(form.getAuthenticationServiceKey())) {
+            if (PortletPreferencesCredentialsAuthenticationService.KEY.equals(form.getAuthenticationServiceKey())) {
                 Attribute username = form.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
                 config.getAdditionalProperties().put(MailPreferences.MAIL_ACCOUNT.getKey(), username.getValue());
                 // NB:  we only accept password if username was also specified

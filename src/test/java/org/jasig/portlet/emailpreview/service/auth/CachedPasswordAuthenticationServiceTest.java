@@ -36,9 +36,9 @@ import org.mockito.MockitoAnnotations;
  * @author Jen Bourey, jbourey@unicon.net
  * @version $Revision$
  */
-public class CachedPasswordAuthenticationServiceImplTest {
+public class CachedPasswordAuthenticationServiceTest {
     
-    CachedPasswordAuthenticationServiceImpl authService;
+    CachedPasswordAuthenticationService authService;
     MailStoreConfiguration configuration;
     @Mock PortletRequest request;
         
@@ -46,12 +46,12 @@ public class CachedPasswordAuthenticationServiceImplTest {
     public void setUp() { 
         MockitoAnnotations.initMocks(this);
         
-        authService = new CachedPasswordAuthenticationServiceImpl();
+        authService = new CachedPasswordAuthenticationService();
         configuration = new MailStoreConfiguration();
         
         Map<String, String> userInfo = new HashMap<String, String>();
-        userInfo.put(CachedPasswordAuthenticationServiceImpl.USERNAME_ATTRIBUTE, "testuser");
-        userInfo.put(CachedPasswordAuthenticationServiceImpl.PASSWORD_ATTRIBUTE, "pass");
+        userInfo.put(CachedPasswordAuthenticationService.USERNAME_ATTRIBUTE, "testuser");
+        userInfo.put(CachedPasswordAuthenticationService.PASSWORD_ATTRIBUTE, "pass");
         
         when(request.getAttribute(PortletRequest.USER_INFO)).thenReturn(userInfo);
     }

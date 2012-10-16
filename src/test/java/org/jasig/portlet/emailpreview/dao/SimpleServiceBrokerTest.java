@@ -33,7 +33,7 @@ import javax.portlet.ReadOnlyException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.SimpleServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.AuthenticationServiceRegistryImpl;
-import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationServiceImpl;
+import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class SimpleServiceBrokerTest {
         MockitoAnnotations.initMocks(this);
 
         serviceBroker = new SimpleServiceBroker();
-        IAuthenticationService authServ = new CachedPasswordAuthenticationServiceImpl();
+        IAuthenticationService authServ = new CachedPasswordAuthenticationService();
         IAuthenticationServiceRegistry authServiceRegistry = new AuthenticationServiceRegistryImpl();
         authServiceRegistry.registerService(authServ);
         serviceBroker.setAuthenticationServiceRegistry(authServiceRegistry);

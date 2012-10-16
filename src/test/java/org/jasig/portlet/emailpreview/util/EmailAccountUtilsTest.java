@@ -28,7 +28,7 @@ import javax.portlet.PortletRequest;
 import junit.framework.Assert;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationServiceImpl;
+import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,12 +46,12 @@ public class EmailAccountUtilsTest {
     MockitoAnnotations.initMocks(this);
 
     final Map<String, String> userInfo = new HashMap<String, String>();
-    userInfo.put(CachedPasswordAuthenticationServiceImpl.USERNAME_ATTRIBUTE, "testuser");
-    userInfo.put(CachedPasswordAuthenticationServiceImpl.PASSWORD_ATTRIBUTE, "pass");
+    userInfo.put(CachedPasswordAuthenticationService.USERNAME_ATTRIBUTE, "testuser");
+    userInfo.put(CachedPasswordAuthenticationService.PASSWORD_ATTRIBUTE, "pass");
 
     when(request.getAttribute(PortletRequest.USER_INFO)).thenReturn(userInfo);
 
-    authService = new CachedPasswordAuthenticationServiceImpl();
+    authService = new CachedPasswordAuthenticationService();
   }
 
   @Test

@@ -30,7 +30,7 @@ public class AuthenticationServiceRegistryImplTest {
     
     @Test
     public void testRegistry() {
-        IAuthenticationService authenticationService = new CachedPasswordAuthenticationServiceImpl();
+        IAuthenticationService authenticationService = new CachedPasswordAuthenticationService();
         IAuthenticationServiceRegistry registry = new AuthenticationServiceRegistryImpl();
         registry.registerService(authenticationService);
         

@@ -322,5 +322,9 @@
         <name>casProxyTicket</name>
     </user-attribute>
     
+    <user-attribute>
+        <description>Campus email address (e.g. for use with ACCOUNT_NAME_ATTRIBUTE setting)</description>
+        <name>mail</name>
+    </user-attribute>
 
 </portlet-app>

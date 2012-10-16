@@ -19,6 +19,8 @@
 
 package org.jasig.portlet.emailpreview.service;
 
+import org.apache.commons.lang.StringUtils;
+
 public class ConfigurationParameter {
 
     private String key;
@@ -26,7 +28,26 @@ public class ConfigurationParameter {
     private String defaultValue;
     private boolean requiresEncryption;
 
-    public ConfigurationParameter() {
+    public ConfigurationParameter() {}
+
+    public ConfigurationParameter(String key, String label, String defaultValue, boolean requiresEncryption) {
+        
+        // Assertions
+        if (StringUtils.isBlank(key)) {
+            String msg = "Argument 'key' cannot be blank";
+            throw new IllegalArgumentException(msg);
+        }
+        if (StringUtils.isBlank(label)) {
+            String msg = "Argument 'label' cannot be blank";
+            throw new IllegalArgumentException(msg);
+        }
+        // NB:  defaultValue may be null
+        
+        this.key = key;
+        this.label = label;
+        this.defaultValue = defaultValue;
+        this.requiresEncryption = requiresEncryption;
+        
     }
 
     public String getKey() {

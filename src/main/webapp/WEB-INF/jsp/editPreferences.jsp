@@ -84,7 +84,10 @@
         <div class="fieldset plt-email-fieldset-authparams plt-email-fieldset-ppauth" style="${displayStyle}">
             <div class="plt-email-row">
                 <label><spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.emailAddress"/></label>
-                <input type="text" name="username" id="plt-email-input-email" title="<spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.emailAddress.tooltip"/>" value="<c:out value="${form.additionalProperties.username}"/>"/>
+                <c:set var="accountNameAttribute" value="${form.additionalProperties['PortletPreferencesCredentialsAuthenticationService.ACCOUNT_NAME_ATTRIBUTE'].value}" />
+                <c:set var="useAccountNameAttribute" value="${not empty accountNameAttribute}" />
+                <c:set var="accountNameValue" value="${useAccountNameAttribute ? userInfo[accountNameAttribute] : form.additionalProperties.username.value}" />
+                <input type="text" name="username" id="plt-email-input-email" title="<spring:message code="editPreferences.emailSettings.portletPreferencesAuthN.emailAddress.tooltip"/>" value="<c:out value="${accountNameValue}"/>"<c:if test="${useAccountNameAttribute}">disabled="disabled"</c:if> />
                 <span class="plt-email-address-suffix"><c:out value="${form.usernameSuffix}"/></span>
             </div>
             <div class="plt-email-row">

@@ -146,7 +146,8 @@ public class MailStoreConfigurationController {
     
     @ModelAttribute("form")
     public MailStoreConfigurationForm getConfigurationForm(PortletRequest req) {
-        return MailStoreConfigurationForm.create(serviceBroker, req);
+        final MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        return MailStoreConfigurationForm.create(config, req);
     }
     
     @ModelAttribute("authServices")
