@@ -206,12 +206,12 @@
                  */
                 
                 /* Check for empty incoming server */
-                if ($(that.options.selectors.input_imap).search(validRegExp) == '-1'){
+                if ($(that.options.selectors.input_imap).val().search(validRegExp) == -1){
                     error_msg = 'Please provide your incoming email server.';
                     culprit = that.options.selectors.input_imap;    
                 }            
                 /* Check for empty port */
-                if ($(that.options.selectors.input_port).val().search(/^\d+$/) == '-1'){
+                if ($(that.options.selectors.input_port).val().search(/^\d+$/) == -1){
                     error_msg = 'Please specify a valid port number for your email account.';
                     culprit = that.options.selectors.input_port;    
                 }
