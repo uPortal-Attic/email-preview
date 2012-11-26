@@ -102,6 +102,7 @@
     <div class="text">
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
         <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <b><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></b> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
+        <span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="space-used"></span> / <span class="user-quota"></span><br /></span>      
         <c:if test="${inboxUrl ne null}">
             &bull; <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.summary.inboxLink.tooltip"/>"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
         </c:if>
@@ -174,6 +175,12 @@
                     $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
                     $("#${n}splash .totalCount").text(data.accountSummary.totalMessageCount);
                     $("#${n}splash .unreadContainer").slideDown(500);
+                    if(data.spaceUsed=="-1"){
+                    	$("#${n}splash .stats").remove();
+                    }else{
+                    $("#${n}splash .space-used").text(data.spaceUsed);
+                    $("#${n}splash .user-quota").text(data.userQuota);
+                    }
                 }
             },
             error: function(request, textStatus, error) {

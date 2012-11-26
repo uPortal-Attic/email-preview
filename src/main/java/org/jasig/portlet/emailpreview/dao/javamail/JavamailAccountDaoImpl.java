@@ -22,8 +22,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Quota;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
@@ -76,6 +79,7 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import com.sun.mail.imap.IMAPFolder;
 
 /**
  * This class does the heavy-lifting for Javamail integration and implements the 
@@ -192,7 +196,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             // Initialize account information with information retrieved from inbox
             AccountSummary rslt = new AccountSummary(inboxUrl, messages, 
                     inbox.getUnreadMessageCount(), inbox.getMessageCount(), 
-                    start, max, isDeleteSupported(inbox));
+                    start, max, isDeleteSupported(inbox), getQuota(inbox));
 
             inbox.close(false);
 
@@ -510,5 +514,38 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
     private boolean isDeleteSupported(Folder f) {
         return f instanceof UIDFolder;
     }
-
+    
+    private Map <String, String> getQuota(Folder folder) {
+    	Map <String, String> map = new HashMap <String, String>();    
+    	try {     
+    	    // Make sure the account is activated and contains messages
+    	    if (folder.exists() && folder.getMessageCount() > 0) {
+    		Quota[] quotas = ((IMAPFolder)folder).getQuota();
+     
+    		for (Quota quota : quotas) {
+    		    for (Quota.Resource resource : quota.resources) {      		    	
+    		    	String unit = " Mo";
+    		    	int coef = 1000; 
+    		    	
+    		    	if ((resource.limit/1000)>9999){
+    		    		unit = " Go";
+    		    		coef = 1000000;
+    		    	}
+    		    	
+    		    	//in octets
+    		        //String spaceUsed = new BigDecimal(String.valueOf(((double)(resource.usage))/coef)).setScale(2, BigDecimal.ROUND_DOWN).toString().concat(unit); 
+    		    	//in percent
+    		    	String spaceUsed = new BigDecimal(String.valueOf(((double)(resource.usage*100)/(double)(resource.limit)))).setScale(2, BigDecimal.ROUND_DOWN).toString().concat("%");
+    		    	map.put("userQuota", new BigDecimal(String.valueOf(((double)(resource.limit))/coef)).setScale(2, BigDecimal.ROUND_DOWN).toString().concat(unit));
+    		    	map.put("spaceUsed", spaceUsed);
+    		    }
+    		  }
+    	    }   
+    	    return map;
+    	} catch (MessagingException e) {
+    	    log.error("Failed to connect or get quota for mail user ");
+    	    map.put("userQuota", null);
+    	    return map;
+    	}
+    }
 }
