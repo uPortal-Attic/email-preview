@@ -74,6 +74,7 @@
                 <c:if test="${supportsHelp}">
                 | <a class="email-action-link" href="<portlet:renderURL portletMode="HELP"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/help.png"/>"/> <spring:message code="preview.toolbar.help"/></a>
                 </c:if>
+                <span class="stats">| <img  alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/chart_bar.png"/>"/> <strong><spring:message code="common.quota"/>: </strong><span class="space-used"></span> / <span class="user-quota"></span></span>
             </p>
 
             <div class="fl-pager">

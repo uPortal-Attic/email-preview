@@ -405,7 +405,11 @@ var jasig = jasig || {};
             that.locate("selectAll").live("click", that.toggleSelectAll);
     
             that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
-    
+            if(account.spaceUsed=="-1"){
+            	that.locate("stats").remove();
+            }
+            that.locate("spaceUsed").html(account.spaceUsed);
+            that.locate("userQuota").html(account.userQuota);   
             showEmailList(that);
         
         }
@@ -440,7 +444,10 @@ var jasig = jasig || {};
             errorMessage: ".error-message",
             errorText: ".error-message #error-text",
             unreadMessageCount: ".unread-message-count",
-            inboxLink: ".inbox-link"
+            inboxLink: ".inbox-link",
+            spaceUsed: ".space-used",
+            userQuota: ".user-quota",        
+            stats: ".stats"
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},

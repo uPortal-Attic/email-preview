@@ -99,7 +99,9 @@
                     <li class="flc-pager-next"><a href="javascript:;" ><spring:message code="preview.pager.next"/> &gt;</a></li>
                 </ul>                   
             </div>
-          	<div class="message_stats"><span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/></div>
+          	<div class="message_stats"><span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>
+          	<span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="space-used"></span> / <span class="user-quota"></span></span>
+          	</div>
             <div class="message_infos">
                 <ul rsf:id="row:" class="email-row"  data-role="listview" >
                     <li>
@@ -114,6 +116,11 @@
     </div>
     
     <div class="email-message" style="display:none">
+        <ul cellpadding="0" cellspacing="0" class="message-headers">
+            <li><span class="message-header-name"><spring:message code="preview.message.from"/></span><span class="sender"></span></li>
+            <li><span class="message-header-name"><spring:message code="preview.message.subject"/></span><span class="subject"></span></li>
+            <li><span class="message-header-name"><spring:message code="preview.message.date"/></span><span class="sentDate"></span></li>
+        </ul>    
         <hr/>
         <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
         <div class="message-content">
@@ -122,11 +129,11 @@
             <input class="message-uid" type="hidden" name="selectMessage" value=""/>
             <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
             <c:if test="${allowDelete}">
-                <input class="delete-message-button" data-icon="delete" data-iconpos="top" type="button" value=" <spring:message code="preview.message.delete"/> "/>
+                <input class="delete-message-button" data-icon="delete" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.delete"/> "/>
             </c:if>
             <c:if test="${supportsToggleSeen}">
-                <input class="mark-read-button" data-icon="check" data-iconpos="top" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
-                <input class="mark-unread-button" data-icon="minus" data-iconpos="top" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
+                <input class="mark-read-button" data-icon="check" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
+                <input class="mark-unread-button" data-icon="minus" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
             </c:if>
         </form>
     </div>    

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Component;
  * @author Landis Casner
  * @author Drew Wills, drew@unicon.net
  */
+@SuppressWarnings("unchecked")
 @Component
 public final class DemoAccountService implements IEmailAccountService {
 
@@ -54,7 +56,9 @@ public final class DemoAccountService implements IEmailAccountService {
 
     private static final String ACCOUNT_SUMMARY_KEY = "DemoAccountService.ACCOUNT_SUMMARY_KEY";
     private static final String INBOX_URL = "http://www.jasig.org/";
-    private static final int DEFAULT_BATCH_SIZE = 20;
+    private static final int DEFAULT_BATCH_SIZE = 20;   
+    private static String[][] quotaArray = { { "userQuota", "1Go" }, { "spaceUsed", "10,14%" }};
+    private static Map <String, String> quotaValues = ArrayUtils.toMap(quotaArray);  
 
     private String jsonLocation = "/SampleJSON.json";
 
@@ -80,7 +84,7 @@ public final class DemoAccountService implements IEmailAccountService {
             // First time;  build from scratch...
             List<EmailMessage> messages = getEmailMessages(req);
             rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
-                                                messages.size(), start, max, true);
+                                                messages.size(), start, max, true, quotaValues);
             req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
         }
 
@@ -123,7 +127,7 @@ public final class DemoAccountService implements IEmailAccountService {
             }
             session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                     newList, getUnreadMessageCount(newList), newList.size(),
-                    0, DEFAULT_BATCH_SIZE, true));
+                    0, DEFAULT_BATCH_SIZE, true, quotaValues));
         }
         
         return rslt;
@@ -151,7 +155,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                 newList, getUnreadMessageCount(newList), newList.size(),
-                0, DEFAULT_BATCH_SIZE, true));
+                0, DEFAULT_BATCH_SIZE, true, quotaValues));
 
         return true;  // Indicate success
 
@@ -180,7 +184,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                 newList, getUnreadMessageCount(newList), newList.size(),
-                0, DEFAULT_BATCH_SIZE, true));
+                0, DEFAULT_BATCH_SIZE, true, quotaValues));
 
         return true;  // success
 
