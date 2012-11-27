@@ -20,8 +20,7 @@ var jasig = jasig || {};
 
 (function($, fluid) {
 
-    var displayMessage = function(that, cell) {
-        
+	var displayMessage = function(that, cell) {
         // display the loading message while we retrieve the desired message
         showLoadingMessage(that);
         
@@ -59,12 +58,13 @@ var jasig = jasig || {};
         
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
-        $(".message-content").html(html);
-        $(".email-message .subject").html(message.subject);
-        $(".email-message .sender").html(message.sender);
-        $(".email-message .sentDate").html(message.sentDateString);
-        $(".email-message .message-uid").val(message.uid);
-        
+
+        that.container.find(".message-content").html(html);
+        that.container.find(".email-message .subject").html(message.subject);
+        that.container.find(".email-message .sender").html(message.sender);
+        that.container.find(".email-message .sentDate").html(message.sentDateString);
+        that.container.find(".email-message .message-uid").val(message.uid);
+
         if (that.options.markMessagesAsRead || !message.unread) {
             that.locate("markMessageReadButton").hide();
             that.locate("markMessageUnreadButton").show();
