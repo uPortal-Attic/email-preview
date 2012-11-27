@@ -1,0 +1,115 @@
+.ui-content{
+padding: 0!important;
+overflow: hidden;
+}
+.ui-body-a label{
+font-size: 12px;
+font-weight: bold;
+text-align: center;
+}
+.ui-select{
+width: 95%;
+margin: 0 auto 2px auto;
+}
+ul.fl-pager-ui li.flc-pager-pageLink, ul.fl-pager-ui li.flc-pager-pageLink-skip,ul.fl-pager-ui li.flc-pager-previous,ul.fl-pager-ui li.flc-pager-next{
+display: inline;
+}
+ul.fl-pager-ui li.flc-pager-pageLink a, ul.fl-pager-ui li.flc-pager-pageLink-skip,ul.fl-pager-ui li.flc-pager-previous a,ul.fl-pager-ui li.flc-pager-next a{
+display: inline-block;
+color: #fff;
+background: transparent;
+padding: 5px;
+}
+.flc-pager-top{
+text-align: center;
+margin-bottom: 6px;
+}
+ul.fl-pager-ui{
+list-style-type: none;
+width: 98%;
+margin: 5px auto;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+border-radius: 10px;
+background: #6098C5;
+}
+.flc-pager-top ul li:nth-of-type(2){
+display: inline-block;
+margin: 5px 10px;
+}
+.select{
+position: absolute;
+right: 18px;
+top: 38px;
+}
+.ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+margin-bottom: 20px;
+}
+.ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+padding: 0.2em 40px;
+}
+h3.ui-li-heading a{
+color: #4B7EB1;
+font-size: 14px;
+}
+p.sender{
+color: #424242;
+}
+.attached .attached-span {
+position: absolute;
+top: 37px;
+left: 19px;
+}    
+.answered .answered-span{
+position: absolute;
+top: 54px;
+left: 19px;
+}    
+.message-content,a.return-link{
+margin: 0 20px 0 20px;	
+}
+.up .email-message .ui-btn{
+width: 98%;
+margin: 5px auto;
+background-color: #6098C5;
+display: inline-block;
+max-width: 32%;
+font-size: 12px;
+}
+.ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+margin-bottom: 14px;
+}
+.message_stats {
+margin: 4px 0px 15px 0px;
+text-align: center;
+border: 1px solid black;
+font-weight: bold;
+font-size: .9em;
+width: 100%;
+line-height: 18px;
+}
+span.unread-message-count{
+background: url(../rs/famfamfam/silk/1.3/email.png) no-repeat;
+padding-left: 20px;
+line-height: 14px;
+}
+.flags {
+position: absolute;
+left: 0px;
+}
+.email-message .ui-btn-inner{
+background-color: #6098C5;
+}	
+.up .email-message .ui-btn-text{
+font-size: 14px;
+}
+.up .email-message .ui-btn-icon-top .ui-btn-inner {
+padding-top: 30px;
+}
+.up .email-message form {
+text-align: center;
+}
+.up .email-message  p {
+text-align: left;
+margin: 10px 10px 15px 10px;
+}
