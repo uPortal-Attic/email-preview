@@ -107,4 +107,14 @@
         </property>
     </bean>
 
+    <util:list id="mobileDeviceRegexes">
+         <value>.*iPhone.*</value>
+         <value>.*iPad.*</value>
+         <value>.*Android.*</value>
+         <value>.*IEMobile.*</value>
+         <value>.*Safari.*Pre.*</value>
+         <value>.*Nokia.*AppleWebKit.*</value>
+    </util:list>
+
 </beans>
+

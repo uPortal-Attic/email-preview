@@ -285,7 +285,8 @@ var jasig = jasig || {};
                 bodyRenderer: {
                     type: "fluid.pager.selfRender",
                     options: {
-                        selectors: { root: "table" },
+        				//Only change for mobile view :replace table by div.message_infos
+                        selectors: { root: that.options.messagesInfoContainer },
                         row: "row:"
                     }
                 },
