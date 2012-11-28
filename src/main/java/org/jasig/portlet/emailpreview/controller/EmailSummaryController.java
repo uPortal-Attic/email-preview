@@ -65,6 +65,7 @@ public class EmailSummaryController {
 
     private final static String DEFAULT_WELCOME_TITLE = "Welcome to Email Preview";
     private final static String DEFAULT_WELCOME_INSTRUCTIONS = "";
+    private final static String MSG_CONTAINER = "messagesInfoContainer";
 
     private final Log log = LogFactory.getLog(this.getClass());
     private String adminRoleName = "admin";
@@ -81,6 +82,8 @@ public class EmailSummaryController {
     @Resource
     private Map<String,String> jsErrorMessages;
 
+	@Resource
+	protected ViewSelectorDefault viewSelector;
     /**
      * Three possible views for this controller.
      */
@@ -161,10 +164,55 @@ public class EmailSummaryController {
 
                 // Check if this mail server supports setting the READ/UNREAD flag
                 model.put(SUPPORTS_TOGGLE_SEEN_KEY, config.supportsToggleSeen());
+                //Display message in a table
+                model.put(MSG_CONTAINER,"table");
 
                 return new ModelAndView(getKey(), model);
             }
-        };
+        },
+        
+        /**
+         * Mobile view of the INBOX with lots of features
+         */
+        MOBILEPREVIEW("mobilePreview") {
+            @Override
+            public ModelAndView show(RenderRequest req, RenderResponse res, EmailSummaryController controller) {
+                Map<String,Object> model = new HashMap<String,Object>();
+
+                PortletPreferences prefs = req.getPreferences();
+
+                // PageSize:  this value can be set by administrators as a publish-time
+                // portlet preference, and (normally) overridden by users as a
+                // user-defined portlet preference.
+                int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_PREFERENCE, "10"));
+                model.put(PAGE_SIZE_PREFERENCE, pageSize);
+
+                // Check to see if the portlet is configured to display a link
+                // to config mode and if it applies to this user
+                boolean showConfigLink = Boolean.valueOf(prefs.getValue(
+                                    SHOW_CONFIG_LINK_KEY, "false"));
+                if (showConfigLink) {
+                    showConfigLink = req.isUserInRole(controller.adminRoleName);
+                }
+                model.put("showConfigLink", showConfigLink);
+
+                // Also see if the portlet is configured
+                // to permit users to delete messages
+                boolean allowDelete = Boolean.valueOf(prefs.getValue(
+                                    ALLOW_DELETE_PREFERENCE, "false"));
+                model.put("allowDelete", allowDelete);
+
+                MailStoreConfiguration config = controller.serviceBroker.getConfiguration(req);
+                model.put("markMessagesAsRead", config.getMarkMessagesAsRead());
+
+                // Check if this mail server supports setting the READ/UNREAD flag
+                model.put(SUPPORTS_TOGGLE_SEEN_KEY, config.supportsToggleSeen());
+                //Display message in a div 
+                model.put(MSG_CONTAINER,"div.message_infos");
+
+                return new ModelAndView(getKey(), model);
+            }
+        };        
 
         private final String key;
 
@@ -234,7 +282,7 @@ public class EmailSummaryController {
             showView = View.WELCOME;
         } else if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
             // Rule #2:  We don't show the rollup in MAXIMIZED state
-            showView = View.PREVIEW;
+            showView = viewSelector.getEmailPreviewViewName(req);
         } else {
             // Rule #3:  Use the defaultView preference;  this setting gets updated
             // every time the user changes from one to the other (it's sticky)
