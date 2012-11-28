@@ -1,0 +1,115 @@
+.email-preview .ui-content{
+padding: 0!important;
+overflow: hidden;
+}
+.email-preview .ui-body-a label{
+font-size: 12px;
+font-weight: bold;
+text-align: center;
+}
+.email-preview .ui-select{
+width: 95%;
+margin: 0 auto 2px auto;
+}
+.email-preview ul.fl-pager-ui li.flc-pager-pageLink, ul.fl-pager-ui li.flc-pager-pageLink-skip,ul.fl-pager-ui li.flc-pager-previous,ul.fl-pager-ui li.flc-pager-next{
+display: inline;
+}
+.email-preview ul.fl-pager-ui li.flc-pager-pageLink a, ul.fl-pager-ui li.flc-pager-pageLink-skip,ul.fl-pager-ui li.flc-pager-previous a,ul.fl-pager-ui li.flc-pager-next a{
+display: inline-block;
+color: #fff;
+background: transparent;
+padding: 5px;
+}
+.email-preview .flc-pager-top{
+text-align: center;
+margin-bottom: 6px;
+}
+.email-preview ul.fl-pager-ui{
+list-style-type: none;
+width: 98%;
+margin: 5px auto;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+border-radius: 10px;
+background: #6098C5;
+}
+.email-preview .flc-pager-top ul li:nth-of-type(2){
+display: inline-block;
+margin: 5px 10px;
+}
+.email-preview .select{
+position: absolute;
+right: 18px;
+top: 38px;
+}
+.email-preview .ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+margin-bottom: 20px;
+}
+.email-preview .ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+padding: 0.2em 40px;
+}
+.email-preview h3.ui-li-heading a{
+color: #4B7EB1;
+font-size: 14px;
+}
+.email-preview p.sender{
+color: #424242;
+}
+.email-preview .attached .attached-span {
+position: absolute;
+top: 37px;
+left: 19px;
+}    
+.email-preview .answered .answered-span{
+position: absolute;
+top: 54px;
+left: 19px;
+}    
+.email-preview .message-content,a.return-link{
+margin: 0 20px 0 20px;	
+}
+.email-preview .email-message .ui-btn{
+width: 98%;
+margin: 5px auto;
+background-color: #6098C5;
+display: inline-block;
+max-width: 32%;
+font-size: 12px;
+}
+.email-preview .ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li {
+margin-bottom: 14px;
+}
+.email-preview .message_stats {
+margin: 4px 0px 15px 0px;
+text-align: center;
+border: 1px solid black;
+font-weight: bold;
+font-size: .9em;
+width: 100%;
+line-height: 18px;
+}
+.email-preview span.unread-message-count{
+background: url(../rs/famfamfam/silk/1.3/email.png) no-repeat;
+padding-left: 20px;
+line-height: 14px;
+}
+.email-preview .flags {
+position: absolute;
+left: 0px;
+}
+.email-preview .email-message .ui-btn-inner{
+background-color: #6098C5;
+}	
+.email-preview .email-message .ui-btn-text{
+font-size: 14px;
+}
+.email-preview .email-message .ui-btn-icon-top .ui-btn-inner {
+padding-top: 30px;
+}
+.email-preview .email-message form {
+text-align: center;
+}
+.email-preview .email-message  p {
+text-align: left;
+margin: 10px 10px 15px 10px;
+}

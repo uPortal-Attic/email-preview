@@ -184,6 +184,7 @@
         var options = {
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
+            messagesInfoContainer: "${messagesInfoContainer}",            
             deleteUrl: "${deleteUrl}",
             toggleSeenUrl: "${toggleSeenUrl}",
             pageSize: <c:out value="${pageSize}"/>,
