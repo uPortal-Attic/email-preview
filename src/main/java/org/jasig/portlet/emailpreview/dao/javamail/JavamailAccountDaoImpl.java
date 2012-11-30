@@ -22,8 +22,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Quota;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
@@ -55,6 +58,7 @@ import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
+import org.jasig.portlet.emailpreview.EmailQuota;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -76,11 +80,12 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import com.sun.mail.imap.IMAPFolder;
 
 /**
- * This class does the heavy-lifting for Javamail integration and implements the 
+ * This class does the heavy-lifting for Javamail integration and implements the
  * caching.
- * 
+ *
  * @author awills
  */
 @Component
@@ -149,8 +154,8 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
     )
     @Override
     public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config,
-            Authenticator auth, @PartialCacheKey String username, 
-            @PartialCacheKey String mailAccount, int start, int max) 
+            Authenticator auth, @PartialCacheKey String username,
+            @PartialCacheKey String mailAccount, int start, int max)
             throws EmailPreviewException {
 
         if (log.isDebugEnabled()) {
@@ -190,9 +195,9 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             }
 
             // Initialize account information with information retrieved from inbox
-            AccountSummary rslt = new AccountSummary(inboxUrl, messages, 
-                    inbox.getUnreadMessageCount(), inbox.getMessageCount(), 
-                    start, max, isDeleteSupported(inbox));
+            AccountSummary rslt = new AccountSummary(inboxUrl, messages,
+                    inbox.getUnreadMessageCount(), inbox.getMessageCount(),
+                    start, max, isDeleteSupported(inbox), getQuota(inbox));
 
             inbox.close(false);
 
@@ -203,9 +208,9 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             return rslt;
 
         } catch (MailAuthenticationException mae) {
-            // We used just to allow this exception to percolate up the chain, 
-            // but we learned that the entire stack trace gets written to 
-            // Catalina.out (by 3rd party code).  Since this is a common 
+            // We used just to allow this exception to percolate up the chain,
+            // but we learned that the entire stack trace gets written to
+            // Catalina.out (by 3rd party code).  Since this is a common
             // occurrence, it causes space issues.
             return new AccountSummary(mae);
         } catch (MessagingException me) {
@@ -232,7 +237,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
 
     @Override
     public Session openMailSession(MailStoreConfiguration config, Authenticator auth) {
-        
+
         // Assertions.
         if (config == null) {
             String msg = "Argument 'config' cannot be null";
@@ -242,7 +247,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             String msg = "Argument 'auth' cannot be null";
             throw new IllegalArgumentException(msg);
         }
-        
+
         // Initialize connection properties
         Properties mailProperties = new Properties();
         mailProperties.put("mail.store.protocol", config.getProtocol());
@@ -322,7 +327,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             try {
                 msgContent = getMessageContent(msg.getContent(), msg.getContentType());
             } catch (MessagingException me) {
-                // We are unable to read digitally-signed messages (perhaps 
+                // We are unable to read digitally-signed messages (perhaps
                 // others?) in the API-standard way;  we have to use a work around.
                 // See: http://www.oracle.com/technetwork/java/faq-135477.html#imapserverbug
                 // Logging as DEBUG because this behavior is known & expected.
@@ -353,7 +358,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         }
 
         int messageNumber = msg.getMessageNumber();
-        
+
         // Prepare the UID if present
         Long uid = null;  // default
         if (msg.getFolder() instanceof UIDFolder) {
@@ -382,8 +387,8 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             multipart = msg.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
             contentType = msg.getContentType();
         } catch (MessagingException me) {
-            // Message was digitally signed and we are unable to read it; 
-            // logging as DEBUG because this issue is known/expected, and 
+            // Message was digitally signed and we are unable to read it;
+            // logging as DEBUG because this issue is known/expected, and
             // because the user's experience is in no way affected (at this point)
             log.debug("Message content unabailable (digitally signed?);  " +
                         "message will appear in the preview table correctly, " +
@@ -391,7 +396,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             log.trace(me.getMessage(), me);
         }
 
-        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, 
+        return new EmailMessage(messageNumber, uid, sender, subject, sentDate,
                 unread, answered, deleted, multipart, contentType, msgContent);
 
     }
@@ -511,4 +516,26 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         return f instanceof UIDFolder;
     }
 
+    private EmailQuota getQuota(Folder folder) {
+        if(!(folder instanceof IMAPFolder)) {
+            return null;
+        }
+    	try {
+    	    // Make sure the account is activated and contains messages
+    	    if (folder.exists() && folder.getMessageCount() > 0) {
+    		Quota[] quotas = ((IMAPFolder)folder).getQuota();
+
+    		for (Quota quota : quotas) {
+    		    for (Quota.Resource resource : quota.resources) {
+    		        if(resource.name.equals("STORAGE")) {
+    		            return new EmailQuota(resource.limit,resource.usage);
+    		        }
+    		    }
+    		  }
+    	    }
+    	} catch (MessagingException e) {
+    	    log.error("Failed to connect or get quota for mail user ");
+    	}
+    	return null;
+    }
 }

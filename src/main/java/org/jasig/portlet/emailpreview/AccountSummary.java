@@ -40,11 +40,12 @@ public final class AccountSummary {
     private final int messagesMax;
     private final boolean deleteSupported;
     private final Throwable errorCause;
+    private final EmailQuota quota;
 
-    public AccountSummary(String inboxUrl, List<EmailMessage> messages, 
-            int numUnreadMessages, int numTotalMessages, int messagesStart, 
-            int messagesMax, boolean deleteSupported) {
-        
+    public AccountSummary(String inboxUrl, List<EmailMessage> messages,
+            int numUnreadMessages, int numTotalMessages, int messagesStart,
+            int messagesMax, boolean deleteSupported, EmailQuota quota) {
+
         // Assertions
         if (messages == null) {
             String msg = "Argument 'messages' cannot be null";
@@ -60,6 +61,7 @@ public final class AccountSummary {
         this.messagesMax = messagesMax;
         this.deleteSupported = deleteSupported;
         this.errorCause = null;
+        this.quota = quota;
 
     }
 
@@ -89,6 +91,7 @@ public final class AccountSummary {
         this.messagesMax = -1;
         this.deleteSupported = false;
         this.errorCause = errorCause;
+        this.quota = null;
 
     }
 
@@ -109,7 +112,7 @@ public final class AccountSummary {
 
     /**
      * Provides the URL to the full-featured web-based mail client, if available.
-     * 
+     *
      * @return A valid web address or <code>null</code>
      */
     public String getInboxUrl() {
@@ -169,4 +172,12 @@ public final class AccountSummary {
         return deleteSupported;
     }
 
+    /**
+     * Returns the value of disk space , max & used
+     *
+     * @return
+     */
+    public EmailQuota getQuota() {
+    	return quota;
+    }
 }
