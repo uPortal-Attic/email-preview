@@ -23,11 +23,11 @@ var jasig = jasig || {};
 	var displayMessage = function(that, cell) {
         // display the loading message while we retrieve the desired message
         showLoadingMessage(that);
-        
+
         // get the message
         var messageNum = parseInt($(cell).attr("messageNum"));
         var message = getMessage(that, messageNum);
-        
+
         // Update the display to reflect the new state of the SEEN flag
         if (that.options.markMessagesAsRead && $(cell).hasClass("unread")) {
             // The UI needs to reflect that a previously unread message is now read
@@ -55,7 +55,7 @@ var jasig = jasig || {};
                 that.locate("unreadMessageCount").html(unreadCount - 1);
             }
         }
-        
+
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
 
@@ -72,21 +72,21 @@ var jasig = jasig || {};
             that.locate("markMessageReadButton").show();
             that.locate("markMessageUnreadButton").hide();
         }
-        
+
         // show the message display
         showEmailMessage(that);
-        
+
         return false;
     };
-    
-    // Top-level abstraction of the user's email account;  
+
+    // Top-level abstraction of the user's email account;
     // needs to be re-set whenever mail is fetched.
     var account = {};
-    
-    // If true, will drop the cache entry (if present) 
+
+    // If true, will drop the cache entry (if present)
     // for this user on the next call to the server
     var clearCache = "false";
-                    
+
     /**
      * Retrieve batched email from the server
      */
@@ -94,38 +94,38 @@ var jasig = jasig || {};
         if (that.cache[start] && that.cache[start][size]) {
             return that.cache[start][size];
         }
-        
+
         $.ajax({
             url: that.options.accountSummaryUrl,
             async: false,
             data: { pageStart: start, numberOfMessages: size, forceRefresh: clearCache },
             type: 'POST',
             dataType: "json",
-            success: function(data) { 
+            success: function(data) {
                 if ( data.errorMessage != null ) {
                     showErrorMessage( that, 900, data.errorMessage );
                 }
                 clearCache = "false";
-                account = data; 
+                account = data;
             },
-            error: function(request, textStatus, error) { 
-                showErrorMessage(that, request.status); 
+            error: function(request, textStatus, error) {
+                showErrorMessage(that, request.status);
             }
         });
 
         var messages = account.accountSummary ? account.accountSummary.messages : [];
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
-        
+
         return messages;
     };
-     
+
     var getEmailFunction = function(that) {
         return function(start, size, sortKey, sortDir) {
             return getEmail(that, start, size, sortKey, sortDir);
         };
     };
-     
+
     var getMessage = function(that, messageNum) {
         var message;
         $.ajax({
@@ -140,8 +140,8 @@ var jasig = jasig || {};
                 }
                 message = data.message;
             },
-            error: function(request, textStatus, error) { 
-                showErrorMessage(that, request.status); 
+            error: function(request, textStatus, error) {
+                showErrorMessage(that, request.status);
             }
         });
 
@@ -154,14 +154,14 @@ var jasig = jasig || {};
         that.locate("errorMessage").hide();
         that.locate("emailList").show();
     };
-     
+
     var showLoadingMessage = function(that) {
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         that.locate("errorMessage").hide();
         that.locate("loadingMessage").show();
     };
-     
+
     var showEmailMessage = function(that) {
         that.locate("loadingMessage").hide();
         that.locate("emailList").hide();
@@ -174,8 +174,8 @@ var jasig = jasig || {};
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         if (httpStatus == 200) {
-            /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal 
-             * this event means the ACTION timed out and improperly went to 
+            /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal
+             * this event means the ACTION timed out and improperly went to
              * RENDER, where it should have resulted in a redirect).
              */
             httpStatus = 504;
@@ -198,7 +198,7 @@ var jasig = jasig || {};
         if (message.multipart) classes += " attached";
         return classes;
     };
-    
+
     var removeMessages = function(messages, cache) {
         that.locate("emailRow").each(function(index, row) {
             if (row.find(options.selectors.selectMessage).attr("checked")) {
@@ -206,9 +206,9 @@ var jasig = jasig || {};
             }
         });
     };
-                
+
     jasig.EmailBrowser = function(container, options) {
-        
+
         var that = fluid.initView("jasig.EmailBrowser", container, options);
 
         that.cache = [];
@@ -291,11 +291,11 @@ var jasig = jasig || {};
                     }
                 },
                 pagerBar: {
-                    type: "fluid.pager.pagerBar", 
+                    type: "fluid.pager.pagerBar",
                     options: {
-                        pageList: { 
+                        pageList: {
                             type: "fluid.pager.renderedPageList",
-                            options: { 
+                            options: {
                                 linkBody: "a",
                                 pageStrategy: fluid.pager.gappedPageStrategy(3, 1)
                             }
@@ -310,9 +310,9 @@ var jasig = jasig || {};
             dataFunction: getEmailFunction(that),
             dataLengthFunction: function() { return account.accountSummary ? account.accountSummary.totalMessageCount : 0; }
         };
-        
+
         that.pager = unicon.batchedpager(that.locate("emailList"), batchOptions);
-        
+
         // The 'accountSummary' key indicates we obtained email info successfully
         if (account.accountSummary) {
 
@@ -324,7 +324,7 @@ var jasig = jasig || {};
                 that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
                 showEmailList(that);
             };
-            
+
             var doDelete = function(data) {
                 showLoadingMessage(that);
                 var ajaxOptions = {
@@ -344,7 +344,7 @@ var jasig = jasig || {};
                 };
                 $.ajax(ajaxOptions);
             };
-            
+
             var doToggleSeen = function(data, seenValue) {
                 showLoadingMessage(that);
                 data.push({name:'seenValue', value:seenValue});
@@ -365,7 +365,7 @@ var jasig = jasig || {};
                 };
                 $.ajax(ajaxOptions);
             };
-    
+
             that.deleteSelectedMessages = function() {
                 if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
                     alert("No Messages Selected.");
@@ -375,18 +375,18 @@ var jasig = jasig || {};
                     doDelete(that.locate("inboxForm").serializeArray());
                 }
             };
-    
+
             that.deleteShownMessage = function() {
                 if (confirm("Delete This Message?")) {
                     doDelete(that.locate("messageForm").serializeArray());
                 }
             };
-    
+
             that.toggleSelectAll = function() {
                 var chk = $(this).attr("checked");
                 that.locate("selectMessage").attr("checked", chk);
             }
-    
+
             that.locate("refreshLink").click(that.refresh);
             if (account.accountSummary.deleteSupported) {
                 that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
@@ -401,21 +401,21 @@ var jasig = jasig || {};
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("inboxLink").attr("href", account.inboxUrl);
-            
+
             that.locate("selectAll").live("click", that.toggleSelectAll);
-    
+
             that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
             if(account.spaceUsed=="-1"){
             	that.locate("stats").remove();
             }
-            that.locate("spaceUsed").html(account.spaceUsed);
-            that.locate("userQuota").html(account.userQuota);   
+            that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
+            that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
             showEmailList(that);
-        
+
         }
 
         return that;
-    
+
     };
 
     fluid.defaults("jasig.EmailBrowser", {
@@ -445,8 +445,8 @@ var jasig = jasig || {};
             errorText: ".error-message #error-text",
             unreadMessageCount: ".unread-message-count",
             inboxLink: ".inbox-link",
-            spaceUsed: ".space-used",
-            userQuota: ".user-quota",        
+            emailQuotaUsage: ".email-quota-usage",
+            emailQuotaLimit: ".email-quota-limit",
             stats: ".stats"
         },
         listeners: {},

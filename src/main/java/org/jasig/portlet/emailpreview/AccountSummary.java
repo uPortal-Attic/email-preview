@@ -21,7 +21,6 @@ package org.jasig.portlet.emailpreview;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Encapsulates basic information about the email INBOX.  Typicaly sent to the
@@ -41,12 +40,12 @@ public final class AccountSummary {
     private final int messagesMax;
     private final boolean deleteSupported;
     private final Throwable errorCause;
-	private final Map <String, String> quota;
-	
-    public AccountSummary(String inboxUrl, List<EmailMessage> messages, 
-            int numUnreadMessages, int numTotalMessages, int messagesStart, 
-            int messagesMax, boolean deleteSupported, Map <String, String> quota) {
-        
+    private final EmailQuota quota;
+
+    public AccountSummary(String inboxUrl, List<EmailMessage> messages,
+            int numUnreadMessages, int numTotalMessages, int messagesStart,
+            int messagesMax, boolean deleteSupported, EmailQuota quota) {
+
         // Assertions
         if (messages == null) {
             String msg = "Argument 'messages' cannot be null";
@@ -113,7 +112,7 @@ public final class AccountSummary {
 
     /**
      * Provides the URL to the full-featured web-based mail client, if available.
-     * 
+     *
      * @return A valid web address or <code>null</code>
      */
     public String getInboxUrl() {
@@ -172,13 +171,13 @@ public final class AccountSummary {
     public boolean isDeleteSupported() {
         return deleteSupported;
     }
-    
+
     /**
-     * Returns the value of disk space , max & used 
+     * Returns the value of disk space , max & used
      *
      * @return
      */
-    public Map<String, String> getQuota() {
+    public EmailQuota getQuota() {
     	return quota;
     }
 }

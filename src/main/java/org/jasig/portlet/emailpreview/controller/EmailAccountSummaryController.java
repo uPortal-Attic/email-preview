@@ -58,8 +58,8 @@ public class EmailAccountSummaryController {
     public static final String KEY_ACCOUNT_SUMMARY = "accountSummary";
     public static final String KEY_INBOX_URL = "inboxUrl";
     public static final String KEY_ERROR = "error";
-    public static final String KEY_USER_QUOTA = "userQuota";
-    public static final String KEY_SPACE_USED = "spaceUsed";  
+    public static final String KEY_EMAIL_QUOTA_LIMIT = "emailQuotaLimit";
+    public static final String KEY_EMAIL_QUOTA_USAGE = "emailQuotaUsage";
 
     @ResourceMapping(value = "accountSummary")
     public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
@@ -89,11 +89,11 @@ public class EmailAccountSummaryController {
             if (accountSummary.isValid()) {
                 model.put(KEY_ACCOUNT_SUMMARY, accountSummary);
                 model.put(KEY_INBOX_URL, accountSummary.getInboxUrl());
-                if(accountSummary.getQuota().get("spaceUsed")==null)
-                	model.put(KEY_SPACE_USED,"-1");
-                else{
-                model.put(KEY_SPACE_USED, accountSummary.getQuota().get("spaceUsed"));
-                model.put(KEY_USER_QUOTA, accountSummary.getQuota().get("userQuota"));    
+                if(accountSummary.getQuota() == null) {
+                	model.put(KEY_EMAIL_QUOTA_USAGE,"-1");
+                } else {
+                    model.put(KEY_EMAIL_QUOTA_USAGE, accountSummary.getQuota().getUsageAsPercentage());
+                    model.put(KEY_EMAIL_QUOTA_LIMIT, accountSummary.getQuota().getLimitAsString());
                 }
             } else {
                 Throwable cause = accountSummary.getErrorCause();

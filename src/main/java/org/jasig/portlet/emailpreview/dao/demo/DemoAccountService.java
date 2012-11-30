@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
@@ -37,6 +36,7 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
+import org.jasig.portlet.emailpreview.EmailQuota;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +56,8 @@ public final class DemoAccountService implements IEmailAccountService {
 
     private static final String ACCOUNT_SUMMARY_KEY = "DemoAccountService.ACCOUNT_SUMMARY_KEY";
     private static final String INBOX_URL = "http://www.jasig.org/";
-    private static final int DEFAULT_BATCH_SIZE = 20;   
-    private static String[][] quotaArray = { { "userQuota", "1Go" }, { "spaceUsed", "10,14%" }};
-    private static Map <String, String> quotaValues = ArrayUtils.toMap(quotaArray);  
+    private static final int DEFAULT_BATCH_SIZE = 20;
+    private static EmailQuota quota = new EmailQuota(10561140,239702);
 
     private String jsonLocation = "/SampleJSON.json";
 
@@ -84,7 +83,7 @@ public final class DemoAccountService implements IEmailAccountService {
             // First time;  build from scratch...
             List<EmailMessage> messages = getEmailMessages(req);
             rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
-                                                messages.size(), start, max, true, quotaValues);
+                                                messages.size(), start, max, true, quota);
             req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
         }
 
@@ -93,14 +92,14 @@ public final class DemoAccountService implements IEmailAccountService {
     }
 
     public EmailMessage getMessage(PortletRequest req, int messageNum) {
-        
+
         PortletSession session = req.getPortletSession();
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
         if (summary == null) {
             // Probably shouldn't happen...
             summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false);
         }
-        
+
         EmailMessage rslt = null;
 
         List<EmailMessage> messages = summary.getMessages();
@@ -127,9 +126,9 @@ public final class DemoAccountService implements IEmailAccountService {
             }
             session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                     newList, getUnreadMessageCount(newList), newList.size(),
-                    0, DEFAULT_BATCH_SIZE, true, quotaValues));
+                    0, DEFAULT_BATCH_SIZE, true, quota));
         }
-        
+
         return rslt;
 
     }
@@ -155,7 +154,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                 newList, getUnreadMessageCount(newList), newList.size(),
-                0, DEFAULT_BATCH_SIZE, true, quotaValues));
+                0, DEFAULT_BATCH_SIZE, true, quota));
 
         return true;  // Indicate success
 
@@ -184,7 +183,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
                 newList, getUnreadMessageCount(newList), newList.size(),
-                0, DEFAULT_BATCH_SIZE, true, quotaValues));
+                0, DEFAULT_BATCH_SIZE, true, quota));
 
         return true;  // success
 
@@ -199,7 +198,7 @@ public final class DemoAccountService implements IEmailAccountService {
         List<EmailMessage> messages = new ArrayList<EmailMessage>();
 
         try {
-            
+
             ObjectMapper mapper = new ObjectMapper();
             ArrayNode json = mapper.readValue(jsonFile, ArrayNode.class);
 
