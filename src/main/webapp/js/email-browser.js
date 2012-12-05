@@ -368,16 +368,16 @@ var jasig = jasig || {};
     
             that.deleteSelectedMessages = function() {
                 if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
-                    alert("No Messages Selected.");
+                    alert(that.options.jsMessages['noMessagesSelected']);
                     return;
                 }
-                if (confirm("Delete Selected Messages?")) {
+                if (confirm(that.options.jsMessages['deleteSelectedMessages'])) {
                     doDelete(that.locate("inboxForm").serializeArray());
                 }
             };
     
             that.deleteShownMessage = function() {
-                if (confirm("Delete This Message?")) {
+                if (confirm(that.options.jsMessages['deleteMessage'])) {
                     doDelete(that.locate("messageForm").serializeArray());
                 }
             };
@@ -393,9 +393,9 @@ var jasig = jasig || {};
                 that.locate("deleteMessageButton").click(that.deleteShownMessage);
             } else {
                 var anchor = that.locate("deleteMessagesLink");
-                anchor.find("span").html("Delete Not Available");
+                anchor.find("span").html(that.options.jsMessages['deleteNotAvailable']);
                 anchor.find("span").addClass("fl-text-silver");
-                anchor.attr("title", "The delete feature is not supported by this mail store");
+                anchor.attr("title", that.options.jsMessages['deleteNotAvailableTitle']);
             }
             that.locate("returnLink").click(function(){ showEmailList(that); });
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });

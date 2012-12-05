@@ -65,7 +65,7 @@
                 (<span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>)
                 | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/>&nbsp;<spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
-                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/>&nbsp;<spring:message code="preview.toolbar.deleteSelected"/></a>
+                | <a class="delete-link email-action-link" href="javascript:;"><img alt="Delete Selected" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/delete.png"/>"/>&nbsp;<span><spring:message code="preview.toolbar.deleteSelected"/></span></a>
                 </c:if>
                 | <a class="email-action-link" href="${showRollupUrl}"><img alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/door_out.png"/>"/>&nbsp;<spring:message code="preview.toolbar.closePreview"/></a>
                 <c:if test="${supportsEdit}">
@@ -181,6 +181,12 @@
             </c:forEach>        
         };
 
+        var jsMessages = {
+            <c:forEach items="${jsMessages}" var="entry" varStatus="status">
+                '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        };
+
         var options = {
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
@@ -192,6 +198,7 @@
                 initiatePageSizeChange: updatePageSize
             },
             jsErrorMessages: jsErrorMessages,
+            jsMessages: jsMessages,
             markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
         };
         // Initialize the display asynchronously
