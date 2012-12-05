@@ -61,7 +61,14 @@
         <form name="inboxForm">
         
             <p>
-                <a class="inbox-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/></a> 
+                <c:choose>
+                    <c:when test="${not empty inboxUrl}">
+                        <a class="inbox-link email-action-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/></a>
+                    </c:when>
+                    <c:otherwise>
+                        <img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/>
+                    </c:otherwise>
+                </c:choose>
                 (<span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>)
                 | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/>&nbsp;<spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
