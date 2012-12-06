@@ -82,6 +82,9 @@ public class EmailSummaryController {
     @Resource
     private Map<String,String> jsErrorMessages;
 
+    @Resource
+    private Map<String,String> jsMessages;
+
 	@Resource
 	protected ViewSelectorDefault viewSelector;
     /**
@@ -296,6 +299,7 @@ public class EmailSummaryController {
 
         // Add common model stuff...
         rslt.getModel().put("jsErrorMessages", jsErrorMessages);
+        rslt.getModel().put("jsMessages", jsMessages);
         rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
         rslt.getModel().put("supportsHelp", req.isPortletModeAllowed(PortletMode.HELP));
 
