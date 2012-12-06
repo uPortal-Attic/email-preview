@@ -63,15 +63,15 @@
     </div>
 
     <div class="email-list" style="display:none;">
-    
+
         <form name="inboxForm">
         	<div data-role="navbar" class="ui-body-a">
         	  <ul>
                 <li><a data-icon="check" data-iconpos="top" class="inbox-link" href="" target="_blank"><spring:message code="preview.toolbar.inbox"/></a></li>
                 <li><a data-icon="refresh" data-iconpos="top" class="refresh-link email-action-link" href="javascript:;"><spring:message code="preview.toolbar.refresh"/></a></li>
-                <c:if test="${allowDelete}">             
-                	<li><a data-icon="delete" data-iconpos="top" class="delete-link email-action-link" href="javascript:;"><spring:message code="preview.toolbar.deleteSelected"/></a></li>   
-                </c:if>  
+                <c:if test="${allowDelete}">
+                	<li><a data-icon="delete" data-iconpos="top" class="delete-link email-action-link" href="javascript:;"><spring:message code="preview.toolbar.deleteSelected"/></a></li>
+                </c:if>
                 <li>
 	                <label for="results"><spring:message code="preview.pager.perPage"/></label>
 	                <select id="results" data-mini="true"  class="pager-page-size flc-pager-page-size">
@@ -80,11 +80,11 @@
 	                    <option value="20">20</option>
 	                    <option value="50">50</option>
 	                </select>
-                </li> 
+                </li>
                </ul>
-              
+
             </div>
-             
+
             <div class="flc-pager-top">
                 <ul id="pager-top" class="fl-pager-ui">
                     <li class="flc-pager-previous"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></li>
@@ -97,23 +97,30 @@
                         </ul>
                     </li>
                     <li class="flc-pager-next"><a href="javascript:;" ><spring:message code="preview.pager.next"/> &gt;</a></li>
-                </ul>                   
+                </ul>
             </div>
-          	<div class="message_stats"><span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/></div>
+          	<div class="message_stats"><span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>
+          	<span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="email-quota-usage"></span> / <span class="email-quota-limit"></span></span>
+          	</div>
             <div class="message_infos">
                 <ul rsf:id="row:" class="email-row"  data-role="listview" >
                     <li>
 	                    <span rsf:id="flags" class="flags"><p class="answered-span">&nbsp;</p></span>
-	                    <span rsf:id="attachments" class="flags"><p class="attached-span">&nbsp;</p></span> 
+	                    <span rsf:id="attachments" class="flags"><p class="attached-span">&nbsp;</p></span>
 	                    <h3 rsf:id="subject"><a href="javascript:;" class="subject"></a></h3><p rsf:id="sender" class="sender"></p><p rsf:id="sentDate" class="sentDate"></p>
 	                    <p rsf:id="select" class="select"></p>
                     </li>
-                </ul>   
-            </div>         
-        </form>       
+                </ul>
+            </div>
+        </form>
     </div>
-    
+
     <div class="email-message" style="display:none">
+        <ul cellpadding="0" cellspacing="0" class="message-headers">
+            <li><span class="message-header-name"><spring:message code="preview.message.from"/></span><span class="sender"></span></li>
+            <li><span class="message-header-name"><spring:message code="preview.message.subject"/></span><span class="subject"></span></li>
+            <li><span class="message-header-name"><spring:message code="preview.message.date"/></span><span class="sentDate"></span></li>
+        </ul>
         <hr/>
         <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
         <div class="message-content">
@@ -122,14 +129,14 @@
             <input class="message-uid" type="hidden" name="selectMessage" value=""/>
             <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
             <c:if test="${allowDelete}">
-                <input class="delete-message-button" data-icon="delete" data-iconpos="top" type="button" value=" <spring:message code="preview.message.delete"/> "/>
+                <input class="delete-message-button" data-icon="delete" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.delete"/> "/>
             </c:if>
             <c:if test="${supportsToggleSeen}">
-                <input class="mark-read-button" data-icon="check" data-iconpos="top" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
-                <input class="mark-unread-button" data-icon="minus" data-iconpos="top" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
+                <input class="mark-read-button" data-icon="check" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
+                <input class="mark-unread-button" data-icon="minus" data-iconpos="top" data-mini="true" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
             </c:if>
         </form>
-    </div>    
+    </div>
 </div>
 </div>
 
@@ -140,11 +147,11 @@
     ${n}.fluid = fluid;
     fluid = null;
     fluid_1_1 = null;
-    
+
     ${n}.jQuery(function() {
         var $ = ${n}.jQuery;
         var fluid = ${n}.fluid;
-       
+
         // Notify the server of changes to pageSize so they can be remembered
         var updatePageSize = function(newPageSize) {
             $.post("${updatePageSizeUrl}", {newPageSize: newPageSize});
@@ -153,7 +160,7 @@
         var jsErrorMessages = {
             <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
                 '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
-            </c:forEach>        
+            </c:forEach>
         };
 
         var options = {

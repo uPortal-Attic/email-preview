@@ -39,7 +39,7 @@
 <!-- email splash styles -->
 <style type="text/css">
     .emailSplash {
-        height: 84px;
+        height: 120px;
         margin: 0 auto;
         color: #847d76;
         position: relative;
@@ -102,7 +102,8 @@
     <div class="text">
         <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
         <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <b><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></b> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
-            <c:if test="${not empty inboxUrl}">
+        <span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="email-quota-usage"></span> / <span class="email-quota-limit"></span><br /></span>
+        <c:if test="${not empty inboxUrl}">
             &bull; <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.summary.inboxLink.tooltip"/>"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
         </c:if>
         &bull; <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>" title="<spring:message code="rollup.summary.previewLink.tooltip"/>"><spring:message code="rollup.summary.previewLink"/></a> <spring:message code="rollup.summary.previewPostLink"/></p>
@@ -134,17 +135,17 @@
 
     ${n}.jQuery(function() {
         var $ = ${n}.jQuery;
-        
+
         var jsErrorMessages = {
             <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
                 '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
-            </c:forEach>        
+            </c:forEach>
         };
 
         var showErrorMessage = function(httpStatus, customMessage) {
             if (httpStatus == 200) {
-                /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal 
-                 * this event means the ACTION timed out and improperly went to 
+                /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal
+                 * this event means the ACTION timed out and improperly went to
                  * RENDER, where it should have resulted in a redirect).
                  */
                 httpStatus = 504;
@@ -164,7 +165,7 @@
             data: { pageStart: 0, numberOfMessages: 20 /* matches batchSize elsewhere to increase cache hits */, forceRefresh: false },
             type: 'POST',
             dataType: "json",
-            success: function(data) { 
+            success: function(data) {
                 if (data.errorMessage != null) {
                     showErrorMessage('900', data.errorMessage);
                 }
@@ -174,6 +175,12 @@
                     $("#${n}splash .unreadCountCircle").text(count < 100 ? count : "#");
                     $("#${n}splash .totalCount").text(data.accountSummary.totalMessageCount);
                     $("#${n}splash .unreadContainer").slideDown(500);
+                    if(data.spaceUsed=="-1"){
+                    	$("#${n}splash .stats").remove();
+                    }else{
+                    $("#${n}splash .email-quota-usage").text(data.emailQuotaUsage);
+                    $("#${n}splash .email-quota-limit").text(data.emailQuotaLimit);
+                    }
                 }
             },
             error: function(request, textStatus, error) {

@@ -58,6 +58,8 @@ public class EmailAccountSummaryController {
     public static final String KEY_ACCOUNT_SUMMARY = "accountSummary";
     public static final String KEY_INBOX_URL = "inboxUrl";
     public static final String KEY_ERROR = "error";
+    public static final String KEY_EMAIL_QUOTA_LIMIT = "emailQuotaLimit";
+    public static final String KEY_EMAIL_QUOTA_USAGE = "emailQuotaUsage";
 
     @ResourceMapping(value = "accountSummary")
     public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
@@ -87,6 +89,12 @@ public class EmailAccountSummaryController {
             if (accountSummary.isValid()) {
                 model.put(KEY_ACCOUNT_SUMMARY, accountSummary);
                 model.put(KEY_INBOX_URL, accountSummary.getInboxUrl());
+                if(accountSummary.getQuota() == null) {
+                	model.put(KEY_EMAIL_QUOTA_USAGE,"-1");
+                } else {
+                    model.put(KEY_EMAIL_QUOTA_USAGE, accountSummary.getQuota().getUsageAsPercentage());
+                    model.put(KEY_EMAIL_QUOTA_LIMIT, accountSummary.getQuota().getLimitAsString());
+                }
             } else {
                 Throwable cause = accountSummary.getErrorCause();
                 if (MailAuthenticationException.class.isAssignableFrom(cause.getClass())) {

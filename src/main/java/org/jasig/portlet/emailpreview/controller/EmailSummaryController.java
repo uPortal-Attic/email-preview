@@ -26,6 +26,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
@@ -41,6 +42,7 @@ import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.jasig.portlet.emailpreview.util.EmailAccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 
@@ -117,12 +119,6 @@ public class EmailSummaryController {
 
                 String emailAddress = EmailAccountUtils.determineUserEmailAddress(req, config, authService);
                 model.put("emailAddress", emailAddress);
-
-                IEmailLinkService linkService = controller.linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
-                if (linkService != null) {
-                    String inboxUrl = linkService.getInboxUrl(config);
-                    model.put("inboxUrl", inboxUrl);
-                }
 
                 return new ModelAndView(getKey(), model);
             }
@@ -299,6 +295,25 @@ public class EmailSummaryController {
         rslt.getModel().put("supportsEdit", req.isPortletModeAllowed(PortletMode.EDIT));
         rslt.getModel().put("supportsHelp", req.isPortletModeAllowed(PortletMode.HELP));
 
+        return rslt;
+
+    }
+    
+    /*
+     * Other stuff
+     */
+    
+    @ModelAttribute("inboxUrl")
+    public String getInboxUrl(PortletRequest req) {
+        
+        String rslt = null;  // default
+        
+        final MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        final IEmailLinkService linkService = linkServiceRegistry.getEmailLinkService(config.getLinkServiceKey());
+        if (linkService != null) {
+            rslt = linkService.getInboxUrl(config);
+        }
+        
         return rslt;
 
     }

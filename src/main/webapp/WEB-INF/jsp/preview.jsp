@@ -57,11 +57,17 @@
     </div>
 
     <div class="email-list" style="display:none;">
-    
+
         <form name="inboxForm">
-        
+
             <p>
-                <a class="inbox-link email-action-link" href="" target="_blank"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/></a> 
+                <c:if test="${not empty inboxUrl}">
+                    <a class="inbox-link email-action-link" href="" target="_blank">
+                </c:if>
+                <img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/>&nbsp;<spring:message code="preview.toolbar.inbox"/>
+                <c:if test="${not empty inboxUrl}">
+                    </a>
+                </c:if>
                 (<span class="unread-message-count"></span> <spring:message code="preview.toolbar.unreadMessages"/>)
                 | <a class="refresh-link email-action-link" href="javascript:;"><img alt="Refresh" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/arrow_refresh_small.png"/>"/>&nbsp;<spring:message code="preview.toolbar.refresh"/></a>
                 <c:if test="${allowDelete}">
@@ -74,10 +80,11 @@
                 <c:if test="${supportsHelp}">
                 | <a class="email-action-link" href="<portlet:renderURL portletMode="HELP"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/help.png"/>"/> <spring:message code="preview.toolbar.help"/></a>
                 </c:if>
+                <span class="stats">| <img  alt="Close" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/chart_bar.png"/>"/> <strong><spring:message code="common.quota"/>: </strong><span class="email-quota-usage"></span> / <span class="email-quota-limit"></span></span>
             </p>
 
             <div class="fl-pager">
-                
+
                 <div class="flc-pager-top">
                     <ul id="pager-top" class="fl-pager-ui">
                         <li class="flc-pager-previous"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></li>
@@ -101,7 +108,7 @@
                         </li>
                     </ul>
                 </div>
-            
+
                 <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
                     <tr>
                         <th class="select"><input type="checkbox" class="select-all"></th>
@@ -129,11 +136,11 @@
                     </tr>
                 </table>
             </div>
-            
+
         </form>
-        
+
     </div>
-    
+
     <div class="email-message" style="display:none">
         <table cellpadding="0" cellspacing="0" class="message-headers">
             <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
@@ -154,7 +161,7 @@
                 <input class="mark-unread-button" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
             </c:if>
         </form>
-    </div>    
+    </div>
 
 </div>
 
@@ -169,7 +176,7 @@
     ${n}.jQuery(function() {
         var $ = ${n}.jQuery;
         var fluid = ${n}.fluid;
-       
+
         // Notify the server of changes to pageSize so they can be remembered
         var updatePageSize = function(newPageSize) {
             $.post("${updatePageSizeUrl}", {newPageSize: newPageSize});
@@ -178,13 +185,13 @@
         var jsErrorMessages = {
             <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
                 '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
-            </c:forEach>        
+            </c:forEach>
         };
 
         var options = {
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
-            messagesInfoContainer: "${messagesInfoContainer}",            
+            messagesInfoContainer: "${messagesInfoContainer}",
             deleteUrl: "${deleteUrl}",
             toggleSeenUrl: "${toggleSeenUrl}",
             pageSize: <c:out value="${pageSize}"/>,
