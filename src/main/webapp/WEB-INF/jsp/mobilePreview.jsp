@@ -69,9 +69,9 @@
         	  <ul>
                 <li><a data-icon="check" data-iconpos="top" class="inbox-link" href="" target="_blank"><spring:message code="preview.toolbar.inbox"/></a></li>
                 <li><a data-icon="refresh" data-iconpos="top" class="refresh-link email-action-link" href="javascript:;"><spring:message code="preview.toolbar.refresh"/></a></li>
-                <c:if test="${allowDelete}">
-                	<li><a data-icon="delete" data-iconpos="top" class="delete-link email-action-link" href="javascript:;"><spring:message code="preview.toolbar.deleteSelected"/></a></li>
-                </c:if>
+                <c:if test="${allowDelete}">             
+                	<li><a data-icon="delete" data-iconpos="top" class="delete-link email-action-link" href="javascript:;"><span><spring:message code="preview.toolbar.deleteSelected"/></span></a></li>
+                </c:if>  
                 <li>
 	                <label for="results"><spring:message code="preview.pager.perPage"/></label>
 	                <select id="results" data-mini="true"  class="pager-page-size flc-pager-page-size">
@@ -163,7 +163,13 @@
             </c:forEach>
         };
 
-        var options = {
+        var jsMessages = {
+            <c:forEach items="${jsMessages}" var="entry" varStatus="status">
+                '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        };
+
+var options = {
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
             messagesInfoContainer: "${messagesInfoContainer}",
@@ -174,6 +180,7 @@
                 initiatePageSizeChange: updatePageSize
             },
             jsErrorMessages: jsErrorMessages,
+            jsMessages: jsMessages,
             markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
         };
         // Initialize the display asynchronously

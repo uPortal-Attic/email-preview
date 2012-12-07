@@ -142,6 +142,12 @@
             </c:forEach>
         };
 
+        var jsMessages = {
+            <c:forEach items="${jsMessages}" var="entry" varStatus="status">
+                '${entry.key}': '<spring:message code="${entry.value}"/>'<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        };
+
         var showErrorMessage = function(httpStatus, customMessage) {
             if (httpStatus == 200) {
                 /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal
