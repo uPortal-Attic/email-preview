@@ -199,8 +199,6 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
                     inbox.getUnreadMessageCount(), inbox.getMessageCount(),
                     start, max, isDeleteSupported(inbox), getQuota(inbox));
 
-            inbox.close(false);
-
             if (log.isDebugEnabled()) {
                 log.debug("Successfully retrieved email AccountSummary");
             }
@@ -229,7 +227,14 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             if ( inbox != null ) {
                 try {
                     inbox.close(false);
-                } catch ( Exception e ) {}
+		} catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+		}
+		try {
+		    inbox.getStore().close();
+                } catch ( Exception e ) {
+		    log.warn("Can't close correctly javamail store connection");
+		}
             }
         }
 
