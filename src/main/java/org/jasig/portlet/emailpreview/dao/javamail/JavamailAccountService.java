@@ -167,8 +167,6 @@ public final class JavamailAccountService implements IEmailAccountService {
                 emailMessage.setUnread(unread);
             }
 
-            inbox.close(false);
-
             return emailMessage;
         } catch (MessagingException e) {
             log.error("Messaging exception while retrieving individual message", e);
@@ -182,7 +180,14 @@ public final class JavamailAccountService implements IEmailAccountService {
             if ( inbox != null ) {
                 try {
                     inbox.close(false);
-                } catch ( Exception e ) {}
+		} catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+		}
+		try {
+		    inbox.getStore().close();
+                } catch ( Exception e ) {
+		    log.warn("Can't close correctly javamail store connection");
+		}
             }
         }
 
@@ -229,9 +234,14 @@ public final class JavamailAccountService implements IEmailAccountService {
         } finally {
             if ( inbox != null ) {
                 try {
-                    inbox.close(true);
+                    inbox.close(false);
                 } catch ( Exception e ) {
-                    log.error("Error closing inbox folder", e);
+                    log.warn("Can't close correctly javamail inbox connection");
+		}
+		try {
+		    inbox.getStore().close();
+                } catch ( Exception e ) {
+		    log.warn("Can't close correctly javamail store connection");
                 }
             }
         }
@@ -279,9 +289,14 @@ public final class JavamailAccountService implements IEmailAccountService {
         } finally {
             if ( inbox != null ) {
                 try {
-                    inbox.close(true);
+                    inbox.close(false);
+		} catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+		}
+		try {
+		    inbox.getStore().close();
                 } catch ( Exception e ) {
-                    log.error("Error closing inbox folder", e);
+		    log.warn("Can't close correctly javamail store connection");
                 }
             }
         }
