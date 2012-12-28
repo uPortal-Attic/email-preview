@@ -184,8 +184,14 @@
                     if(data.spaceUsed=="-1"){
                     	$("#${n}splash .stats").remove();
                     }else{
-                    $("#${n}splash .email-quota-usage").text(data.emailQuotaUsage);
-                    $("#${n}splash .email-quota-limit").text(data.emailQuotaLimit);
+                    	$("#${n}splash .email-quota-usage").text(data.emailQuotaUsage);
+                        $("#${n}splash .email-quota-limit").text(data.emailQuotaLimit);
+                        
+                        if (data.emailQuotaUsage <= 0 || data.emailQuotaLimit <= 0) {
+                          $("#${n}splash .stats").hide();
+                        } else {
+                          $("#${n}splash .stats").show();
+                        }
                     }
                 }
             },
