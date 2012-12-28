@@ -86,7 +86,8 @@ public final class EditPreferencesController {
         model.put("disableHost", config.isReadOnly(req, MailPreferences.HOST));
         model.put("disablePort", config.isReadOnly(req, MailPreferences.PORT));
         model.put("disableAuthService", config.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY));
-        
+        model.put("disableMarkMessagesAsRead", config.isReadOnly(req, MailPreferences.MARK_MESSAGES_AS_READ));
+         
         // Available protocols
         model.put("protocols", protocols);
 
