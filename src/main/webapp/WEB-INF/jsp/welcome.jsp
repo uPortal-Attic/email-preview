@@ -28,7 +28,10 @@
         <h2 role="heading"><c:out value="${welcomeTitle}"/></h2>
     </div>
 
-    <p><spring:message code="welcome.summary.begin"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="welcome.summary.linkText"/></a> <spring:message code="welcome.summary.end"/></p>
+    <p>
+      <spring:message code="welcome.summary" />
+      <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="welcome.summary.linkText"/></a>
+    </p>
 
     <div>${welcomeInstructions}</div>
 
