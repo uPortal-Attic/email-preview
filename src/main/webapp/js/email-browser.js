@@ -410,10 +410,10 @@ var jasig = jasig || {};
             }
             if (account.emailQuotaUsage <= 0 || account.emailQuotaLimit <= 0) {
 	            that.locate("stats").remove();
-	        } else {
-	            that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
-	            that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
-	        }
+            } else {
+                that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
+                that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
+            }
             showEmailList(that);
 
         }
