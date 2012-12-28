@@ -391,11 +391,13 @@ var jasig = jasig || {};
             if (account.accountSummary.deleteSupported) {
                 that.locate("deleteMessagesLink").click(that.deleteSelectedMessages);
                 that.locate("deleteMessageButton").click(that.deleteShownMessage);
+                that.locate("deleteMessageButton").show();
             } else {
                 var anchor = that.locate("deleteMessagesLink");
                 anchor.find("span").html(that.options.jsMessages['deleteNotAvailable']);
                 anchor.find("span").addClass("fl-text-silver");
                 anchor.attr("title", that.options.jsMessages['deleteNotAvailableTitle']);
+                that.locate("deleteMessageButton").hide();
             }
             that.locate("returnLink").click(function(){ showEmailList(that); });
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
