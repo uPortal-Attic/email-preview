@@ -22,6 +22,8 @@ package org.jasig.portlet.emailpreview.security;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionInitializationException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * JasyptPBEStringEncryptionServiceImpl is an implementation of 
@@ -30,43 +32,52 @@ import org.jasypt.exceptions.EncryptionInitializationException;
  * 
  * @author Jen Bourey
  */
-public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionService {
+public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionService, InitializingBean {
 
-	PBEStringEncryptor encryptor = null;
+	private PBEStringEncryptor encryptor = null;
 	
 	/**
 	 * Set the PBEStringEncryptor to be used
 	 * 
 	 * @param encryptor
 	 */
-	public void setStringEncryptor(PBEStringEncryptor encryptor) {
+	public void setStringEncryptor(final PBEStringEncryptor encryptor) {
 		this.encryptor = encryptor;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public String encrypt(String plaintext) {
-        try {
-		    return this.encryptor.encrypt(plaintext);
-        } catch (EncryptionInitializationException e) {
-            throw new EmailPreviewException("Encryption error. Verify an encryption password"
-                    + " is configured in the email preview portlet's"
-                    + " stringEncryptionService bean in applicationContent.xml", e);
-        }
+	public String encrypt(final String plaintext) {
+      try {
+	        return this.encryptor.encrypt(plaintext);
+      } catch (EncryptionInitializationException e) {
+          throw new EmailPreviewException("Encryption error. Verify an encryption password"
+                  + " is configured in the email preview portlet's"
+                  + " stringEncryptionService bean in applicationContent.xml", e);
+      }
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public String decrypt(String cryptotet) {
-        try {
-		    return this.encryptor.decrypt(cryptotet);
-        } catch (EncryptionInitializationException e) {
-            throw new EmailPreviewException("Decryption error. Was encryption password"
-                    + " changed in the email preview portlet's"
-                    + " stringEncryptionService bean in applicationContent.xml?", e);
-        }
+	public String decrypt(final String cryptotet) {
+      try {
+	        return this.encryptor.decrypt(cryptotet);
+      } catch (EncryptionInitializationException e) {
+          throw new EmailPreviewException("Decryption error. Was encryption password"
+                  + " changed in the email preview portlet's"
+                  + " stringEncryptionService bean in applicationContent.xml?", e);
+      }
     }
-	
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        final String enc = this.encrypt(this.getClass().getName());
+        Assert.notNull(enc, "String encryption service is not properly configured.");
+        
+        final String dec = this.decrypt(enc);
+        Assert.notNull(dec, "String decryption service is not properly configured.");
+        Assert.isTrue(dec.equals(this.getClass().getName()), "String decryption failed to decode the encrypted text " + enc);
+    }
 }
