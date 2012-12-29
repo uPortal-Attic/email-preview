@@ -94,7 +94,7 @@
                                 <td class="preference-name">
                                     <form:label path="allowRenderingEmailContent"><spring:message code="config.preferences.allowEmailContent"/></form:label>
                                 </td>
-                                <td class="value"><form:input path="allowRenderingEmailContent"/></td>
+                                <td class="value"><form:checkbox path="allowRenderingEmailContent"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
