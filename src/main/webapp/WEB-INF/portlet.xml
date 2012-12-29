@@ -214,6 +214,11 @@
                 </value>
             </preference>   
 
+			<!-- Enable the preview mode to display the actual content of an email message -->
+			<preference>
+                <name>allowRenderingEmailContent</name>
+                <value>true</value>
+            </preference>
         </portlet-preferences>
     </portlet>
     
@@ -303,6 +308,11 @@
             <preference>
                 <name>inboxUrl</name>
                 <value>http://www.jasig.org/</value>
+            </preference>
+            <!-- Enable the preview mode to display the actual content of an email message -->
+            <preference>
+                <name>allowRenderingEmailContent</name>
+                <value>true</value>
             </preference>
         </portlet-preferences>
     </portlet>

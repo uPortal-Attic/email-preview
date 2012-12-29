@@ -92,6 +92,12 @@
                             </tr>
                             <tr>
                                 <td class="preference-name">
+                                    <form:label path="allowRenderingEmailContent"><spring:message code="config.preferences.allowEmailContent"/></form:label>
+                                </td>
+                                <td class="value"><form:input path="allowRenderingEmailContent"/></td>
+                            </tr>
+                            <tr>
+                                <td class="preference-name">
                                     <form:label path="usernameSuffix"><spring:message code="config.preferences.suffix"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="usernameSuffix"/></td>
