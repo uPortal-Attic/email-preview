@@ -32,7 +32,8 @@ public interface IStringEncryptionService {
 	 * Encrypt a string
 	 * 
 	 * @param plaintext
-	 * @return
+	 * @return encrypted version of the plaintext
+	 * @throws StringEncryptionException
 	 */
 	public String encrypt(String plaintext);
 	
@@ -40,7 +41,8 @@ public interface IStringEncryptionService {
 	 * Decrypt a string
 	 * 
 	 * @param cryptotext
-	 * @return
+	 * @return decrypted version of the cryptotext
+	 * @throws StringEncryptionException
 	 */
 	public String decrypt(String cryptotext);
 

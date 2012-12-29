@@ -32,6 +32,25 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
 
+    <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
+        <!-- 
+         | Always declare an 'exceptionResolver' bean with a 'defaultErrorView' 
+         | because, in addition to other uses, it protects the portlet from 
+         | failing when a bad request (due to a bug or malicious user) doesn't 
+         | match any declared @RequestMapping.  When this happens, the portlet 
+         | throws an Exception and takes itself out of service until a portal 
+         | restart.  THIS CONDITION AFFECTS ALL USERS!
+         +-->
+         <property name="exceptionMappings">
+            <props>
+              <!-- Exception thrown when an error is raised during initialization, such as when 
+                   the encryption password is not set for password based encryptor  -->
+              <prop key="org.jasig.portlet.emailpreview.security.StringEncryptionException">pswEncError</prop>
+            </props>
+        </property>
+        <property name="defaultErrorView" value="error"/>
+    </bean>
+    
     <!-- Properties configuration -->
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
