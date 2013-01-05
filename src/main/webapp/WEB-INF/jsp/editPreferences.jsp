@@ -57,6 +57,10 @@
             <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
         </div>
         <div class="plt-email-row">
+            <label><spring:message code="editPreferences.emailSettings.inboxFolderName"/></label>
+            <input type="text" name="inboxName" id="plt-email-input-inbox-folder-name" title="<spring:message code="editPreferences.emailSettings.inboxFolderName.tooltip"/>" value="<c:out value="${form.inboxFolderName}"/>"/>
+        </div>
+        <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
             <input type="checkbox" name="markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
         </div>
@@ -145,6 +149,9 @@
                 }
                 if(that.options.disableHost){
                     $('#plt-email-input-server').addClass('disabled').attr('disabled',true);
+                }
+                if(that.options.disableInboxName){
+                    $('#plt-email-input-inbox-folder-name').addClass('disabled').attr('disabled',true);
                 }
                 if(that.options.disablePort){
                     $('#plt-email-input-port').addClass('disabled').attr('disabled',true);
@@ -289,6 +296,7 @@
             disableProtocol: false,
             disableHost: false,
             disablePort: false,
+            disableInboxName: false,
             disableAuthService: false
         });
     
@@ -301,6 +309,7 @@
             disableProtocol: <c:out value="${disableProtocol}"/>,
             disableHost: <c:out value="${disableHost}"/>,
             disablePort: <c:out value="${disablePort}"/>,
+            disableInboxName: <c:out value="${disableInboxName}"/>,
             disableAuthService: <c:out value="${disableAuthService}"/>
         };
         ${n}.pltEmailForm($('#plt-email-form'), options);

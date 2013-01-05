@@ -33,6 +33,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
@@ -86,6 +87,7 @@ public final class EditPreferencesController {
         model.put("disableHost", config.isReadOnly(req, MailPreferences.HOST));
         model.put("disablePort", config.isReadOnly(req, MailPreferences.PORT));
         model.put("disableAuthService", config.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY));
+        model.put("disableInboxName", config.isReadOnly(req, MailPreferences.INBOX_NAME));
         
         // Available protocols
         model.put("protocols", protocols);
@@ -228,6 +230,16 @@ public final class EditPreferencesController {
             }
             form.setMarkMessagesAsRead(Boolean.valueOf(markMessagesAsRead));
         }
+        
+        if (!config.isReadOnly(req, MailPreferences.INBOX_NAME)) {
+            String inboxName = req.getParameter(MailPreferences.INBOX_NAME.getKey());
+            
+            if (StringUtils.isBlank(inboxName) && StringUtils.isBlank(err)) {
+                err = "Inbox folder name is required";
+            } else {
+                form.setInboxFolderName(inboxName);
+            }
+        }
 
         if (!config.isReadOnly(req, MailPreferences.AUTHENTICATION_SERVICE_KEY)) {
             String authKey = req.getParameter(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey());
@@ -288,6 +300,7 @@ public final class EditPreferencesController {
             config.setPort(form.getPort());
             config.setMarkMessagesAsRead(form.getMarkMessagesAsRead());
             config.setAuthenticationServiceKey(form.getAuthenticationServiceKey());
+            config.setInboxFolderName(form.getInboxFolderName());
             
             // username/password
             if (PortletPreferencesCredentialsAuthenticationService.KEY.equals(form.getAuthenticationServiceKey())) {
