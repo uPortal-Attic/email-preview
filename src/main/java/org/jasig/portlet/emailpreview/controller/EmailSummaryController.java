@@ -273,11 +273,12 @@ public class EmailSummaryController {
 
         View showView = null;
 
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
-        if (!authService.isConfigured(req, config)) {
+        final MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        final IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+        if (authService == null || !authService.isConfigured(req, config)) {
             // Rule #1:  If we're not configured for authentication,
             // show the 'welcome' view so the user knows what to do
+            log.debug("Authentication service is not configured. Review the portlet configuration.");
             showView = View.WELCOME;
         } else if (req.getWindowState().equals(WindowState.MAXIMIZED)) {
             // Rule #2:  We don't show the rollup in MAXIMIZED state
