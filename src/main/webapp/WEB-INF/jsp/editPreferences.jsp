@@ -58,7 +58,7 @@
         </div>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
-            <input type="checkbox" name="markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
+            <input type="checkbox" name="markMessagesAsRead" id="plt-email-input-markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
         </div>
     </div>          
 
@@ -152,6 +152,9 @@
                 if(that.options.disableAuthService){
                     $('#authtype_cache').addClass('disabled').attr('disabled',true);
                     $('#authtype_preferences').addClass('disabled').attr('disabled',true);
+                }
+                if (that.options.disableMarkMessagesAsRead){
+                    $('#plt-email-input-markMessagesAsRead').addClass('disabled').attr('disabled',true);            
                 }
                 
                 setTimeout(
@@ -288,6 +291,7 @@
             },
             disableProtocol: false,
             disableHost: false,
+            disableMarkMessagesAsRead: false,
             disablePort: false,
             disableAuthService: false
         });
@@ -301,6 +305,7 @@
             disableProtocol: <c:out value="${disableProtocol}"/>,
             disableHost: <c:out value="${disableHost}"/>,
             disablePort: <c:out value="${disablePort}"/>,
+            disableMarkMessagesAsRead: <c:out value="${disableMarkMessagesAsRead}"/>,
             disableAuthService: <c:out value="${disableAuthService}"/>
         };
         ${n}.pltEmailForm($('#plt-email-form'), options);
