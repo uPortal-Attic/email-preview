@@ -408,8 +408,12 @@ var jasig = jasig || {};
             if(account.spaceUsed=="-1"){
             	that.locate("stats").remove();
             }
-            that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
-            that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
+            if (account.emailQuotaUsage <= 0 || account.emailQuotaLimit <= 0) {
+	            that.locate("stats").remove();
+            } else {
+                that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
+                that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
+            }
             showEmailList(that);
 
         }
