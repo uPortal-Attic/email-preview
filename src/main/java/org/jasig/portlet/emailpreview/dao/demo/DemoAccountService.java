@@ -48,7 +48,6 @@ import org.springframework.stereotype.Component;
  * @author Landis Casner
  * @author Drew Wills, drew@unicon.net
  */
-@SuppressWarnings("unchecked")
 @Component
 public final class DemoAccountService implements IEmailAccountService {
 

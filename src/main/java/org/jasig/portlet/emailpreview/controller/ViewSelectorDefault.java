@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.portlet.PortletRequest;
-import javax.portlet.WindowState;
 
 import org.jasig.portlet.emailpreview.controller.EmailSummaryController.View;
 import org.springframework.stereotype.Service;
