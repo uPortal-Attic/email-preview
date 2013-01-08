@@ -29,7 +29,10 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.service">
+        <!-- AuthN Service impls should be configured in the appropriate portlet sub-contexts -->
+        <context:exclude-filter type="regex" expression="org\.jasig\.portlet\.emailpreview\.service\.auth\."/>
+    </context:component-scan>
     <context:annotation-config />
 
     <!-- Properties configuration -->
@@ -42,16 +45,6 @@
             </list>
         </property>
     </bean>
-
-
-
-    <util:list id="authServices">
-        <ref bean="cachedPasswordAuthenticationService"/>
-        <ref bean="portletPreferencesCredentialsAuthenticationService"/>
-        <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
-        <ref bean="demoAuthenticationService"/>
-        <ref bean="casAuthenticationService"/>
-    </util:list>
 
     <util:list id="linkServices">
         <ref bean="simpleEmailLinkService"/>
@@ -68,35 +61,6 @@
         p:order="10" p:cache="true"
         p:viewClass="org.springframework.web.servlet.view.JstlView"
         p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
-
-    <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
-        <property name="stringEncryptor">
-            <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
-
-                <!-- Before using the string encryption service you must
-                 first set a password.
-
-                 NOTE:  Do NOT change this password after a user has entered
-                 their password into the portlet configuration. The system
-                 won't be able to decrypt it and the portlet will fail.
-             <property name="password" value="changeMe!"/> -->
-
-                <!-- 
-                    Example BouncyCastle-powered AES encryption
-                    
-                    To use AES encryption, uncomment the following section, add
-                    the unrestricted JCE provider files to your JVM, and add 
-                    the JVM-version-appropriate BouncyCastle dependency to uPortal
-                -->
-                <!--
-                <property name="algorithm" value="PBEWITHSHA256AND128BITAES-CBC-BC"/>
-                <property name="provider">
-                    <bean class="org.bouncycastle.jce.provider.BouncyCastleProvider"/>
-                </property>
-                -->
-            </bean>
-        </property>
-    </bean>
 
     <!-- Message source for this context, loaded from localized "messages_xx" files -->
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">

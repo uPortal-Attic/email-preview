@@ -29,14 +29,12 @@ import javax.portlet.PortletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author Jen Bourey, jbourey@unicon.net
  * @version $Revision$
  */
-@Component("cachedPasswordAuthenticationService")
 public class CachedPasswordAuthenticationService implements IAuthenticationService {
     
     private static final String KEY = "cachedPassword";

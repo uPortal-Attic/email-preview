@@ -31,7 +31,8 @@
             http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail" />
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.service.auth"/>
     <context:annotation-config />
 
     <ehcache:annotation-driven />
@@ -107,5 +108,38 @@
         <value>pop3</value>
         <value>pop3s</value>
     </util:list>
+
+
+    <bean id="cachedPasswordAuthenticationService" 
+            class="org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService"/>
+
+    <bean id="casAuthenticationService" 
+            class="org.jasig.portlet.emailpreview.service.auth.cas.CasAuthenticationService"/>
+
+    <!-- 
+     | Uncomment the following 2 beans to use the portletPreferencesCredentialsAuthenticationService
+     |
+     | NOTE:  Read carefully the instructions for the 'stringEncryptionService' bean (below).
+     +-->
+     <!--
+    <bean id="portletPreferencesCredentialsAuthenticationService" 
+            class="org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService"/>
+    -->
+
+    <!-- Before using the string encryption service you must first set a password.
+
+        NOTE:  Do NOT change this password after a user has entered
+        their password into the portlet configuration. The system
+        won't be able to decrypt it and the portlet will fail!
+    -->
+    <!--
+    <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
+        <property name="stringEncryptor">
+            <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+                 <property name="password" value="CHANGEME!"/>
+            </bean>
+        </property>
+    </bean>
+    -->
 
 </beans>

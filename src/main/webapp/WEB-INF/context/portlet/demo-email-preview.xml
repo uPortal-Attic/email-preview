@@ -31,7 +31,8 @@
             http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo" />
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.service.auth"/>
     <context:annotation-config />
     
     <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
@@ -55,5 +56,8 @@
     <util:list id="protocols">
         <value>JSON</value>
     </util:list>
-    
+
+    <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
+    <bean id="demoAuthenticationService" class="org.jasig.portlet.emailpreview.service.auth.DemoAuthenticationService"/>
+
 </beans>

@@ -29,7 +29,6 @@ import javax.portlet.PortletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Component;
  * @author Drew Wills
  * @version $Revision$
  */
-@Component("demoAuthenticationService")
 public class DemoAuthenticationService implements IAuthenticationService {
     
     private static final String KEY = "demoAuthService";

@@ -22,35 +22,37 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthenticationServiceRegistryImpl implements IAuthenticationServiceRegistry {
+public class AuthenticationServiceRegistryImpl implements IAuthenticationServiceRegistry, ApplicationContextAware {
     
-    private Map<String, IAuthenticationService> serviceMap = new HashMap<String, IAuthenticationService>();
+    private final Map<String, IAuthenticationService> serviceMap = new HashMap<String, IAuthenticationService>();
 
-    @Resource(name = "authServices")
-    @Required
-    public void setServices(Collection<IAuthenticationService> services) {
-        serviceMap.clear();
-        for (IAuthenticationService service : services) {
-            registerService(service);
-        }
-    }
-
+    @Override
     public IAuthenticationService getAuthenticationService(String key) {
         return serviceMap.get(key);
     }
 
+    @Override
     public Collection<IAuthenticationService> getServices() {
         return serviceMap.values();
     }
 
+    @Override
     public void registerService(IAuthenticationService authService) {
         serviceMap.put(authService.getKey(), authService);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        Map<String, IAuthenticationService> serviceBeans = ctx.getBeansOfType(IAuthenticationService.class);
+        for (Map.Entry<String, IAuthenticationService> y : serviceBeans.entrySet()) {
+            registerService(y.getValue());
+        }
     }
 
 }

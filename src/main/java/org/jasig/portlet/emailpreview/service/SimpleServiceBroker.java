@@ -130,6 +130,12 @@ public class SimpleServiceBroker implements IServiceBroker {
                     // AuthN properties may require encryption
                     ConfigurationParameter param = allParams.get(key);
                     if (param != null && param.isEncryptionRequired()) {
+                        if (stringEncryptionService == null) {
+                            final String msg = "The following setting requires " +
+                                    "encryption but the 'stringEncryptionService' " +
+                                    "bean is not configured:  " + entry.getKey();
+                            throw new IllegalStateException(msg);
+                        }
                         value = stringEncryptionService.decrypt(value);
                     }
                     config.getAdditionalProperties().put(key, value);
@@ -211,6 +217,12 @@ public class SimpleServiceBroker implements IServiceBroker {
                     String value = entry.getValue();
                     ConfigurationParameter param = allParams.get(entry.getKey());
                     if (param != null && param.isEncryptionRequired()) {
+                        if (stringEncryptionService == null) {
+                            final String msg = "The following setting requires " +
+                            		"encryption but the 'stringEncryptionService' " +
+                            		"bean is not configured:  " + entry.getKey();
+                            throw new IllegalStateException(msg);
+                        }
                         value = stringEncryptionService.encrypt(value);
                     }
                     prefs.setValue(entry.getKey(), value);
@@ -225,12 +237,12 @@ public class SimpleServiceBroker implements IServiceBroker {
         
     }
 
-    @Autowired(required = true)
+    @Autowired
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
     }
 
-    @Autowired(required = true)
+    @Autowired(required = false)
     public void setStringEncryptionService(IStringEncryptionService stringEncryptionService) {
         this.stringEncryptionService = stringEncryptionService;
     }

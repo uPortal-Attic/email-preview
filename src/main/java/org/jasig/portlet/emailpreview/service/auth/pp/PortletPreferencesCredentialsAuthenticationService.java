@@ -33,9 +33,7 @@ import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
-import org.springframework.stereotype.Component;
 
-@Component("portletPreferencesCredentialsAuthenticationService")
 public class PortletPreferencesCredentialsAuthenticationService implements IAuthenticationService {
 
     public static final String KEY = "portletPreferences";
