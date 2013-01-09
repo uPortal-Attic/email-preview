@@ -64,7 +64,6 @@ public class SimpleServiceBroker implements IServiceBroker {
                 });    
     
     public MailStoreConfiguration getConfiguration(PortletRequest request) {
-        
         PortletPreferences prefs = request.getPreferences();
         
         MailStoreConfiguration config = new MailStoreConfiguration();
@@ -77,6 +76,9 @@ public class SimpleServiceBroker implements IServiceBroker {
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
         config.setUsernameSuffix(prefs.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
         config.setMarkMessagesAsRead(Boolean.valueOf(prefs.getValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), "true")));
+        
+        String allowContent = prefs.getValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), "true");
+        config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));
         
         // set the port number
         try {
@@ -208,6 +210,12 @@ public class SimpleServiceBroker implements IServiceBroker {
             if (!prefs.isReadOnly(MailPreferences.USERNAME_SUFFIX.getKey())) {
                 prefs.setValue(MailPreferences.USERNAME_SUFFIX.getKey(), config.getUsernameSuffix());
             }
+            
+            if (!prefs.isReadOnly(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey())) {
+                prefs.setValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), 
+                                String.valueOf(config.getAllowRenderingEmailContent()));
+            }
+            
 
             // JavaMail properties
             for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {

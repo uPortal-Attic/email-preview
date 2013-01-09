@@ -35,7 +35,6 @@ import org.jasig.portlet.emailpreview.dao.MailPreferences;
 /**
  * 
  * @author Jen Bourey, jbourey@unicon.net
- * @version $Revision$
  */
 public final class MailStoreConfiguration {
     
@@ -58,6 +57,7 @@ public final class MailStoreConfiguration {
     
     // Preferences
     private boolean markMessagesAsRead;
+    private boolean allowRenderingEmailContent = true;
     
     public String getProtocol() {
         return protocol;
@@ -83,6 +83,14 @@ public final class MailStoreConfiguration {
         this.markMessagesAsRead = markMessagesAsRead;
     }
 
+    public void setAllowRenderingEmailContent(Boolean allow) {
+        allowRenderingEmailContent = allow;
+    }
+    
+    public boolean getAllowRenderingEmailContent() {
+        return allowRenderingEmailContent;
+    }
+    
     public int getPort() {
         return port;
     }
@@ -163,6 +171,7 @@ public final class MailStoreConfiguration {
         this.usernameSuffix = usernameSuffix;
     }
 
+    
     public boolean isReadOnly(PortletRequest req, MailPreferences mp) {
         PortletPreferences prefs = req.getPreferences();
         return prefs.isReadOnly(mp.getKey());
@@ -226,6 +235,8 @@ public final class MailStoreConfiguration {
             .append(this.usernameSuffix)
             .append(this.additionalProperties)
             .append(this.javaMailProperties)
+            .append(this.markMessagesAsRead)
+            .append(this.allowRenderingEmailContent)
             .toHashCode();
     }
 
@@ -242,6 +253,8 @@ public final class MailStoreConfiguration {
             .append("authenticationServiceKey", this.authenticationServiceKey)
             .append("allowableAuthenticationServiceKeys", this.allowableAuthenticationServiceKeys)
             .append("usernameSuffix", this.usernameSuffix)
+            .append("markMessagesAsRead", this.markMessagesAsRead)
+            .append("allowRenderingEmailContent", this.allowRenderingEmailContent)
             .append("Additional properties", this.additionalProperties)
             .append("Java Mail properties", this.javaMailProperties)
             .toString();
