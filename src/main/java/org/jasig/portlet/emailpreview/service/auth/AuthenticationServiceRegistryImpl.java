@@ -19,8 +19,6 @@
 package org.jasig.portlet.emailpreview.service.auth;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -30,29 +28,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationServiceRegistryImpl implements IAuthenticationServiceRegistry, ApplicationContextAware {
     
-    private final Map<String, IAuthenticationService> serviceMap = new HashMap<String, IAuthenticationService>();
+    private ApplicationContext applicationContext;
 
     @Override
     public IAuthenticationService getAuthenticationService(String key) {
-        return serviceMap.get(key);
+        IAuthenticationService rslt = null;  // default
+        Collection<IAuthenticationService> services = getServices();
+        for (IAuthenticationService auth : services) {
+            // It's unfortunate that we have to loop this collection, but there 
+            // should be max 2-3 items in it
+            if (auth.getKey().equalsIgnoreCase(key)) {
+                rslt = auth;
+                break;
+            }
+        }
+        return rslt;
     }
 
     @Override
     public Collection<IAuthenticationService> getServices() {
-        return serviceMap.values();
+        return applicationContext.getBeansOfType(IAuthenticationService.class).values();
     }
 
     @Override
-    public void registerService(IAuthenticationService authService) {
-        serviceMap.put(authService.getKey(), authService);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        Map<String, IAuthenticationService> serviceBeans = ctx.getBeansOfType(IAuthenticationService.class);
-        for (Map.Entry<String, IAuthenticationService> y : serviceBeans.entrySet()) {
-            registerService(y.getValue());
-        }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext; 
     }
 
 }

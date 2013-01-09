@@ -21,13 +21,6 @@ package org.jasig.portlet.emailpreview.service.auth;
 import java.util.Collection;
 
 public interface IAuthenticationServiceRegistry {
-
-    /**
-     * Register a authentication service.
-     * 
-     * @param authService
-     */
-    public void registerService(IAuthenticationService authService);
     
     /**
      * Return an instance of the authentication service associated with the supplied key.

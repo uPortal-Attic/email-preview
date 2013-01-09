@@ -55,13 +55,13 @@ public class PortletPreferencesCredentialsAuthenticationService implements IAuth
 
         ConfigurationParameter usernameParam = new ConfigurationParameter();
         usernameParam.setKey(MailPreferences.MAIL_ACCOUNT.getKey());
-        usernameParam.setLabel("Inbox folder name");
+        usernameParam.setLabel("Mail account name");
         usernameParam.setEncryptionRequired(true);
         params.add(usernameParam);
 
         ConfigurationParameter passwordParam = new ConfigurationParameter();
         passwordParam.setKey(MailPreferences.PASSWORD.getKey());
-        passwordParam.setLabel("Inbox folder name");
+        passwordParam.setLabel("Password");
         passwordParam.setEncryptionRequired(true);
         params.add(passwordParam);
 

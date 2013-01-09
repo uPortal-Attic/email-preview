@@ -19,7 +19,6 @@
 
 package org.jasig.portlet.emailpreview.security;
 
-import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionInitializationException;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,13 +48,13 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
 	 * {@inheritDoc}
 	 */
 	public String encrypt(final String plaintext) {
-      try {
-	        return this.encryptor.encrypt(plaintext);
-      } catch (EncryptionInitializationException e) {
-          throw new EmailPreviewException("Encryption error. Verify an encryption password"
-                  + " is configured in the email preview portlet's"
-                  + " stringEncryptionService bean in applicationContent.xml", e);
-      }
+        try {
+            return this.encryptor.encrypt(plaintext);
+        } catch (EncryptionInitializationException e) {
+            throw new StringEncryptionException("Encryption error. Verify an encryption password"
+                    + " is configured in the email preview portlet's"
+                    + " stringEncryptionService bean in applicationContent.xml", e);
+        }
 	}
 	
 	/**
@@ -65,7 +64,7 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
       try {
 	        return this.encryptor.decrypt(cryptotet);
       } catch (EncryptionInitializationException e) {
-          throw new EmailPreviewException("Decryption error. Was encryption password"
+          throw new StringEncryptionException("Decryption error. Was encryption password"
                   + " changed in the email preview portlet's"
                   + " stringEncryptionService bean in applicationContent.xml?", e);
       }
@@ -80,4 +79,5 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
         Assert.notNull(dec, "String decryption service is not properly configured.");
         Assert.isTrue(dec.equals(this.getClass().getName()), "String decryption failed to decode the encrypted text " + enc);
     }
+
 }

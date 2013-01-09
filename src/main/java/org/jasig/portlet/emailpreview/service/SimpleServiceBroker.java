@@ -29,11 +29,14 @@ import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +51,7 @@ public class SimpleServiceBroker implements IServiceBroker {
     
     private IAuthenticationServiceRegistry authServiceRegistry;
     private IStringEncryptionService stringEncryptionService;
+    private final Log log = LogFactory.getLog(this.getClass());
 
     protected static final List<String> RESERVED_PROPERTIES = Arrays.asList(
                 new String[] { 
@@ -136,7 +140,16 @@ public class SimpleServiceBroker implements IServiceBroker {
                                     "bean is not configured:  " + entry.getKey();
                             throw new IllegalStateException(msg);
                         }
-                        value = stringEncryptionService.decrypt(value);
+                        try {
+                            value = stringEncryptionService.decrypt(value);
+                        } catch (EncryptionOperationNotPossibleException eonpe) {
+                            log.warn("Failed to decrypt a configuration " +
+                            		"parameter -- did the encrytion password " +
+                            		"change?  (it shouldn't)", eonpe);
+                            // provide a dummy value for safety (a blank value 
+                            //would make the portlet seem unconfigured)
+                            value = "xxx";  
+                        }
                     }
                     config.getAdditionalProperties().put(key, value);
                 }

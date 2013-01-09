@@ -29,12 +29,28 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.service">
-        <!-- AuthN Service impls should be configured in the appropriate portlet sub-contexts -->
-        <context:exclude-filter type="regex" expression="org\.jasig\.portlet\.emailpreview\.service\.auth\."/>
-    </context:component-scan>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.service" />
     <context:annotation-config />
 
+    <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
+        <!-- 
+         | Always declare an 'exceptionResolver' bean with a 'defaultErrorView' 
+         | because, in addition to other uses, it protects the portlet from 
+         | failing when a bad request (due to a bug or malicious user) doesn't 
+         | match any declared @RequestMapping.  When this happens, the portlet 
+         | throws an Exception and takes itself out of service until a portal 
+         | restart.  THIS CONDITION AFFECTS ALL USERS!
+         +-->
+         <property name="exceptionMappings">
+            <props>
+              <!-- Exception thrown when an error is raised during initialization, such as when 
+                   the encryption password is not set for password based encryptor  -->
+              <prop key="org.jasig.portlet.emailpreview.security.StringEncryptionException">pswEncError</prop>
+            </props>
+        </property>
+        <property name="defaultErrorView" value="error"/>
+    </bean>
+    
     <!-- Properties configuration -->
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
@@ -79,6 +95,37 @@
          <value>.*Safari.*Pre.*</value>
          <value>.*Nokia.*AppleWebKit.*</value>
     </util:list>
+
+    <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
+    <bean id="demoAuthenticationService" class="org.jasig.portlet.emailpreview.service.auth.DemoAuthenticationService"/>
+
+    <bean id="cachedPasswordAuthenticationService" 
+            class="org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService"/>
+
+    <!-- Uncomment the following 2 beans to use the portletPreferencesCredentialsAuthenticationService
+
+         NOTE:  Read carefully the instructions for the 'stringEncryptionService' bean (below).
+    -->
+    <!--
+    <bean id="portletPreferencesCredentialsAuthenticationService" 
+            class="org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService"/>
+    -->
+
+    <!-- Before using the string encryption service you MUST first set a password.
+
+         WARNING:  Do NOT change this password once users have entered
+         their credentials into the portlet configuration. The system
+         won't be able to decrypt them, and users will get an error.
+    -->
+    <!--
+    <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
+        <property name="stringEncryptor">
+            <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+                 <property name="password" value=""/>
+            </bean>
+        </property>
+    </bean>
+    -->
 
 </beans>
 

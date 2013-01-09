@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,6 @@ import javax.portlet.ReadOnlyException;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.SimpleServiceBroker;
-import org.jasig.portlet.emailpreview.service.auth.AuthenticationServiceRegistryImpl;
 import org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
@@ -67,9 +67,17 @@ public class SimpleServiceBrokerTest {
         MockitoAnnotations.initMocks(this);
 
         serviceBroker = new SimpleServiceBroker();
-        IAuthenticationService authServ = new CachedPasswordAuthenticationService();
-        IAuthenticationServiceRegistry authServiceRegistry = new AuthenticationServiceRegistryImpl();
-        authServiceRegistry.registerService(authServ);
+        final IAuthenticationService authServ = new CachedPasswordAuthenticationService();
+        IAuthenticationServiceRegistry authServiceRegistry = new IAuthenticationServiceRegistry() {
+            @Override
+            public IAuthenticationService getAuthenticationService(String key) {
+                return authServ.getKey().equalsIgnoreCase(key) ? authServ : null;
+            }
+            @Override
+            public Collection<IAuthenticationService> getServices() {
+                return Arrays.asList(new IAuthenticationService[] { authServ });
+            }
+        };
         serviceBroker.setAuthenticationServiceRegistry(authServiceRegistry);
         
         configuration = new MailStoreConfiguration();

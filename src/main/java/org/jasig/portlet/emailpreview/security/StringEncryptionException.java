@@ -16,30 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview.service.auth;
+package org.jasig.portlet.emailpreview.security;
 
-import java.util.Collection;
-
-import org.junit.Test;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
 
 /**
- * @author Jen Bourey, jbourey@unicon.net
- * @version $Revision$
+ * A custom Exception for the email preview portlet that may be thrown as the result 
+ * of a failure in encrypting/decrypting a string.
+ *
+ * @author Misagh Moayyed
+ * @see IStringEncryptionService
  */
-public class AuthenticationServiceRegistryImplTest {
+public class StringEncryptionException extends EmailPreviewException {
+
+    private static final long serialVersionUID = 2252205978899483802L;
     
-    @Test
-    public void testRegistry() {
-        IAuthenticationService authenticationService = new CachedPasswordAuthenticationService();
-        IAuthenticationServiceRegistry registry = new AuthenticationServiceRegistryImpl();
-        registry.registerService(authenticationService);
-        
-        Collection<IAuthenticationService> services = registry.getServices();
-        assert services.size() == 1;
-        
-        IAuthenticationService defaultService = registry.getAuthenticationService("cachedPassword");
-        assert defaultService != null;
-        
+    public StringEncryptionException(Throwable cause) {
+        super(cause);
+    }
+
+    public StringEncryptionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public StringEncryptionException(String message) {
+        super(message);
     }
 
 }

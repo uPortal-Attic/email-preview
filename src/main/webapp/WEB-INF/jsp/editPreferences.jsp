@@ -199,7 +199,7 @@
                 var culprit;
                 
                 /* Tests for existance of at least one valid character */
-                var validRegExp = /^([a-zA-Z0-9_.-])+$/;
+                var validRegExp = /^([a-zA-Z0-9_.-])+/;
                                     
                 /* Hide error bar initially in case a previous error occured */
                 $(that.options.selectors.input_error).slideUp(200);
