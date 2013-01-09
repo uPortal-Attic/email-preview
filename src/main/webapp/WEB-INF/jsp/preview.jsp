@@ -28,7 +28,7 @@
 <script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
-<link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
 <portlet:resourceURL id="accountSummary" var="accountSummaryUrl" />

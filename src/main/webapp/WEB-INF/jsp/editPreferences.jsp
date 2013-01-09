@@ -26,7 +26,7 @@
     <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
 </c:if>
 <script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
-<link type="text/css" rel="stylesheet" href="<c:url value="/css/email.css"/>"/>
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
 
@@ -55,6 +55,10 @@
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.emailSettings.serverPort"/></label>
             <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
+        </div>
+        <div class="plt-email-row">
+            <label><spring:message code="editPreferences.emailSettings.inboxFolderName"/></label>
+            <input type="text" name="inboxName" id="plt-email-input-inbox-folder-name" title="<spring:message code="editPreferences.emailSettings.inboxFolderName.tooltip"/>" value="<c:out value="${form.inboxFolderName}"/>"/>
         </div>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
@@ -145,6 +149,9 @@
                 }
                 if(that.options.disableHost){
                     $('#plt-email-input-server').addClass('disabled').attr('disabled',true);
+                }
+                if(that.options.disableInboxName){
+                    $('#plt-email-input-inbox-folder-name').addClass('disabled').attr('disabled',true);
                 }
                 if(that.options.disablePort){
                     $('#plt-email-input-port').addClass('disabled').attr('disabled',true);
@@ -293,6 +300,7 @@
             disableHost: false,
             disableMarkMessagesAsRead: false,
             disablePort: false,
+            disableInboxName: false,
             disableAuthService: false
         });
     
@@ -306,6 +314,7 @@
             disableHost: <c:out value="${disableHost}"/>,
             disablePort: <c:out value="${disablePort}"/>,
             disableMarkMessagesAsRead: <c:out value="${disableMarkMessagesAsRead}"/>,
+            disableInboxName: <c:out value="${disableInboxName}"/>,
             disableAuthService: <c:out value="${disableAuthService}"/>
         };
         ${n}.pltEmailForm($('#plt-email-form'), options);
