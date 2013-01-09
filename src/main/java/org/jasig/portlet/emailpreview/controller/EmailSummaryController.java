@@ -34,6 +34,7 @@ import javax.portlet.WindowState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
@@ -166,6 +167,7 @@ public class EmailSummaryController {
                 //Display message in a table
                 model.put(MSG_CONTAINER,"table");
 
+                model.put(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), config.getAllowRenderingEmailContent());    
                 return new ModelAndView(getKey(), model);
             }
         },
@@ -209,6 +211,8 @@ public class EmailSummaryController {
                 //Display message in a div 
                 model.put(MSG_CONTAINER,"div.message_infos");
 
+                model.put(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), config.getAllowRenderingEmailContent());   
+                
                 return new ModelAndView(getKey(), model);
             }
         };        

@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
@@ -59,7 +60,6 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * 
  * @author Jen Bourey, jbourey@unicon.net
- * @version $Revision$
  */
 @Controller
 @RequestMapping("CONFIG")
@@ -128,6 +128,15 @@ public class MailStoreConfigurationController {
             config.setLinkServiceKey(form.getLinkServiceKey());
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());
+            
+            String allowContent = request.getParameter(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey());
+            if (StringUtils.isNotEmpty(allowContent)) {
+                config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));
+            } else {
+                config.setAllowRenderingEmailContent(false);
+            }
+            
+            config.setMarkMessagesAsRead(form.getMarkMessagesAsRead());
             
             for (Map.Entry<String, Attribute> entry : form.getJavaMailProperties().entrySet()) {
                 config.getJavaMailProperties().put(entry.getKey(), entry.getValue().getValue());

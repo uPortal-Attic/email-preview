@@ -141,28 +141,29 @@
 
     </div>
 
-    <div class="email-message" style="display:none">
-        <table cellpadding="0" cellspacing="0" class="message-headers">
-            <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
-            <tr><td class="message-header-name"><spring:message code="preview.message.subject"/></td><td class="subject"></td></tr>
-            <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
-        </table>
-        <hr/>
-        <div class="message-content">
-        </div>
-        <form name="messageForm">
-            <input class="message-uid" type="hidden" name="selectMessage" value=""/>
-            <a class="return-link" style="margin-right: 1.5em;" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a>
-            <c:if test="${allowDelete}">
-                <input class="delete-message-button" type="button" value=" <spring:message code="preview.message.delete"/> "/>
-            </c:if>
-            <c:if test="${supportsToggleSeen}">
-                <input class="mark-read-button" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
-                <input class="mark-unread-button" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
-            </c:if>
-        </form>
-    </div>
-
+    <c:if test="${allowRenderingEmailContent}">
+      <div class="email-message" style="display:none">
+          <table cellpadding="0" cellspacing="0" class="message-headers">
+              <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
+              <tr><td class="message-header-name"><spring:message code="preview.message.subject"/></td><td class="subject"></td></tr>
+              <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
+          </table>
+          <hr/>
+          <div class="message-content">
+          </div>
+          <form name="messageForm">
+              <input class="message-uid" type="hidden" name="selectMessage" value=""/>
+              <a class="return-link" style="margin-right: 1.5em;" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a>
+              <c:if test="${allowDelete}">
+                  <input class="delete-message-button" type="button" value=" <spring:message code="preview.message.delete"/> "/>
+              </c:if>
+              <c:if test="${supportsToggleSeen}">
+                  <input class="mark-read-button" type="button" value=" <spring:message code="preview.message.markRead"/> " style="display: none;"/>
+                  <input class="mark-unread-button" type="button" value=" <spring:message code="preview.message.markUnread"/> " style="display: none;"/>
+              </c:if>
+          </form>
+      </div>
+    </c:if>
 </div>
 
 <script type="text/javascript">
@@ -206,6 +207,7 @@
             },
             jsErrorMessages: jsErrorMessages,
             jsMessages: jsMessages,
+            allowRenderingEmailContent: <c:out value="${allowRenderingEmailContent ? 'true' : 'false'}"/>,
             markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
         };
         // Initialize the display asynchronously

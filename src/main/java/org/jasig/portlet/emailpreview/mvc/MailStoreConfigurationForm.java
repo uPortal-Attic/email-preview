@@ -40,7 +40,8 @@ public class MailStoreConfigurationForm implements Serializable {
     private int port;
     private String inboxFolderName;
     private Boolean markMessagesAsRead;
-
+    private Boolean allowRenderingEmailContent = true;
+    
     private int timeout;
     private int connectionTimeout;
 
@@ -71,6 +72,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setLinkServiceKey(config.getLinkServiceKey());
         form.setConnectionTimeout(config.getConnectionTimeout());
         form.setTimeout(config.getTimeout());
+        form.setAllowRenderingEmailContent(config.getAllowRenderingEmailContent());
         
         for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
             form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
@@ -191,6 +193,14 @@ public class MailStoreConfigurationForm implements Serializable {
 
     public boolean getMarkMessagesAsRead() {
         return markMessagesAsRead;
+    }
+
+    public void setAllowRenderingEmailContent(Boolean allow) {
+        allowRenderingEmailContent = allow;
+    }
+    
+    public boolean getAllowRenderingEmailContent() {
+        return allowRenderingEmailContent;
     }
 
 }
