@@ -21,6 +21,11 @@ var jasig = jasig || {};
 (function($, fluid) {
 
 	var displayMessage = function(that, cell) {
+    
+        if (!that.options.allowRenderingEmailContent) {
+            return false;
+        }
+        
         // display the loading message while we retrieve the desired message
         showLoadingMessage(that);
 
@@ -249,15 +254,25 @@ var jasig = jasig || {};
                     },
                     { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
+                          
+                            if (that.options.allowRenderingEmailContent) {
+                              return {
+                                  markup: "<a href=\"javascript:;\">\${*.subject}</a>",
+                                  decorators: [
+                                      { attrs: { messageNum: '\${*.messageNumber}' } },
+                                      { type: "jQuery", func: "click",
+                                          args: function(){ displayMessage(that, this); }
+                                      },
+                                      { type: "addClass", classes: getClasses(index, row) }
+                                  ]
+                              }
+                            } 
                             return {
-                                markup: "<a href=\"javascript:;\">\${*.subject}</a>",
-                                decorators: [
-                                    { attrs: { messageNum: '\${*.messageNumber}' } },
-                                    { type: "jQuery", func: "click",
-                                        args: function(){ displayMessage(that, this); }
-                                    },
-                                    { type: "addClass", classes: getClasses(index, row) }
-                                ]
+                                  markup: "<span>\${*.subject}</span>",
+                                  decorators: [
+                                      { attrs: { messageNum: '\${*.messageNumber}' } },
+                                      { type: "addClass", classes: getClasses(index, row) }
+                                  ]
                             }
                         }
                     },

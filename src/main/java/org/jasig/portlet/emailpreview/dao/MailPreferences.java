@@ -39,6 +39,7 @@ public enum MailPreferences {
     ALLOWABLE_AUTHENTICATION_SERVICE_KEYS("allowableAuthenticationServiceKeys"),
     USERNAME_SUFFIX("usernameSuffix"),
     MARK_MESSAGES_AS_READ("markMessagesAsRead"),
+    ALLOW_RENDERING_EMAIL_CONTENT("allowRenderingEmailContent"),
 
     /*
      * Optional settings used by some auth services 
