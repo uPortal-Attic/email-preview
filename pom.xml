@@ -188,6 +188,14 @@
                 <version>1.4</version>
             </dependency>
             <dependency>
+            <!-- nekohtml is a transitive dependency of antisamy;  
+                 listing it explicitly to bump to v1.9.17, which 
+                 fixes issues with malformed HTML emails -->
+            <groupId>net.sourceforge.nekohtml</groupId>
+                <artifactId>nekohtml</artifactId>
+                <version>1.9.17</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
                 <version>${spring.version}</version>
