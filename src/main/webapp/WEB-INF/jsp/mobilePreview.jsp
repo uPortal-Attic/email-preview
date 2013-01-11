@@ -22,20 +22,15 @@
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${includeJQuery}">
-    <script src="<rs:resourceURL value="/rs/jquery/1.3.2/jquery-1.3.2.min.js"/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value="/rs/jquery/1.8.3/jquery-1.8.3.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
 </c:if>
-<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/jquery.mobile.structure-1.1.1.min.css" media="screen, projection"/>
-<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/emailMobile.css" media="screen, projection"/>
-<%--
-
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-1.8.1.min.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.mobile-1.1.1.min.js"></script>
-
---%>
 <script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
+
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/jquery.mobile.structure-1.1.1.min.css"/>" media="screen, projection"/>
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/emailMobile.css"/>" media="screen, projection"/>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
@@ -169,7 +164,7 @@
             </c:forEach>
         };
 
-var options = {
+        var options = {
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
             messagesInfoContainer: "${messagesInfoContainer}",
@@ -181,6 +176,7 @@ var options = {
             },
             jsErrorMessages: jsErrorMessages,
             jsMessages: jsMessages,
+            allowRenderingEmailContent: <c:out value="${allowRenderingEmailContent ? 'true' : 'false'}"/>,
             markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
         };
         // Initialize the display asynchronously
