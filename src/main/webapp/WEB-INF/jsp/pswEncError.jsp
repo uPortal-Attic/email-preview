@@ -18,12 +18,7 @@
     under the License.
 
 --%>
-<%@ page contentType="text/html" isELIgnored="false" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="portlet" uri="http://java.sun.com/portlet" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
 
 <div class="portlet-font">
     <p><a href="<portlet:renderURL><portlet:param name="action" value="preview"/></portlet:renderURL>"><spring:message code="error.message.refresh"/></a></p>
