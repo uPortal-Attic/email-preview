@@ -57,37 +57,6 @@
             </list>
         </property>
     </bean>
-    
-    <!-- 
-     | This bean maps error codes to UI messages that will be shown to users.  
-     | The keys are numeric HTTP codes (e.g. 401 for "not authorized"), and the 
-     | values are used to pull UI strings from the messageSource bean.  This way 
-     | all UI customization and internationalization can be managed in one place.
-     |
-     | In addition to numeric keys, provide also a 'default' key, which will be 
-     | used for any error code that doesn't have it's own entry.  Lastly, the 
-     | controller may also add a custom message by sending an HTTP 200 together 
-     | with an 'errorMessage' property in the returned JSON.
-     +-->
-    <util:map id="jsErrorMessages">
-        <entry key="401" value="ajax.errorMessage.401"/>
-        <entry key="504" value="ajax.errorMessage.504"/>
-        <entry key="900" value="ajax.errorMessage.900"/>
-        <entry key="default" value="ajax.errorMessage.default"/>
-    </util:map>
-
-    <!--
-     | This bean maps message codes to UI messages that will be shown to users.
-     | The values are used to pull UI strings from the messageSource bean.  This way
-     | all UI customization and internationalization can be managed in one place.
-     -->
-    <util:map id="jsMessages">
-        <entry key="deleteSelectedMessages" value="preview.alert.deleteSelectedMessages"/>
-        <entry key="deleteMessage" value="preview.alert.deleteMessage"/>
-        <entry key="deleteNotAvailable" value="preview.alert.deleteNotAvailable"/>
-        <entry key="deleteNotAvailableTitle" value="preview.alert.deleteNotAvailable.title"/>
-        <entry key="noMessagesSelected" value="preview.alert.noMessagesSelected"/>
-    </util:map>
 
     <util:list id="protocols">
         <value>imap</value>

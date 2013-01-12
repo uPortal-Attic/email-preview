@@ -33,13 +33,7 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo"/>
     <context:annotation-config />
-        
-    <util:map id="jsErrorMessages">
-        <entry key="default" value="ajax.errorMessage.default"/>
-    </util:map>
 
-    <util:map id="jsMessages" />
-    
     <util:list id="protocols">
         <value>JSON</value>
     </util:list>
