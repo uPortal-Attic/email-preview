@@ -413,7 +413,7 @@
                             <exclude>NOTICE</exclude>
                             <exclude>docs/**</exclude>
                             <exclude>src/main/resources/**/*.json</exclude>
-                            <exclude>src/main/webapp/**/jquery*</exclude>
+                            <exclude>src/main/webapp/css/jquery.mobile.structure-1.1.1.min.css</exclude>
                         </excludes>
                         <mapping>
                             <tld>XML_STYLE</tld>

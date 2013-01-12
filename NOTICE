@@ -36,6 +36,7 @@ This project includes:
   Ehcache Spring Annotations under Apache 2
   Ehcache Web Filters under The Apache Software License, Version 2.0
   Email Preview Portlet under JA-SIG Collaborative Licence
+  FindBugs-jsr305 under The Apache Software License, Version 2.0
   GMaven Common under The Apache Software License, Version 2.0
   GMaven Feature :: API under The Apache Software License, Version 2.0
   GMaven Feature :: Support under The Apache Software License, Version 2.0
@@ -44,6 +45,7 @@ This project includes:
   GMaven Runtime :: Default under The Apache Software License, Version 2.0
   GMaven Runtime :: Support under The Apache Software License, Version 2.0
   Groovy under Apache License, Version 2.0
+  Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   Hamcrest Core under BSD style
   HttpClient under Apache License
   Jackson under The Apache Software License, Version 2.0
@@ -52,6 +54,7 @@ This project includes:
   Java Portlet Specification V2.0 under Commons Development and Distribution License, Version 1.0
   JavaBeans(TM) Activation Framework under COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
   JavaMail API under Sun Binary Code License
+  JAXB2 Basics - Runtime under BSD-Style License
   JLine under BSD
   jstl under Commons Development and Distribution License, Version 1.0
   JUnit under Common Public License Version 1.0
@@ -65,7 +68,9 @@ This project includes:
   Plexus Common Utilities under The Apache Software License, Version 2.0
   Pluto Portlet Tag Library under The Apache Software License, Version 2.0
   QDox under The Apache Software License, Version 2.0
+  Resource Server API under Apache License Version 2.0
   Resource Server Content under Apache License Version 2.0
+  Resource Server Core under Apache License Version 2.0
   Resource Server Utilities under Apache License Version 2.0
   servlet-api under Commons Development and Distribution License, Version 1.0
   SLF4J API Module under MIT License
