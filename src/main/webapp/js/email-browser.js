@@ -382,7 +382,7 @@ var jasig = jasig || {};
             };
 
             that.deleteSelectedMessages = function() {
-                if (that.locate("emailRow").find("input[checked='true']").size() === 0) {
+                if (that.locate('emailRow').find('input:checked').size() === 0) {
                     alert(that.options.jsMessages['noMessagesSelected']);
                     return;
                 }
