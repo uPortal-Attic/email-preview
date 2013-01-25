@@ -13,7 +13,7 @@
 
     <name>Email Preview Portlet</name>
     <description>Read-only email portlet.</description>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.3</version>
 
     <scm>
         <connection>scm:git:git@github.com:Jasig/email-preview.git</connection>
@@ -401,12 +401,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.google.code.maven-license-plugin</groupId>
+                    <groupId>com.mycila.maven-license-plugin</groupId>
                     <artifactId>maven-license-plugin</artifactId>
-                    <version>1.4.0</version>
                     <configuration>
-                        <basedir>${basedir}</basedir>
-                        <header>${jasig-short-license-url}</header>
                         <aggregate>true</aggregate>
                         <excludes>
                             <exclude>LICENSE</exclude>
@@ -416,7 +413,10 @@
                             <exclude>src/main/webapp/css/jquery.mobile.structure-1.1.1.min.css</exclude>
                         </excludes>
                         <mapping>
-                            <tld>XML_STYLE</tld>
+                            <channel>XML_STYLE</channel>
+                            <portlet>XML_STYLE</portlet>
+                            <tag>DYNASCRIPT_STYLE</tag>
+                            <xjb>XML_STYLE</xjb>
                         </mapping>
                     </configuration>
                 </plugin>
