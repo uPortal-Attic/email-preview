@@ -117,6 +117,10 @@
             <li><span class="message-header-name"><spring:message code="preview.message.date"/></span><span class="sentDate"></span></li>
         </ul>
         <hr/>
+		<p class="pager-msg">        
+			<span class="previous-msg"><a data-role="button" data-icon="arrow-l" data-mini="true" data-inline="true" href="javascript:;"><spring:message code="preview.pager.previous"/></a></span>
+	 		<span class="next-msg"><a data-role="button" data-icon="arrow-r" data-iconpos="right" data-mini="true" data-inline="true" href="javascript:;"><spring:message code="preview.pager.next"/></a></span>
+ 		</p>          
         <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
         <div class="message-content">
         </div>
