@@ -115,6 +115,7 @@
             <li><span class="message-header-name"><spring:message code="preview.message.from"/></span><span class="sender"></span></li>
             <li><span class="message-header-name"><spring:message code="preview.message.subject"/></span><span class="subject"></span></li>
             <li><span class="message-header-name"><spring:message code="preview.message.date"/></span><span class="sentDate"></span></li>
+            <li><span class="message-header-name"><spring:message code="preview.message.to"/></span><span class="allRecipients"></span></li>
         </ul>
         <hr/>
         <p><a class="return-link" data-role="button" data-icon="back" data-mini="true" href="javascript:;"><spring:message code="preview.message.returnToMessages"/></a></p>
