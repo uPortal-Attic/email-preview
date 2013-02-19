@@ -32,6 +32,8 @@ var jasig = jasig || {};
         // get the message
         var messageNum = parseInt($(cell).attr("messageNum"));
         var message = getMessage(that, messageNum);
+        var previousMsg = messageNum -1;
+        var nextMsg = messageNum +1;            
 
         // Update the display to reflect the new state of the SEEN flag
         if (that.options.markMessagesAsRead && $(cell).hasClass("unread")) {
@@ -65,6 +67,18 @@ var jasig = jasig || {};
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
 
         that.container.find(".message-content").html(html);
+        $(".email-message .previous-msg").attr("messageNum", previousMsg);
+        if(messageNum=="1"){
+        	$(".email-message .previous-msg").hide();
+        }else{
+        	$(".email-message .previous-msg").show();
+        }
+        if(messageNum==that.pager.pager.pageSize.model.totalRange){
+        	$(".email-message .next-msg").hide();
+        }else{
+        	$(".email-message .next-msg").show();
+        } 
+        $(".email-message .next-msg").attr("messageNum", nextMsg);          
         that.container.find(".email-message .subject").html(message.subject);
         that.container.find(".email-message .sender").html(message.sender);
         that.container.find(".email-message .sentDate").html(message.sentDateString);
@@ -415,6 +429,8 @@ var jasig = jasig || {};
                 that.locate("deleteMessageButton").hide();
             }
             that.locate("returnLink").click(function(){ showEmailList(that); });
+            that.locate("previousMsg").click(function(){ displayMessage(that, this); });
+            that.locate("nextMsg").click(function(){ displayMessage(that, this); });              
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("inboxLink").attr("href", account.inboxUrl);
@@ -468,7 +484,9 @@ var jasig = jasig || {};
             inboxLink: ".inbox-link",
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
-            stats: ".stats"
+            stats: ".stats",
+            previousMsg: ".previous-msg",
+            nextMsg: ".next-msg"
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},

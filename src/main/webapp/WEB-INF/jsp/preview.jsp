@@ -149,6 +149,8 @@
               <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
           </table>
           <hr/>
+		  <span class="previous-msg"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></span>
+		  <span class="next-msg"><a href="javascript:;"><spring:message code="preview.pager.next"/> &gt;</a></span>                  
           <div class="message-content">
           </div>
           <form name="messageForm">
