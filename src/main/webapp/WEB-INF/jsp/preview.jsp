@@ -147,6 +147,7 @@
               <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
               <tr><td class="message-header-name"><spring:message code="preview.message.subject"/></td><td class="subject"></td></tr>
               <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
+              <tr><td class="message-header-name"><spring:message code="preview.message.to"/></td><td class="allRecipients"></td></tr>
           </table>
           <hr/>
           <div class="message-content">

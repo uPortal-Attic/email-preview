@@ -66,8 +66,9 @@ var jasig = jasig || {};
 
         that.container.find(".message-content").html(html);
         that.container.find(".email-message .subject").html(message.subject);
-        that.container.find(".email-message .sender").html(message.sender);
+        that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
         that.container.find(".email-message .sentDate").html(message.sentDateString);
+        that.container.find(".email-message .allRecipients").html(message.allRecipients);
         that.container.find(".email-message .message-uid").val(message.uid);
 
         if (that.options.markMessagesAsRead || !message.unread) {
@@ -468,7 +469,8 @@ var jasig = jasig || {};
             inboxLink: ".inbox-link",
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
-            stats: ".stats"
+            stats: ".stats",
+            allRecipients: ".all-recipients" 
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},
