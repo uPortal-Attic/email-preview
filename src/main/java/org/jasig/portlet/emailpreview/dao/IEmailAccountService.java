@@ -18,6 +18,7 @@
  */
 package org.jasig.portlet.emailpreview.dao;
 
+import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.AccountSummary;
@@ -48,7 +49,7 @@ public interface IEmailAccountService {
      * @throws EmailPreviewException On other errors
      */
     public AccountSummary getAccountSummary(PortletRequest req, int start,
-            int max, boolean refresh) throws EmailPreviewException;
+            int max, boolean refresh, String folder) throws EmailPreviewException;
 
     /**
      * Retrieve an individual message from the mail store.
@@ -80,4 +81,5 @@ public interface IEmailAccountService {
      */
     public boolean setSeenFlag(PortletRequest req, long[] uids, boolean value);
 
+    Folder[] getAllUserInboxFolders(PortletRequest req);
 }

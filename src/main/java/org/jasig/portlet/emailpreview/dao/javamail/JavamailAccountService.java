@@ -26,6 +26,7 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Store;
 import javax.mail.UIDFolder;
 import javax.mail.Flags.Flag;
 import javax.portlet.PortletRequest;
@@ -71,9 +72,9 @@ public final class JavamailAccountService implements IEmailAccountService {
      * Public API
      */
 
-    @Override
+    
     public AccountSummary getAccountSummary(PortletRequest req, int start,
-            int max, boolean refresh) throws EmailPreviewException {
+            int max, boolean refresh, String folder) throws EmailPreviewException {
         
         String username = req.getRemoteUser();
         if (username == null) {
@@ -81,6 +82,7 @@ public final class JavamailAccountService implements IEmailAccountService {
         }
         
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        config.setInboxFolderName(folder);
 
         IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
         if (authService == null) {
@@ -304,5 +306,55 @@ public final class JavamailAccountService implements IEmailAccountService {
         return false;  // We failed if we reached this point
 
     }
+
+    @Override
+    public Folder [] getAllUserInboxFolders(PortletRequest req) {
+
+    	Store store = null;
+
+    	try {
+
+    		MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+
+    		IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+    		if (authService == null) {
+    			String msg = "Unrecognized authentication service:  " + config.getAuthenticationServiceKey();
+    			log.error(msg);
+    			throw new EmailPreviewException(msg);
+    		}
+    		Authenticator auth = authService.getAuthenticator(req, config);
+
+    		Session session = dao.openMailSession(config, auth);
+
+    		// Assertions.
+    		if (session == null) {
+    			String msg = "Argument 'session' cannot be null";
+    			throw new IllegalArgumentException(msg);
+    		}
+
+    		store = session.getStore();
+    		store.connect();
+
+    		if (log.isDebugEnabled()) {
+    			log.debug("Mail store connection established");
+    		}
+
+    		// Retrieve user's inbox folder
+    		Folder [] allUserInboxFolders = store.getDefaultFolder().list("*");
+
+    		return allUserInboxFolders;
+    	} catch ( Exception e ) {
+    		log.error("Can't get all user Inbox folders");
+    		return null;
+    	} finally {
+    		if (store != null) {
+    			try {
+    				store.close();
+    			} catch ( Exception e ) {
+    				log.warn("Can't close correctly javamail store connection");
+    			}   			
+    		}
+    	}
+    }    
 
 }

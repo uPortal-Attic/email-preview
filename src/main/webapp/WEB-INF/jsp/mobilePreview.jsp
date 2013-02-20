@@ -42,6 +42,7 @@
 <portlet:resourceURL id="deleteMessages" var="deleteUrl" />
 <portlet:resourceURL id="toggleSeen" var="toggleSeenUrl" />
 <portlet:resourceURL id="updatePageSize" var="updatePageSizeUrl" />
+<portlet:resourceURL id="inboxFolder" var="inboxFolderUrl" />
 
 <c:if test="${showConfigLink}">
     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
@@ -81,6 +82,13 @@
             </div>
 
             <div class="flc-pager-top">
+	           <div class="styled-select" data-role="fieldcontain">
+	               	<form name="selectForm">
+						<!-- label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label-->
+						<select id="allFolders" name="allFolders">
+						</select>
+					</form>
+				</div>             
                 <ul id="pager-top" class="fl-pager-ui">
                     <li class="flc-pager-previous"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></li>
                     <li>
@@ -170,6 +178,7 @@
         };
 
         var options = {
+        	inboxFolderUrl: "${inboxFolderUrl}",
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
             messagesInfoContainer: "${messagesInfoContainer}",

@@ -150,3 +150,8 @@ margin: 4px 0;
 .email-preview .ui-btn-text{
 text-shadow: none !important;
 }
+.email-preview label{	
+font-weight: bold;
+margin: 10px;
+font-size: 1.2em;
+} 

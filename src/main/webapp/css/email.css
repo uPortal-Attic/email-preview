@@ -114,3 +114,7 @@ font-size: 14px;
 font-weight: bold;
 margin-right: 10px;
 }
+.email-list li label{
+margin-left: 40px;
+font-weight: bold;
+}

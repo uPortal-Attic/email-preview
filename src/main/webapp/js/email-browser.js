@@ -111,22 +111,22 @@ var jasig = jasig || {};
     /**
      * Retrieve batched email from the server
      */
-    var getEmail = function(that, start, size, sortKey, sortDir) {
-        if (that.cache[start] && that.cache[start][size]) {
-            return that.cache[start][size];
-        }
+    var getEmail = function(that, start, size, sortKey, sortDir, folderName) {
+        //if (that.cache[start] && that.cache[start][size]) {
+        //    return that.cache[start][size];
+        //}
 
         $.ajax({
             url: that.options.accountSummaryUrl,
             async: false,
-            data: { pageStart: start, numberOfMessages: size, forceRefresh: clearCache },
+            data: { pageStart: start, numberOfMessages: size, forceRefresh: clearCache, inboxFolder: folderName },
             type: 'POST',
             dataType: "json",
             success: function(data) {
                 if ( data.errorMessage != null ) {
                     showErrorMessage( that, 900, data.errorMessage );
                 }
-                clearCache = "false";
+                clearCache = "true";
                 account = data;
             },
             error: function(request, textStatus, error) {
@@ -148,8 +148,8 @@ var jasig = jasig || {};
     };
 
     var getEmailFunction = function(that) {
-        return function(start, size, sortKey, sortDir) {
-            return getEmail(that, start, size, sortKey, sortDir);
+        return function(start, size, sortKey, sortDir, folderName) {
+            return getEmail(that, start, size, sortKey, sortDir, folderName);
         };
     };
 
@@ -344,7 +344,7 @@ var jasig = jasig || {};
                 },
                 listeners: that.options.listeners
             },
-            dataFunction: getEmailFunction(that),
+            dataFunction: getEmailFunction(that, that.options.folderName),
             dataLengthFunction: function() { return account.accountSummary ? account.accountSummary.totalMessageCount : 0; }
         };
 
@@ -403,6 +403,48 @@ var jasig = jasig || {};
                 $.ajax(ajaxOptions);
             };
 
+            var getFoldersList = function() {
+	        	showLoadingMessage(that);
+	        	var ajaxOptions = {
+	                url: options.inboxFolderUrl,
+	                type: "POST",
+	                data: {} ,
+	                dataType: "json",
+	                success: function(response){  	                	
+		                var select = that.locate("allFolders");	
+		                $("option", select).remove();
+		                if(select.prop) {
+		                	var options = select.prop('options');
+		                }
+		                else {
+		                	 var options = select.attr('options');
+		                }
+		                var selected;
+		                $.each(response, function(index,response) {
+		                	if(index=="selected"){
+		                		selected = response;
+		                	}
+		                	else{
+		                    	options[options.length] = new Option(response,response);
+		                    }
+		                });  
+		                // Sort by name
+		                select.html(select.children("option").sort(function (a, b) {
+		                  return a.text == b.text ? 0 : a.text < b.text ? -1 : 1;
+		                }));
+		                select.val(selected);            
+		                $(".styled-select .ui-btn-text").html(selected);
+		                select.find("option[value='INBOX']").css("color","red").css("font-weight","bold");
+		                select.find("option[value='inbox']").css("color","red").css("font-weight","bold");		                
+		                console.log("list completed");
+	                },
+	                error: function(e){
+	                    alert('Error: ' + e);
+	                }
+	            };
+	    		$.ajax(ajaxOptions);
+	        }; 
+	        
             that.deleteSelectedMessages = function() {
                 if (that.locate('emailRow').find('input:checked').size() === 0) {
                     alert(that.options.jsMessages['noMessagesSelected']);
@@ -441,6 +483,12 @@ var jasig = jasig || {};
             that.locate("nextMsg").click(function(){ displayMessage(that, this); });              
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
+            that.locate("allFolders").ready(function(){ getFoldersList();});
+            that.locate("allFolders").change(
+            	function(){ 
+	            	getEmail(that, 0, that.options.batchSize, undefined, undefined,that.locate("allFolders").val());
+	            	location.reload();
+            	});             
             that.locate("inboxLink").attr("href", account.inboxUrl);
             //Mobile view          
             that.locate("mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
@@ -469,6 +517,7 @@ var jasig = jasig || {};
         messageUrl: null,
         deleteUrl: null,
         toggleSeenUrl: null,
+        inboxFolderUrl: null,
         pageSize: 10,
         batchSize: 20,
         selectors: {
@@ -477,6 +526,8 @@ var jasig = jasig || {};
             returnLink: ".return-link",
             inboxForm: "form[name='inboxForm']",
             messageForm: "form[name='messageForm']",
+            selectForm: "form[name='selectForm']",
+            allFolders: "#allFolders",            
             deleteMessageButton: ".delete-message-button",
             markMessageReadButton: ".mark-read-button",
             markMessageUnreadButton: ".mark-unread-button",

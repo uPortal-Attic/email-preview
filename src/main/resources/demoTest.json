@@ -1,0 +1,2 @@
+[{"from":"paging@testEmail.com","to":"Demo@jasig-test-mail.com","subject":"paging test","body":"There should be two pages","sentDate":1317626598765,"uid":72141278013617,"unread":false,"multipart":false,"deleted":false,"answered":false},
+{"from":"Bob@testEmail.com","to":"Demo@jasig-test-mail.com","subject":"This is a test subject","body":"This is a text body","sentDate":1317626574532,"uid":65213284528077,"unread":false,"multipart":false,"deleted":false,"answered":false}]
