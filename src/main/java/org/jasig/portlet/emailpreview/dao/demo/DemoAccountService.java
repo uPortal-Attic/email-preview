@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
@@ -57,6 +58,7 @@ public final class DemoAccountService implements IEmailAccountService {
     private static final String INBOX_URL = "http://www.jasig.org/";
     private static final int DEFAULT_BATCH_SIZE = 20;
     private static EmailQuota quota = new EmailQuota(10561140,239702);
+    private static final String INBOX_FOLDER = "INBOX";
 
     private String jsonLocation = "/SampleJSON.json";
 
@@ -72,19 +74,25 @@ public final class DemoAccountService implements IEmailAccountService {
     }
 
     public AccountSummary getAccountSummary(PortletRequest req, int start,
-            int max, boolean refresh) {
+            int max, boolean refresh, String folder) {
 
         // Try PortletSession first
         PortletSession session = req.getPortletSession();
         AccountSummary rslt = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
 
-        if (rslt == null) {
-            // First time;  build from scratch...
-            List<EmailMessage> messages = getEmailMessages(req);
-            rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
-                                                messages.size(), start, max, true, quota);
-            req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
-        }
+        //Set the right JSON!
+        if(INBOX_FOLDER.equals(folder)){
+        	setJsonLocation("/SampleJSON.json");
+        }else{
+        	setJsonLocation("/".concat(folder).concat(".json"));
+        }  
+        
+        // First time;  build from scratch...
+        List<EmailMessage> messages = getEmailMessages(req);
+        rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
+                                            messages.size(), start, max, true, quota);
+        req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
+        
 
         return rslt;
 
@@ -96,7 +104,7 @@ public final class DemoAccountService implements IEmailAccountService {
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
         if (summary == null) {
             // Probably shouldn't happen...
-            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false);
+            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false, INBOX_FOLDER);
         }
 
         EmailMessage rslt = null;
@@ -140,7 +148,7 @@ public final class DemoAccountService implements IEmailAccountService {
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
         if (summary == null) {
             // Probably shouldn't happen...
-            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false);
+            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false, INBOX_FOLDER);
         }
         List<EmailMessage> messages = summary.getMessages();
         List<EmailMessage> newList = new ArrayList<EmailMessage>();
@@ -167,7 +175,7 @@ public final class DemoAccountService implements IEmailAccountService {
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
         if (summary == null) {
             // Probably shouldn't happen...
-            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false);
+            summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false, INBOX_FOLDER);
         }
         List<EmailMessage> messages = summary.getMessages();
         List<EmailMessage> newList = new ArrayList<EmailMessage>();
@@ -243,5 +251,8 @@ public final class DemoAccountService implements IEmailAccountService {
 
         return unreadCount;
     }
-
+    
+    public Folder [] getAllUserInboxFolders(PortletRequest req) { 
+     	return null;
+    }
 }

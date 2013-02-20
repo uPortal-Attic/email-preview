@@ -178,6 +178,7 @@
             <preference>
                 <name>inboxName</name>
                 <value>INBOX</value>
+                <read-only>false</read-only>
             </preference>
 
             <!-- 

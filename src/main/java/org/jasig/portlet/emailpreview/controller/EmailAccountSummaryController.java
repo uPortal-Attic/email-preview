@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.portlet.PortletPreferences;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -60,11 +61,14 @@ public class EmailAccountSummaryController {
     public static final String KEY_ERROR = "error";
     public static final String KEY_EMAIL_QUOTA_LIMIT = "emailQuotaLimit";
     public static final String KEY_EMAIL_QUOTA_USAGE = "emailQuotaUsage";
+    public static final String INBOX_NAME_PREFERENCE = "inboxName";
+    public static final String INBOX_NAME_DEFAULT = "INBOX";
+    public static final String INBOX_NAME_UNDEFINED = "undefined";    
 
     @ResourceMapping(value = "accountSummary")
     public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
             @RequestParam("pageStart") int start,
-            @RequestParam("numberOfMessages") int max) throws IOException {
+            @RequestParam("numberOfMessages") int max, @RequestParam(value ="inboxFolder", required = false) String folder) throws IOException {
 
         // Define view and generate model
         Map<String, Object> model = new HashMap<String, Object>();
@@ -81,9 +85,21 @@ public class EmailAccountSummaryController {
                 refresh = true;
                 req.getPortletSession().removeAttribute(FORCE_REFRESH_PARAMETER);
             }
-
+            
+            PortletPreferences prefs = req.getPreferences();
+            
+            if((folder==null)||(folder.equals(INBOX_NAME_UNDEFINED))){
+            	folder= prefs.getValue(EmailAccountSummaryController.INBOX_NAME_PREFERENCE, INBOX_NAME_DEFAULT);
+            }
+             
+            String prefFolder= prefs.getValue(EmailAccountSummaryController.INBOX_NAME_PREFERENCE, INBOX_NAME_DEFAULT);
+            if ((!prefs.isReadOnly(INBOX_NAME_PREFERENCE))&&(!folder.equals(prefFolder))) {
+            	prefs.setValue(INBOX_NAME_PREFERENCE, folder);
+	            prefs.store();
+            }
+            
             // Get current user's account information
-            AccountSummary accountSummary = accountDao.getAccountSummary(req, start, max, refresh);
+            AccountSummary accountSummary = accountDao.getAccountSummary(req, start, max, refresh, folder);
 
             // Check for AuthN failure...
             if (accountSummary.isValid()) {
