@@ -19,8 +19,12 @@
 var jasig = jasig || {};
 
 (function($, fluid) {
+	
+	// Remember these items so we can access the cache quickly & accurately
+	var lastRequestedStart;
+	var lastRequestedSize;
 
-	var displayMessage = function(that, cell) {
+	var displayMessage = function(that, element) {
     
         if (!that.options.allowRenderingEmailContent) {
             return false;
@@ -30,66 +34,63 @@ var jasig = jasig || {};
         showLoadingMessage(that);
 
         // get the message
-        var messageNum = parseInt($(cell).attr("messageNum"));
+        var messageNum = parseInt($(element).attr("messageNum"));
         var message = getMessage(that, messageNum);
-        var previousMsg = messageNum -1;
-        var nextMsg = messageNum +1;            
-
-        // Update the display to reflect the new state of the SEEN flag
-        if (that.options.markMessagesAsRead && $(cell).hasClass("unread")) {
-            // The UI needs to reflect that a previously unread message is now read
-            // $(cell).parent().children().removeClass("unread");
-            var found = false;
-            for (var f in that.cache) {
-                var first = that.cache[f];
-                for (var s in first) {
-                    var second = first[s];
-                    for (var m in second) {
-                        var msg = second[m];
-                        if (msg.messageNumber === messageNum) {
-                            msg.unread = false;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) break;
-                }
-                if (found) break;
-            }
-            that.pager.refreshView();
-            var unreadCount = parseInt(that.locate("unreadMessageCount").html());
-            if (unreadCount && unreadCount > 0) {
-                that.locate("unreadMessageCount").html(unreadCount - 1);
-            }
-        }
 
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
-
         that.container.find(".message-content").html(html);
-        $(".email-message .previous-msg").attr("messageNum", previousMsg);
-        if(messageNum=="1"){
-        	$(".email-message .previous-msg").hide();
-        }else{
-        	$(".email-message .previous-msg").show();
-        }
-        if(messageNum==that.pager.pager.pageSize.model.totalRange){
-        	$(".email-message .next-msg").hide();
-        }else{
-        	$(".email-message .next-msg").show();
-        } 
-        $(".email-message .next-msg").attr("messageNum", nextMsg);          
         that.container.find(".email-message .subject").html(message.subject);
         that.container.find(".email-message .sender").html(message.sender);
         that.container.find(".email-message .sentDate").html(message.sentDateString);
         that.container.find(".email-message .message-uid").val(message.uid);
 
+        // Mark messages read?
         if (that.options.markMessagesAsRead || !message.unread) {
             that.locate("markMessageReadButton").hide();
             that.locate("markMessageUnreadButton").show();
         } else {
             that.locate("markMessageReadButton").show();
             that.locate("markMessageUnreadButton").hide();
+        }
+
+        // Access the messageObject in cache
+        var mostRecentCache = that.cache[lastRequestedStart][lastRequestedSize];
+        var cacheIndex = -1;
+        for (var i in mostRecentCache) {
+        	var msg = mostRecentCache[i];
+        	if (msg.messageNumber === messageNum) {
+        		cacheIndex = parseInt(i);
+        		if (msg.unread && that.options.markMessagesAsRead) {
+        	        // Update the display to reflect the new state of the SEEN flag
+                    msg.unread = false;
+                    var unreadCount = parseInt(that.locate("unreadMessageCount").html());
+                    if (unreadCount && unreadCount > 0) {
+                        that.locate("unreadMessageCount").html(unreadCount - 1);
+                    }                    
+                    that.pager.refreshView();
+        		}
+                break;
+            }
+        }
+        
+        if (cacheIndex != -1) {
+        	// Load the previous link...
+        	if (cacheIndex > 0) {
+        		var previousMsg = mostRecentCache[cacheIndex - 1];
+    	        $(".email-message .previous-msg").attr("messageNum", previousMsg.messageNumber);
+    	        $(".email-message .previous-msg").show();
+        	} else {
+            	$(".email-message .previous-msg").hide();
+        	}
+        	// Load the next link...
+        	if (cacheIndex < mostRecentCache.length - 1) {
+        		var nextMsg = mostRecentCache[cacheIndex + 1];
+    	        $(".email-message .next-msg").attr("messageNum", nextMsg.messageNumber);
+    	        $(".email-message .next-msg").show();
+        	} else {
+            	$(".email-message .next-msg").hide();
+        	}
         }
 
         // show the message display
@@ -133,8 +134,14 @@ var jasig = jasig || {};
         });
 
         var messages = account.accountSummary ? account.accountSummary.messages : [];
+        
+        // Cache the response
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
+        
+    	// Remember start/size for easy cache access
+    	lastRequestedStart = start;
+    	lastRequestedSize = size;
 
         return messages;
     };
