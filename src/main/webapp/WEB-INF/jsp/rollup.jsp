@@ -40,7 +40,7 @@
 <style type="text/css">
     .emailSplash {
         height: 120px;
-        margin: 0 auto;
+        margin: 0 auto auto 20px;
         color: #847d76;
         position: relative;
     }
