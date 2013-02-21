@@ -67,7 +67,7 @@
                 <c:if test="${allowDelete}">             
                 	<li><a data-icon="delete" data-iconpos="top" class="delete-link email-action-link" href="javascript:;"><span><spring:message code="preview.toolbar.deleteSelected"/></span></a></li>
                 </c:if>  
-                <li>
+                <li id="mobileSelect">
 	                <label for="results"><spring:message code="preview.pager.perPage"/></label>
 	                <select id="results" data-mini="true"  class="pager-page-size flc-pager-page-size">
 	                    <option value="5">5</option>

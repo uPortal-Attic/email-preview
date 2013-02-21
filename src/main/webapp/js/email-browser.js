@@ -441,7 +441,8 @@ var jasig = jasig || {};
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("inboxLink").attr("href", account.inboxUrl);
-
+            //Mobile view          
+            that.locate("mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
             that.locate("selectAll").live("click", that.toggleSelectAll);
 
             that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
@@ -493,7 +494,8 @@ var jasig = jasig || {};
             emailQuotaLimit: ".email-quota-limit",
             stats: ".stats",
             previousMsg: ".previous-msg",
-            nextMsg: ".next-msg"
+            nextMsg: ".next-msg",
+            mobileSelect: "#mobileSelect"
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},
