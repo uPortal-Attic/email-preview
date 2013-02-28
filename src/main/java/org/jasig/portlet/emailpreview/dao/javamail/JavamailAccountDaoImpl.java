@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -380,6 +381,21 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             }
         }
         Date sentDate = msg.getSentDate();
+        Address[] allRecipients = msg.getAllRecipients();
+        List <String> allRecipientsList = new ArrayList <String>();
+        String receiver = null;
+        if (allRecipients != null && allRecipients.length != 0) {
+	        for (Address adress : allRecipients){
+	            if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
+	                InternetAddress inet = (InternetAddress) adress;
+	                receiver = inet.toUnicodeString();
+	            } else {
+	            	receiver = adress.toString();
+	            }      	
+	        	allRecipientsList.add(receiver);
+	        }
+        }
+        String allRecipientsString = StringUtils.join(allRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");        
         boolean unread = !msg.isSet(Flag.SEEN);
         boolean answered = msg.isSet(Flag.ANSWERED);
         boolean deleted = msg.isSet(Flag.DELETED);
@@ -400,7 +416,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         }
 
         return new EmailMessage(messageNumber, uid, sender, subject, sentDate,
-                unread, answered, deleted, multipart, contentType, msgContent);
+                unread, answered, deleted, multipart, contentType, msgContent, allRecipientsString);
 
     }
 

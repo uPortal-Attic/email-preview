@@ -47,6 +47,7 @@ public final class EmailMessage {
     private boolean multipart;
     private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
+    private final String allRecipients;
 
 	/*
 	 * Public API.
@@ -58,7 +59,7 @@ public final class EmailMessage {
      */
     public EmailMessage(int messageNumber, Long uid, String sender, String subject, 
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
-                boolean multipart, String contentType, EmailMessageContent content) {
+                boolean multipart, String contentType, EmailMessageContent content, String allRecipients) {
 	    	    
 	    // Instance Members.
         this.messageNumber = messageNumber;
@@ -72,9 +73,16 @@ public final class EmailMessage {
         this.multipart = multipart;
         this.contentType = contentType;  // NB:  may be null
         this.content = content;
+        this.allRecipients = allRecipients;
 	    
 	}
-	
+
+    public EmailMessage(int messageNumber, Long uid, String sender, String subject,
+                        Date sentDate, boolean unread, boolean answered, boolean deleted,
+                        boolean multipart, String contentType, EmailMessageContent content) {
+        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null);
+    }
+
 	public int getMessageNumber() {
         return messageNumber;
     }
@@ -159,4 +167,7 @@ public final class EmailMessage {
         return content;
     }
 
+    public String getAllRecipients() {
+    	return allRecipients;
+    }
 }
