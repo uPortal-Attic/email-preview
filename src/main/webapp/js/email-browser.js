@@ -526,7 +526,6 @@ var jasig = jasig || {};
             returnLink: ".return-link",
             inboxForm: "form[name='inboxForm']",
             messageForm: "form[name='messageForm']",
-            selectForm: "form[name='selectForm']",
             allFolders: "#allFolders",            
             deleteMessageButton: ".delete-message-button",
             markMessageReadButton: ".mark-read-button",
