@@ -82,13 +82,11 @@
             </div>
 
             <div class="flc-pager-top">
-	           <div class="styled-select" data-role="fieldcontain">
-	               	<form name="selectForm">
-						<!-- label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label-->
-						<select id="allFolders" name="allFolders">
-						</select>
-					</form>
-				</div>             
+                <div class="styled-select" data-role="fieldcontain">
+                    <!-- label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label-->
+                    <select id="allFolders" name="allFolders">
+                    </select>
+                </div>             
                 <ul id="pager-top" class="fl-pager-ui">
                     <li class="flc-pager-previous"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></li>
                     <li>
