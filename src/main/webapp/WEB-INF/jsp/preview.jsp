@@ -108,10 +108,8 @@
                             </select></span> <spring:message code="preview.pager.perPage"/>
                         </li>
                         <li>
-			  			    <form name="selectForm" id="selectForm">
-								<label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label>
-								<select id="allFolders" name="allFolders" ><option></option></select>
-							</form>                      
+                            <label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label>
+                            <select id="allFolders" name="allFolders" ><option></option></select>
                         </li>                          
                     </ul>
                 </div>
