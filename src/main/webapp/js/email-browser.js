@@ -126,7 +126,7 @@ var jasig = jasig || {};
                 if ( data.errorMessage != null ) {
                     showErrorMessage( that, 900, data.errorMessage );
                 }
-                clearCache = "true";
+                clearCache = "false";
                 account = data;
             },
             error: function(request, textStatus, error) {
