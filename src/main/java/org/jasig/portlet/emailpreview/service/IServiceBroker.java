@@ -18,10 +18,13 @@
  */
 package org.jasig.portlet.emailpreview.service;
 
+import java.util.Set;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 
 /**
  * Provides access to the various services (Email, AuthN, etc) in the portlet.
@@ -49,4 +52,12 @@ public interface IServiceBroker {
      */
     void saveConfiguration(ActionRequest request, MailStoreConfiguration config);
 
+    /**
+     * Returns the appropriate email account service for this request.
+     * @param request Request
+     * @return Email account service.
+     */
+    IEmailAccountService getEmailAccountService(PortletRequest request);
+
+    Set<String> getSupportedProtocols();
 }

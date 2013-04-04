@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
+import org.apache.http.auth.Credentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
@@ -55,6 +56,14 @@ public interface IAuthenticationService {
      * @return
      */
     Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config);
+
+    /**
+     * Returns a credentials object.  This is for Exchange integration.
+     * @param req
+     * @param config
+     * @return
+     */
+    Credentials getCredentials(PortletRequest req, MailStoreConfiguration config);
     
     String getMailAccountName(PortletRequest request, MailStoreConfiguration config);
 

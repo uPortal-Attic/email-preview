@@ -364,9 +364,9 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         int messageNumber = msg.getMessageNumber();
 
         // Prepare the UID if present
-        Long uid = null;  // default
+        String uid = null;  // default
         if (msg.getFolder() instanceof UIDFolder) {
-            uid = ((UIDFolder) msg.getFolder()).getUID(msg);
+            uid = Long.toString(((UIDFolder) msg.getFolder()).getUID(msg));
         }
 
         Address[] addr = msg.getFrom();

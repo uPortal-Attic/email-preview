@@ -28,9 +28,7 @@ import javax.portlet.ResourceResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.EmailMessage;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,25 +42,22 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
  */
 @Controller
 @RequestMapping("VIEW")
-public class EmailMessageController {
+public class EmailMessageController extends BaseEmailController {
 
     private static final String CONTENT_TYPE_TEXT_PREFIX = "text/plain;";
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    @Autowired(required = true)
-    private IEmailAccountService accountDao;
-
     @ResourceMapping(value = "emailMessage")
     public ModelAndView showMessage(ResourceRequest req, ResourceResponse res,
-            @RequestParam("messageNum") int messageNum){
+            @RequestParam("messageId") String messageId){
 
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
 
             // Get current user's account information
-            EmailMessage message = accountDao.getMessage(req, messageNum);
+            EmailMessage message = getEmailAccountService(req).getMessage(req, messageId);
             
             /*
              * A bit of after-market work on messages in certain circumstances
@@ -87,7 +82,7 @@ public class EmailMessageController {
 
     @ResourceMapping(value = "deleteMessages")
     public ModelAndView deleteMessages(ResourceRequest req, ResourceResponse res,
-                @RequestParam(value="selectMessage", required=false) long[] uids) {
+                @RequestParam(value="selectMessage", required=false) String[] uids) {
 
         Map<String, Object> model = new HashMap<String, Object>();
 
@@ -100,7 +95,7 @@ public class EmailMessageController {
             }
 
             if (uids != null && uids.length != 0) {
-                accountDao.deleteMessages(req, uids);
+                getEmailAccountService(req).deleteMessages(req, uids);
             }
 
             model.put("success", "success");
@@ -115,25 +110,25 @@ public class EmailMessageController {
 
     @ResourceMapping(value = "toggleSeen")
     public ModelAndView toggleSeen(ResourceRequest req, ResourceResponse res,
-                @RequestParam(value="selectMessage", required=false) long[] messages,
+                @RequestParam(value="selectMessage", required=false) String[] messageIds,
                 @RequestParam("seenValue") boolean seenValue) {
 
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
 
-            if (messages != null && messages.length != 0) {
+            if (messageIds != null && messageIds.length != 0) {
 
                 // Opportunity for improvement:  respond to return value 
                 // of 'false' with some user-facing message 
-                accountDao.setSeenFlag(req, messages, seenValue);
+                getEmailAccountService(req).setSeenFlag(req, messageIds, seenValue);
 
             }
 
             model.put("success", "success");
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to update the seen flag for specified messages", e);
+            throw new RuntimeException("Failed to update the seen flag for specified messageIds", e);
         }
 
         return new ModelAndView("json", model);

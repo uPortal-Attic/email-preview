@@ -16,34 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview;
 
-import java.util.Date;
 
-import org.junit.Test;
+package org.jasig.portlet.emailpreview.dao.exchange;
 
-public class EmailMessageTest {
+import javax.portlet.PortletRequest;
 
-    @Test
-    public void testSenderNamePruneEmail() throws Exception {
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 
-        EmailMessage message = new EmailMessage(0, "123",
-                    "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                    false, false, false, null, null);
-
-        assert "Test User".equals(message.getSenderName());
-
-    }
-
-    @Test
-    public void testSenderNameNoEmail() throws Exception {
-
-        EmailMessage message = new EmailMessage(0, "123",
-                "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                false, false, false, null, null);
-
-        assert "Test User".equals(message.getSenderName());
-
-    }
+/**
+ * Obtains the exchange credentials and stores them into accessible location for Exchange communication.
+ *
+ * @author James Wennmacher, jwennmacher@unicon.net
+ */
+public interface IExchangeCredentialsService {
+    void initialize(PortletRequest request, MailStoreConfiguration config, IAuthenticationService authService);
+    String getUsername();
 
 }

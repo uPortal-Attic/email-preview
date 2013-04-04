@@ -42,6 +42,11 @@ public enum MailPreferences {
     ALLOW_RENDERING_EMAIL_CONTENT("allowRenderingEmailContent"),
 
     /*
+     * Settings used by the Exchange DAO
+     */
+    EXCHANGE_USER_DOMAIN("exchangeUserDomain"),
+
+    /*
      * Optional settings used by some auth services 
      */
     

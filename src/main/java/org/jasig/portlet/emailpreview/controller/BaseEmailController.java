@@ -16,34 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview;
+package org.jasig.portlet.emailpreview.controller;
 
-import java.util.Date;
+import javax.portlet.PortletRequest;
 
-import org.junit.Test;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class EmailMessageTest {
+/**
+ * Provides common functionality for controllers
+ *
+ * @author James Wennmacher, jwennmacher@unicon.net
+ */
 
-    @Test
-    public void testSenderNamePruneEmail() throws Exception {
+public class BaseEmailController {
 
-        EmailMessage message = new EmailMessage(0, "123",
-                    "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                    false, false, false, null, null);
+    @Autowired(required = true)
+    protected IServiceBroker serviceBroker;
 
-        assert "Test User".equals(message.getSenderName());
-
+    public IServiceBroker getServiceBroker() {
+        return serviceBroker;
     }
 
-    @Test
-    public void testSenderNameNoEmail() throws Exception {
-
-        EmailMessage message = new EmailMessage(0, "123",
-                "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                false, false, false, null, null);
-
-        assert "Test User".equals(message.getSenderName());
-
+    public IEmailAccountService getEmailAccountService(PortletRequest req) {
+        return serviceBroker.getEmailAccountService(req);
     }
-
 }

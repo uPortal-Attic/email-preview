@@ -56,6 +56,18 @@
                         <tbody>
                             <tr>
                                 <td class="preference-name">
+                                    <form:label path="protocol"><spring:message code="config.preferences.protocol"/></form:label>
+                                </td>
+                                <td class="value"><form:input path="protocol"/></td>
+                            </tr>
+                            <tr>
+                                <td class="preference-name">
+                                    <form:label path="exchangeDomain"><spring:message code="config.preferences.exchange.domain"/></form:label>
+                                </td>
+                                <td class="value"><form:input path="exchangeDomain"/></td>
+                            </tr>
+                            <tr>
+                                <td class="preference-name">
                                     <form:label path="host"><spring:message code="config.preferences.host"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="host"/></td>
@@ -65,12 +77,6 @@
                                     <form:label path="port"><spring:message code="config.preferences.port"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="port"/></td>
-                            </tr>
-                            <tr>
-                                <td class="preference-name">
-                                    <form:label path="protocol"><spring:message code="config.preferences.protocol"/></form:label>
-                                </td>
-                                <td class="value"><form:input path="protocol"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">

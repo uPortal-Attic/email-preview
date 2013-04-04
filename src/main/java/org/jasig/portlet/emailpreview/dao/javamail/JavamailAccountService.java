@@ -22,13 +22,13 @@ import java.io.IOException;
 
 import javax.mail.Authenticator;
 import javax.mail.Flags;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
-import javax.mail.Flags.Flag;
 import javax.portlet.PortletRequest;
 
 import org.apache.commons.logging.Log;
@@ -75,12 +75,16 @@ public final class JavamailAccountService implements IEmailAccountService {
     
     public AccountSummary getAccountSummary(PortletRequest req, int start,
             int max, boolean refresh, String folder) throws EmailPreviewException {
-        
+
         String username = req.getRemoteUser();
         if (username == null) {
             throw new EmailPreviewException("Anonymous access is not supported");
         }
-        
+
+        if (log.isDebugEnabled()) {
+            log.debug("Requesting account summary for user " + username + " folder " + folder + ", start=" + start + " max=" + max);
+        }
+
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
         config.setInboxFolderName(folder);
 
@@ -129,7 +133,7 @@ public final class JavamailAccountService implements IEmailAccountService {
     }
 
     @Override
-    public EmailMessage getMessage(PortletRequest req, int messageNum) {
+    public EmailMessage getMessage(PortletRequest req, String messageId) {
 
         Folder inbox = null;
         try {
@@ -151,7 +155,12 @@ public final class JavamailAccountService implements IEmailAccountService {
             inbox = dao.getUserInbox(session, config.getInboxFolderName());
             inbox.open(mode);
 
-            Message message = inbox.getMessage(messageNum);
+            Message message;
+            if (inbox instanceof UIDFolder) {
+                message = ((UIDFolder)inbox).getMessageByUID(Long.parseLong(messageId));
+            } else {
+                message = inbox.getMessage(Integer.parseInt(messageId));
+            }
             boolean unread = !message.isSet(Flags.Flag.SEEN);
             if (config.getMarkMessagesAsRead()) {
                 message.setFlag(Flag.SEEN, true);
@@ -198,7 +207,7 @@ public final class JavamailAccountService implements IEmailAccountService {
     }
 
     @Override
-    public boolean deleteMessages(PortletRequest req, long[] uids) {
+    public boolean deleteMessages(PortletRequest req, String[] messageIds) {
 
         Folder inbox = null;
         try {
@@ -226,7 +235,7 @@ public final class JavamailAccountService implements IEmailAccountService {
 
             inbox.open(Folder.READ_WRITE);
 
-            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(uids);
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(getMessageUidsAsLong(messageIds));
             inbox.setFlags(msgs, new Flags(Flag.DELETED), true);
 
             return true;  // Indicate success
@@ -252,8 +261,17 @@ public final class JavamailAccountService implements IEmailAccountService {
 
     }
 
+    private long[] getMessageUidsAsLong(String[] messageIds) {
+        long[] ids = new long[messageIds.length];
+        int i = 0;
+        for (String id : messageIds) {
+            ids[i++] = Long.parseLong(id);
+        }
+        return ids;
+    }
+
     @Override
-    public boolean setSeenFlag(PortletRequest req, long[] uids, boolean value) {
+    public boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean read) {
 
         Folder inbox = null;
         try {
@@ -281,8 +299,8 @@ public final class JavamailAccountService implements IEmailAccountService {
 
             inbox.open(Folder.READ_WRITE);
 
-            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(uids);
-            inbox.setFlags(msgs, new Flags(Flag.SEEN), value);
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(getMessageUidsAsLong(messageIds));
+            inbox.setFlags(msgs, new Flags(Flag.SEEN), read);
 
             return true;  // Indicate success
 

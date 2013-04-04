@@ -28,7 +28,6 @@ import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
@@ -86,19 +85,20 @@ public final class DemoAccountService implements IEmailAccountService {
         }else{
         	setJsonLocation("/".concat(folder).concat(".json"));
         }  
-        
-        // First time;  build from scratch...
-        List<EmailMessage> messages = getEmailMessages(req);
-        rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
-                                            messages.size(), start, max, true, quota);
-        req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
-        
+
+        if (rslt == null) {
+            // First time;  build from scratch...
+            List<EmailMessage> messages = getEmailMessages(req);
+            rslt = new AccountSummary(INBOX_URL, messages, getUnreadMessageCount(messages),
+                                                messages.size(), start, max, true, quota);
+            req.getPortletSession().setAttribute(ACCOUNT_SUMMARY_KEY, rslt);
+        }
 
         return rslt;
 
     }
 
-    public EmailMessage getMessage(PortletRequest req, int messageNum) {
+    public EmailMessage getMessage(PortletRequest req, String messageId) {
 
         PortletSession session = req.getPortletSession();
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
@@ -109,16 +109,16 @@ public final class DemoAccountService implements IEmailAccountService {
 
         EmailMessage rslt = null;
 
-        List<EmailMessage> messages = summary.getMessages();
+        List<? extends EmailMessage> messages = summary.getMessages();
         for (EmailMessage m : messages) {
-            if (m.getMessageNumber() == messageNum) {
+            if (m.getMessageId() == messageId) {
                 rslt = m;
                 break;
             }
         }
 
         if (rslt == null) {
-            throw new RuntimeException("No such message:  " + messageNum);
+            throw new RuntimeException("No such message:  " + messageId);
         }
 
         // Set the SEEN flag if configured to do so
@@ -140,9 +140,9 @@ public final class DemoAccountService implements IEmailAccountService {
 
     }
 
-    public boolean deleteMessages(PortletRequest req, long[] uids) {
+    public boolean deleteMessages(PortletRequest req, String[] messageIds) {
 
-        List<Long> excluded = Arrays.asList(ArrayUtils.toObject(uids));
+        List<String> excluded = Arrays.asList(messageIds);
 
         PortletSession session = req.getPortletSession(true);
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
@@ -150,11 +150,11 @@ public final class DemoAccountService implements IEmailAccountService {
             // Probably shouldn't happen...
             summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false, INBOX_FOLDER);
         }
-        List<EmailMessage> messages = summary.getMessages();
+        List<? extends EmailMessage> messages = summary.getMessages();
         List<EmailMessage> newList = new ArrayList<EmailMessage>();
 
         for (EmailMessage m : messages) {
-            if (!excluded.contains(m.getUid())) {
+            if (!excluded.contains(m.getMessageId())) {
                 newList.add(m);
             }
         }
@@ -167,9 +167,9 @@ public final class DemoAccountService implements IEmailAccountService {
 
     }
 
-    public boolean setSeenFlag(PortletRequest req, long[] uids, boolean seenValue) {
+    public boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean seenValue) {
 
-        List<Long> changed = Arrays.asList(ArrayUtils.toObject(uids));
+        List<String> changed = Arrays.asList(messageIds);
 
         PortletSession session = req.getPortletSession(true);
         AccountSummary summary = (AccountSummary) session.getAttribute(ACCOUNT_SUMMARY_KEY);
@@ -177,11 +177,11 @@ public final class DemoAccountService implements IEmailAccountService {
             // Probably shouldn't happen...
             summary = getAccountSummary(req, 0, DEFAULT_BATCH_SIZE, false, INBOX_FOLDER);
         }
-        List<EmailMessage> messages = summary.getMessages();
+        List<? extends EmailMessage> messages = summary.getMessages();
         List<EmailMessage> newList = new ArrayList<EmailMessage>();
 
         for (EmailMessage m : messages) {
-            EmailMessage msg = !changed.contains(m.getUid()) ? m
+            EmailMessage msg = !changed.contains(m.getMessageId()) ? m
                     : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                         m.getSentDate(), !seenValue, m.isAnswered(), m.isDeleted(),
                         m.isMultipart(), m.getContentType(), m.getContent(), m.getAllRecipients());
@@ -212,7 +212,7 @@ public final class DemoAccountService implements IEmailAccountService {
             // Creates a Mime Message because Email Message depends on a "message" variable.
             for (JsonNode msg : json) {
 
-                long uid = msg.path("uid").getLongValue();
+                String uid = msg.path("uid").getValueAsText();
                 String sender = msg.path("from").getTextValue();
                 String subject = msg.path("subject").getTextValue();
                 Date sentDate = new Date(msg.path("sentDate").getLongValue());

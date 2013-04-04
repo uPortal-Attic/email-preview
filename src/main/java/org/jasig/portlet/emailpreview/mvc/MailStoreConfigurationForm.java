@@ -41,7 +41,9 @@ public class MailStoreConfigurationForm implements Serializable {
     private String inboxFolderName;
     private Boolean markMessagesAsRead;
     private Boolean allowRenderingEmailContent = true;
-    
+
+    private String exchangeDomain;
+
     private int timeout;
     private int connectionTimeout;
 
@@ -73,6 +75,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setConnectionTimeout(config.getConnectionTimeout());
         form.setTimeout(config.getTimeout());
         form.setAllowRenderingEmailContent(config.getAllowRenderingEmailContent());
+        form.setExchangeDomain(config.getExchangeDomain());
         
         for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
             form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
@@ -203,4 +206,11 @@ public class MailStoreConfigurationForm implements Serializable {
         return allowRenderingEmailContent;
     }
 
+    public String getExchangeDomain() {
+        return exchangeDomain;
+    }
+
+    public void setExchangeDomain(String exchangeDomain) {
+        this.exchangeDomain = exchangeDomain;
+    }
 }

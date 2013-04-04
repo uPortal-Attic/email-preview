@@ -25,7 +25,7 @@
 
     <!--
      | Please see http://ehcache.sourceforge.net/documentation/configuration.html for
-     | detailed information on how to configurigure caches in this file
+     | detailed information on how to configure caches in this file
      +-->
 
     <defaultCache eternal="false" maxElementsInMemory="100"
@@ -36,5 +36,10 @@
         maxElementsInMemory="250" overflowToDisk="false" diskPersistent="false"
         timeToIdleSeconds="0" timeToLiveSeconds="300"
         memoryStoreEvictionPolicy="LRU" />
+
+    <cache name="exchangeChangeKeyCache" eternal="false"
+           maxElementsInMemory="5000" overflowToDisk="false" diskPersistent="false"
+           timeToIdleSeconds="0" timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LRU" />
 
 </ehcache>

@@ -18,10 +18,10 @@
  */
 package org.jasig.portlet.emailpreview.controller;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.portlet.ActionRequest;
@@ -37,34 +37,31 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 
 @Controller
 @RequestMapping("EDIT")
-public final class EditPreferencesController {
+public final class EditPreferencesController extends BaseEmailController {
     
     private static final String UNCHANGED_PASSWORD = "uNch@ng3d.pswd!";
     private static final String CONFIG_FORM_KEY = "org.jasig.portlet.emailpreview.controller.CONFIG_FORM_KEY";
     private static final String FOCUS_ON_PREVIEW_PREFERENCE = "focusOnPreview";
     private static final String DEFAULT_FOCUS_ON_PREVIEW = "true";
 
-    private IServiceBroker serviceBroker;
-    IEmailAccountService emailAccountDao;
     private IAuthenticationServiceRegistry authServiceRegistry;
-    private List<String> protocols;
     private final Log log = LogFactory.getLog(getClass());
+
+    @Resource (name = "nonUserProtocols")
+    private Set<String> nonUserProtocols;
 
     @RequestMapping
     public ModelAndView getAccountFormView(RenderRequest req) {
@@ -91,7 +88,8 @@ public final class EditPreferencesController {
         model.put("disableInboxName", config.isReadOnly(req, MailPreferences.INBOX_NAME));
 
         // Available protocols
-        model.put("protocols", protocols);
+        model.put("protocols", filterNonUserProtocols(serviceBroker.getSupportedProtocols()));
+        model.put("adminOnlyProtocol", protocolSetToNonUserProtocol(config.getProtocol()));
 
         // AuthN info
         Map<String,IAuthenticationService> authServices = new HashMap<String,IAuthenticationService>();
@@ -123,6 +121,16 @@ public final class EditPreferencesController {
         
         return new ModelAndView("editPreferences", model);
 
+    }
+
+    private Set<String> filterNonUserProtocols(Set<String> protocols) {
+        HashSet filteredSet = new HashSet<String>(protocols);
+        filteredSet.removeAll(nonUserProtocols);
+        return filteredSet;
+    }
+
+    private boolean protocolSetToNonUserProtocol(String protocol) {
+        return nonUserProtocols.contains(protocol);
     }
 
     @RequestMapping(params = "action=updatePreferences")
@@ -179,13 +187,15 @@ public final class EditPreferencesController {
         MailStoreConfigurationForm form = MailStoreConfigurationForm.create(config, req);
         String err = null;  // default
 
+        String protocol = req.getParameter(MailPreferences.PROTOCOL.getKey());
+        protocol = protocol != null ? protocol.trim() : "";
+        boolean hostConfigRequired = hostConfigRequired(protocol);
+
         if (!config.isReadOnly(req, MailPreferences.PROTOCOL)) {
-            String protocol = req.getParameter(MailPreferences.PROTOCOL.getKey());
-            protocol = protocol != null ? protocol.trim() : "";
             if (log.isDebugEnabled()) {
                 log.debug("Receieved the following user input for Protocol:  '" + protocol + "'");
             }
-            if (!protocols.contains(protocol)) {
+            if (!serviceBroker.getSupportedProtocols().contains(protocol)) {
                 // User must have hacked a HttpRequest
                 throw new RuntimeException("Unsupported protocol:  " + protocol);
             }
@@ -202,7 +212,7 @@ public final class EditPreferencesController {
                 log.debug("Receieved the following user input for Host:  '" + host + "'");
             }
             form.setHost(host);
-            if (host.length() == 0 && err == null) {
+            if (hostConfigRequired && host.length() == 0 && err == null) {
                 err = "Server Name is required";
             }
         }
@@ -218,7 +228,7 @@ public final class EditPreferencesController {
             } catch (NumberFormatException nfe) {
                 log.debug("The specified value is not a number:  " + port, nfe);
             }
-            if (port.length() == 0 && err == null) {
+            if (hostConfigRequired && port.length() == 0 && err == null) {
                 err = "Server Port is required";
             }
         }
@@ -327,25 +337,14 @@ public final class EditPreferencesController {
         
     }
 
+    // Exchange Web Services does not need host configuration
+    private boolean hostConfigRequired(String protocol) {
+        return !"ExchangeWebServices".equals(protocol);
+    }
+
     @Autowired(required = true)
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
     }
     
-    @Autowired(required = true)
-    public void setEmailAccountDao(IEmailAccountService emailAccountDao) {
-        this.emailAccountDao = emailAccountDao;
-    }
-
-    @Autowired(required = true)
-    public void setServiceBroker(IServiceBroker serviceBroker) {
-        this.serviceBroker = serviceBroker;
-    }
-
-    @Resource(name="protocols")
-    @Required
-    public void setProtocols(List<String> protocols) {
-        this.protocols = Collections.unmodifiableList(protocols);
-    }
-
 }

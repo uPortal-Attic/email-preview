@@ -20,6 +20,7 @@ package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 
 /**
@@ -31,13 +32,13 @@ import org.apache.commons.lang.time.FastDateFormat;
  * @author Drew Wills, drew@unicon.net
  * @version $Revision$
  */
-public final class EmailMessage {
+public class EmailMessage {
 
     private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("h:mm a MMM d, yyyy");
     
     // Instance Members
     private final int messageNumber;
-    private final Long uid;
+    private final String uid;
     private final String sender;
     private final String subject;  // Passed in separately AntiSamy treatment 
     private final Date sentDate;
@@ -57,7 +58,7 @@ public final class EmailMessage {
      * Creates a new {@link EmailMessage} based on the specified 
      * <code>Message</code> and {@link EmailMessageContent}.
      */
-    public EmailMessage(int messageNumber, Long uid, String sender, String subject, 
+    public EmailMessage(int messageNumber, String uid, String sender, String subject,
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
                 boolean multipart, String contentType, EmailMessageContent content, String allRecipients) {
 	    	    
@@ -77,7 +78,7 @@ public final class EmailMessage {
 	    
 	}
 
-    public EmailMessage(int messageNumber, Long uid, String sender, String subject,
+    public EmailMessage(int messageNumber, String uid, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
                         boolean multipart, String contentType, EmailMessageContent content) {
         this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null);
@@ -93,9 +94,18 @@ public final class EmailMessage {
 	 * 
 	 * @return The UID provided by the Folder for this message or null
 	 */
-	public Long getUid() {
+	public String getUid() {
 	    return uid;
 	}
+
+    /**
+     * Returns the UID of the message if it is present, else the message number.
+     *
+     * @return UID if present else message number
+     */
+    public String getMessageId() {
+        return StringUtils.isNotBlank(uid) ? uid : new Integer(messageNumber).toString();
+    }
 	
     /**
 	 * Returns the date the email message was sent or <code>null</code> if the 

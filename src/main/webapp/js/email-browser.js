@@ -34,8 +34,8 @@ var jasig = jasig || {};
         showLoadingMessage(that);
 
         // get the message
-        var messageNum = parseInt($(element).attr("messageNum"));
-        var message = getMessage(that, messageNum);
+        var messageId = $(element).attr("messageId");
+        var message = getMessage(that, messageId);
 
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
@@ -44,7 +44,7 @@ var jasig = jasig || {};
 		that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
         that.container.find(".email-message .sentDate").html(message.sentDateString);
 		that.container.find(".email-message .allRecipients").html(message.allRecipients);
-        that.container.find(".email-message .message-uid").val(message.uid);
+        that.container.find(".email-message .message-uid").val(message.messageId);
 
         // Mark messages read?
         if (that.options.markMessagesAsRead || !message.unread) {
@@ -60,7 +60,7 @@ var jasig = jasig || {};
         var cacheIndex = -1;
         for (var i in mostRecentCache) {
         	var msg = mostRecentCache[i];
-        	if (msg.messageNumber === messageNum) {
+        	if (msg.messageId === messageId) {
         		cacheIndex = parseInt(i);
         		if (msg.unread && that.options.markMessagesAsRead) {
         	        // Update the display to reflect the new state of the SEEN flag
@@ -79,7 +79,7 @@ var jasig = jasig || {};
         	// Load the previous link...
         	if (cacheIndex > 0) {
         		var previousMsg = mostRecentCache[cacheIndex - 1];
-    	        $(".email-message .previous-msg").attr("messageNum", previousMsg.messageNumber);
+    	        $(".email-message .previous-msg").attr("messageId", previousMsg.messageId);
     	        $(".email-message .previous-msg").show();
         	} else {
             	$(".email-message .previous-msg").hide();
@@ -87,7 +87,7 @@ var jasig = jasig || {};
         	// Load the next link...
         	if (cacheIndex < mostRecentCache.length - 1) {
         		var nextMsg = mostRecentCache[cacheIndex + 1];
-    	        $(".email-message .next-msg").attr("messageNum", nextMsg.messageNumber);
+    	        $(".email-message .next-msg").attr("messageId", nextMsg.messageId);
     	        $(".email-message .next-msg").show();
         	} else {
             	$(".email-message .next-msg").hide();
@@ -126,7 +126,7 @@ var jasig = jasig || {};
                 if ( data.errorMessage != null ) {
                     showErrorMessage( that, 900, data.errorMessage );
                 }
-                clearCache = "true";
+                clearCache = "false";
                 account = data;
             },
             error: function(request, textStatus, error) {
@@ -153,12 +153,12 @@ var jasig = jasig || {};
         };
     };
 
-    var getMessage = function(that, messageNum) {
+    var getMessage = function(that, messageId) {
         var message;
         $.ajax({
             url: that.options.messageUrl,
             async: false,
-            data: { messageNum: messageNum },
+            data: { messageId: messageId },
             type: 'POST',
             dataType: "json",
             success: function(data) {
@@ -248,9 +248,9 @@ var jasig = jasig || {};
                     { key: "select", valuebinding: "*.select",
                         components: function(row, index) {
                             return {
-                                markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.uid}"/>',
+                                markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.messageId}"/>',
                                 decorators: [
-                                    { attrs: { messageNum: '\${*.messageNumber}' } },
+                                    { attrs: { messageId: '\${*.messageId}' } },
                                     { type: "addClass", classes: getClasses(index, row) }
                                 ]
                             }
@@ -281,7 +281,7 @@ var jasig = jasig || {};
                               return {
                                   markup: "<a href=\"javascript:;\">\${*.subject}</a>",
                                   decorators: [
-                                      { attrs: { messageNum: '\${*.messageNumber}' } },
+                                      { attrs: { messageId: '\${*.messageId}' } },
                                       { type: "jQuery", func: "click",
                                           args: function(){ displayMessage(that, this); }
                                       },
@@ -292,7 +292,7 @@ var jasig = jasig || {};
                             return {
                                   markup: "<span>\${*.subject}</span>",
                                   decorators: [
-                                      { attrs: { messageNum: '\${*.messageNumber}' } },
+                                      { attrs: { messageId: '\${*.messageId}' } },
                                       { type: "addClass", classes: getClasses(index, row) }
                                   ]
                             }
@@ -485,7 +485,8 @@ var jasig = jasig || {};
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("allFolders").ready(function(){ getFoldersList();});
             that.locate("allFolders").change(
-            	function(){ 
+            	function(){
+                    clearCache = "true";
 	            	getEmail(that, 0, that.options.batchSize, undefined, undefined,that.locate("allFolders").val());
 	            	location.reload();
             	});             

@@ -27,6 +27,9 @@ import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.NTCredentials;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
@@ -68,6 +71,17 @@ public class CachedPasswordAuthenticationService implements IAuthenticationServi
 
     public Authenticator getAuthenticator(PortletRequest req, MailStoreConfiguration config) {
         return new SimplePasswordAuthenticator(getMailAccountName(req, config), getPassword(req));
+    }
+
+    public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
+        String ntlmDomain = config.getExchangeDomain();
+        if (StringUtils.isBlank(ntlmDomain)) {
+            throw new EmailPreviewException("NT domain must be specified for Exchange integration");
+        }
+
+        // construct a credentials object from the username and password
+        Credentials credentials = new NTCredentials(getMailAccountName(req, config), getPassword(req), "paramDoesNotSeemToMatter", ntlmDomain);
+        return credentials;
     }
 
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {

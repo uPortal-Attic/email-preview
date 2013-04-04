@@ -51,10 +51,12 @@ public final class MailStoreConfiguration {
     private String authenticationServiceKey;
     private List<String> allowableAuthenticationServiceKeys;
     private String usernameSuffix;
-    
+
+    private String exchangeDomain;
+
     private Map<String, String> additionalProperties = new HashMap<String, String>();
     private Map<String, String> javaMailProperties = new HashMap<String, String>();
-    
+
     // Preferences
     private boolean markMessagesAsRead;
     private boolean allowRenderingEmailContent = true;
@@ -127,6 +129,14 @@ public final class MailStoreConfiguration {
         return javaMailProperties;
     }
 
+    public String getExchangeDomain() {
+        return exchangeDomain;
+    }
+
+    public void setExchangeDomain(String exchangeDomain) {
+        this.exchangeDomain = exchangeDomain;
+    }
+
     public void setJavaMailProperties(Map<String, String> properties) {
         this.javaMailProperties = properties;
     }
@@ -181,7 +191,7 @@ public final class MailStoreConfiguration {
         // To the best of my understanding, the IMAP protocol supports 
         // the SEEN flag and POP3 just doesn't  
         String protocol = this.getProtocol().toLowerCase(); 
-        return protocol.startsWith("imap");
+        return protocol.startsWith("imap") || protocol.equals("exchangewebservices");
         // NB:  We probably *should* also be checking whether the javax.mail.Folder 
         // object implements UIDFolder, but that's not easy with the present set of 
         // class interactions.  Something to work in on refactoring.
@@ -212,6 +222,7 @@ public final class MailStoreConfiguration {
             .append(this.authenticationServiceKey, owner.getAuthenticationServiceKey())
             .append(this.allowableAuthenticationServiceKeys, owner.getAllowableAuthenticationServiceKeys())
             .append(this.usernameSuffix, owner.getUsernameSuffix())
+            .append(this.exchangeDomain, owner.getExchangeDomain())
             .append(this.additionalProperties, owner.getAdditionalProperties())
             .append(this.javaMailProperties, owner.getJavaMailProperties())
             .isEquals();
@@ -233,6 +244,7 @@ public final class MailStoreConfiguration {
             .append(this.authenticationServiceKey)
             .append(this.allowableAuthenticationServiceKeys)
             .append(this.usernameSuffix)
+            .append(this.exchangeDomain)
             .append(this.additionalProperties)
             .append(this.javaMailProperties)
             .append(this.markMessagesAsRead)
@@ -255,6 +267,7 @@ public final class MailStoreConfiguration {
             .append("usernameSuffix", this.usernameSuffix)
             .append("markMessagesAsRead", this.markMessagesAsRead)
             .append("allowRenderingEmailContent", this.allowRenderingEmailContent)
+            .append("exchangeDomain", this.exchangeDomain)
             .append("Additional properties", this.additionalProperties)
             .append("Java Mail properties", this.javaMailProperties)
             .toString();

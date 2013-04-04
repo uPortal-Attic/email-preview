@@ -30,10 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountSummary;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,12 +45,9 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
  */
 @Controller
 @RequestMapping("VIEW")
-public class EmailAccountSummaryController {
+public class EmailAccountSummaryController extends BaseEmailController {
 
     protected final Log log = LogFactory.getLog(getClass());
-
-    @Autowired(required = true)
-    private IEmailAccountService accountDao;
 
     public static final String FORCE_REFRESH_PARAMETER = "forceRefresh";
 
@@ -81,7 +76,7 @@ public class EmailAccountSummaryController {
 
             // Or because of a change in settings.
             if (req.getPortletSession().getAttribute(FORCE_REFRESH_PARAMETER) != null) {
-                // Doesn't matter what the value is;  this calles for a refresh...
+                // Doesn't matter what the value is;  this calls for a refresh...
                 refresh = true;
                 req.getPortletSession().removeAttribute(FORCE_REFRESH_PARAMETER);
             }
@@ -99,7 +94,7 @@ public class EmailAccountSummaryController {
             }
             
             // Get current user's account information
-            AccountSummary accountSummary = accountDao.getAccountSummary(req, start, max, refresh, folder);
+            AccountSummary accountSummary = getEmailAccountService(req).getAccountSummary(req, start, max, refresh, folder);
 
             // Check for AuthN failure...
             if (accountSummary.isValid()) {

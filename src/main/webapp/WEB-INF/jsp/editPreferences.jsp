@@ -22,10 +22,10 @@
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${includeJQuery}">
-    <script src="<rs:resourceURL value="/rs/jquery/1.8.3/jquery-1.8.3.min.js"/>" type="text/javascript"></script>
-    <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value='/rs/jquery/1.8.3/jquery-1.8.3.min.js'/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value='/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js'/>" type="text/javascript"></script>
 </c:if>
-<script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
+<script src="<rs:resourceURL value='/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js'/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
@@ -40,26 +40,39 @@
     </c:if>
 
     <div class="fieldset plt-email-fieldset-settings">
-        <div class="plt-email-row">
-            <label><spring:message code="editPreferences.emailSettings.serverProtocol"/></label>
-            <select name="protocol" id="plt-email-input-protocol" title="<spring:message code="editPreferences.emailSettings.serverProtocol.tooltip"/>">
-                <c:forEach items="${protocols}" var="protocol">
-                    <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
-                </c:forEach>
-            </select>
-        </div>
-        <div class="plt-email-row">
-            <label><spring:message code="editPreferences.emailSettings.serverName"/></label>
-            <input type="text" name="host" id="plt-email-input-server" title="<spring:message code="editPreferences.emailSettings.serverName.tooltip"/>" value="<c:out value="${form.host}"/>"/>
-        </div>
-        <div class="plt-email-row">
-            <label><spring:message code="editPreferences.emailSettings.serverPort"/></label>
-            <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
-        </div>
-        <div class="plt-email-row">
-            <label><spring:message code="editPreferences.emailSettings.inboxFolderName"/></label>
-            <input type="text" name="inboxName" id="plt-email-input-inbox-folder-name" title="<spring:message code="editPreferences.emailSettings.inboxFolderName.tooltip"/>" value="<c:out value="${form.inboxFolderName}"/>"/>
-        </div>
+
+        <!-- Don't show server configuration if the protocol is set to an admin-only protocol like Exchange Web Services -->
+        <c:choose>
+            <c:when test="${adminOnlyProtocol}">
+                <div class="hidden">
+                    <input type="text" name="protocol" value="${form.protocol}"/>
+            </c:when>
+            <c:otherwise>
+                <div class="plt-email-row">
+                    <label><spring:message code="editPreferences.emailSettings.serverProtocol"/></label>
+                    <select name="protocol" id="plt-email-input-protocol" title="<spring:message code="editPreferences.emailSettings.serverProtocol.tooltip"/>">
+                    <c:forEach items="${protocols}" var="protocol">
+                        <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
+                    </c:forEach>
+                    </select>
+                </div>
+            </c:otherwise>
+        </c:choose>
+            <div class="plt-email-row">
+                <label><spring:message code="editPreferences.emailSettings.serverName"/></label>
+                <input type="text" name="host" id="plt-email-input-server" title="<spring:message code="editPreferences.emailSettings.serverName.tooltip"/>" value="<c:out value="${form.host}"/>"/>
+            </div>
+            <div class="plt-email-row">
+                <label><spring:message code="editPreferences.emailSettings.serverPort"/></label>
+                <input type="text" name="port" id="plt-email-input-port" title="<spring:message code="editPreferences.emailSettings.serverPort.toolTip"/>" value="<c:out value="${form.port}"/>"/>
+            </div>
+            <div class="plt-email-row">
+                <label><spring:message code="editPreferences.emailSettings.inboxFolderName"/></label>
+                <input type="text" name="inboxName" id="plt-email-input-inbox-folder-name" title="<spring:message code="editPreferences.emailSettings.inboxFolderName.tooltip"/>" value="<c:out value="${form.inboxFolderName}"/>"/>
+            </div>
+        <c:if test="${adminOnlyProtocol}">
+            </div>
+        </c:if>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
             <input type="checkbox" name="markMessagesAsRead" id="plt-email-input-markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
