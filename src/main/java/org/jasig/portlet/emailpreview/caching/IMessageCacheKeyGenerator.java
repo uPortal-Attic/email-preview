@@ -29,9 +29,9 @@ public interface IMessageCacheKeyGenerator {
 	 * Returns a cache key for the user message
 	 * 
 	 * @param username username
-     * @param messageId messageId (note may not be globally unique to user with POP3 or IMAP protocols)
-	 * @return
+	 * @param messageId messageId (note may not be globally unique to user with POP3 or IMAP protocols)
+	 * @return cache key for the user message
 	 */
-	public String getKey(String username, String messageId);
+	String getKey(String username, String messageId);
 
 }

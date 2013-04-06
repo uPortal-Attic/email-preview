@@ -32,11 +32,11 @@ import javax.mail.MessagingException;
 
 public class ExchangeFolderDto extends Folder {
 
-    final String id;
-    int unreadMessageCount;
-    String foldername;
-    int messageCount;
-    int childFolderCount;
+    private final String id;
+    private int unreadMessageCount;
+    private String foldername;
+    private int messageCount;
+    private int childFolderCount;
 
     public ExchangeFolderDto(String id, String foldername, int messageCount, int unreadMessageCount) {
         super(null);

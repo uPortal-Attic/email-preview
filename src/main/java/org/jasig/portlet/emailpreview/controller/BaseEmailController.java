@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 
-public class BaseEmailController {
+public abstract class BaseEmailController {
 
     @Autowired(required = true)
     protected IServiceBroker serviceBroker;

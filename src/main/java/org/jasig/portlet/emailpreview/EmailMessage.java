@@ -30,7 +30,6 @@ import org.apache.commons.lang.time.FastDateFormat;
  * @author Andreas Christoforides
  * @author Jen Bourey, jbourey@unicon.net
  * @author Drew Wills, drew@unicon.net
- * @version $Revision$
  */
 public class EmailMessage {
 
