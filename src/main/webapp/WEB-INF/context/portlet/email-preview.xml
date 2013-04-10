@@ -32,11 +32,19 @@
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.exchange"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
     <ehcache:annotation-driven />
     <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
-    
+
+    <bean id="exchangeChangeKeyCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+          p:cacheManager-ref="cacheManager" p:cacheName="exchangeChangeKeyCache"/>
+
+    <bean id="exchangeFolderCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+          p:cacheManager-ref="cacheManager" p:cacheName="inboxCache"/>
+
     <!-- Ref to the mbean server -->
     <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
         <property name="locateExistingServerIfPossible" value="true" />
@@ -58,11 +66,66 @@
         </property>
     </bean>
 
-    <util:list id="protocols">
-        <value>imap</value>
-        <value>imaps</value>
-        <value>pop3</value>
-        <value>pop3s</value>
-    </util:list>
+    <bean class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
+        <property name="services">
+            <util:map>
+                <entry key="pop3" value-ref="javamailAccountService"/>
+                <entry key="pop3s" value-ref="javamailAccountService"/>
+                <entry key="imap" value-ref="javamailAccountService"/>
+                <entry key="imaps" value-ref="javamailAccountService"/>
+                <entry key="ExchangeWebServices" value-ref="exchangeAccountService"/>
+            </util:map>
+        </property>
+    </bean>
+
+    <!-- List of the protocols that we do not display to users in the Edit Preferences page -->
+    <util:set id="nonUserProtocols">
+        <value>ExchangeWebServices</value>
+    </util:set>
+
+    <!--
+     | EXCHANGE INTEGRATION SUPPORT
+     |
+     | Uncomment the following section to enable Exchange integration.  You will
+     | also need to modify the Exchange server URL in
+     | src/main/resources/com/microsoft/exchange/Service.wsdl and uncomment the
+     | reference to the ExchangeInitializationService bean in calendar.xml.
+     +-->
+    <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="contextPaths">
+            <list>
+                <value>com.microsoft.exchange.messages</value>
+                <value>com.microsoft.exchange.types</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="destinationProvider" class="org.springframework.ws.client.support.destination.Wsdl11DestinationProvider"
+        p:wsdl="classpath:/com/microsoft/exchange/Services.wsdl"/>
+    <bean id="credentialsProvider" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeWsCredentialsProvider"/>
+    <bean id="httpClient" class="org.jasig.portlet.emailpreview.dao.exchange.NtlmAuthHttpClient"
+        p:credentialsProvider-ref="credentialsProvider">
+        <constructor-arg>
+            <bean class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
+        </constructor-arg>
+    </bean>
+    <!-- For TESTING only.  Do NOT use in production.  -->
+    <!--<bean id="httpClient" class="org.jasig.portlet.emailpreview.dao.exchange.TestingDontUseTrustEveryoneNtlmAuthHttpClient"-->
+          <!--p:credentialsProvider-ref="credentialsProvider">-->
+    <!--</bean>-->
+    <bean id="webServiceMessageSender" class="org.springframework.ws.transport.http.HttpComponentsMessageSender"
+        p:httpClient-ref="httpClient" p:connectionTimeout="60000" p:readTimeout="60000"
+        p:maxTotalConnections="200">
+    </bean>
+    <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate"
+        p:destinationProvider-ref="destinationProvider" p:messageSender-ref="webServiceMessageSender"
+        p:marshaller-ref="marshaller" p:unmarshaller-ref="marshaller">
+        <qualifier value="exchange" />
+    </bean>
+    <bean id="exchangeAccountService"
+        class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountService">
+    </bean>
+    <bean id="exchangeAccountDao" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountDaoImpl"
+          p:webServiceOperations-ref="webServiceTemplate" p:idCache-ref="exchangeChangeKeyCache"
+            p:folderCache-ref="exchangeFolderCache"/>
 
 </beans>

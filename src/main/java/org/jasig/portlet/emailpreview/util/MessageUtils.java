@@ -19,17 +19,30 @@
 
 package org.jasig.portlet.emailpreview.util;
 
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
+import org.owasp.validator.html.AntiSamy;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.PolicyException;
+import org.owasp.validator.html.ScanException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 /**
 *
 * @author Drew Wills, drew@unicon.net
 */
-public final class MessageUtils {
+@Component
+public final class MessageUtils implements InitializingBean, ApplicationContextAware {
     
     private static final String CLICKABLE_URLS_REGEX =
         "\\b((?:(?:https?|ftp|file)://|www\\.|ftp\\.)" +
@@ -41,7 +54,44 @@ public final class MessageUtils {
     private static final String CLICKABLE_URLS_PART3 = "</a>";
     private static final Log LOG = LogFactory.getLog(MessageUtils.class);
 
-    
+    private String filePath = "classpath:antisamy.xml";  // default
+    private ApplicationContext ctx;
+    private Policy policy;
+
+    /**
+     * Set the file path to the Anti-samy policy file to be used for cleaning
+     * strings.
+     *
+     * @param path
+     */
+    public void setSecurityFile(String path) {
+        this.filePath = path;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        this.ctx = ctx;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        InputStream stream = ctx.getResource(filePath).getInputStream();
+        policy = Policy.getInstance(stream);
+    }
+
+
+    public String cleanHTML(String message) {
+        try {
+            AntiSamy as = new AntiSamy();
+            CleanResults cr = as.scan(message, policy);
+            return cr.getCleanHTML();
+        } catch (ScanException e) {
+            throw new EmailPreviewException("Error cleansing email message", e);
+        } catch (PolicyException e) {
+            throw new EmailPreviewException("Error with AntiSamy policy exception", e);
+        }
+    }
+
     public static String addClickableUrlsToMessageBody(String msgBody) {
         
         // Assertions.

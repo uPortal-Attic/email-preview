@@ -28,6 +28,9 @@ import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.NTCredentials;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
@@ -90,6 +93,24 @@ public class PortletPreferencesCredentialsAuthenticationService implements IAuth
     public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
         return new SimplePasswordAuthenticator(getMailAccountName(request, config), password);
+    }
+
+    public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
+        String ntlmDomain = config.getExchangeDomain();
+        String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
+        if (StringUtils.isBlank(ntlmDomain)) {
+            throw new EmailPreviewException("NT domain must be specified for Exchange integration");
+        }
+
+        // For Exchange integration, only the username is applicable, not the email address.  This handles the case
+        // of the user specifying an email address and a password in the user config UI.
+        String username = getMailAccountName(req, config);
+        int index = username.indexOf("@");
+        username = index > 0 ? username.substring(0, index) : username;
+
+        // construct a credentials object from the username and password
+        Credentials credentials = new NTCredentials(username, password, "paramDoesNotSeemToMatter", ntlmDomain);
+        return credentials;
     }
 
     public String getMailAccountName(PortletRequest req, MailStoreConfiguration config) {

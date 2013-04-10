@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
@@ -32,13 +33,13 @@ import javax.portlet.PortletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -46,11 +47,12 @@ import org.springframework.stereotype.Component;
  * @author Drew Wills, drew@unicon.net
  * @version $Revision: 24053 $
  */
-@Component
 public class SimpleServiceBroker implements IServiceBroker {
     
     private IAuthenticationServiceRegistry authServiceRegistry;
     private IStringEncryptionService stringEncryptionService;
+    private Map<String,IEmailAccountService> services;
+    private Set<String> protocols;
     private final Log log = LogFactory.getLog(this.getClass());
 
     protected static final List<String> RESERVED_PROPERTIES = Arrays.asList(
@@ -60,6 +62,7 @@ public class SimpleServiceBroker implements IServiceBroker {
                     MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
                     MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
                     MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey(),
+                    MailPreferences.EXCHANGE_USER_DOMAIN.getKey(),
                     MailPreferences.MARK_MESSAGES_AS_READ.getKey()
                 });    
     
@@ -79,6 +82,8 @@ public class SimpleServiceBroker implements IServiceBroker {
         
         String allowContent = prefs.getValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), "true");
         config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));
+
+        config.setExchangeDomain(prefs.getValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), null));
         
         // set the port number
         try {
@@ -215,7 +220,10 @@ public class SimpleServiceBroker implements IServiceBroker {
                 prefs.setValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), 
                                 String.valueOf(config.getAllowRenderingEmailContent()));
             }
-            
+            if (!prefs.isReadOnly(MailPreferences.EXCHANGE_USER_DOMAIN.getKey())) {
+                prefs.setValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), String.valueOf(config.getExchangeDomain()));
+            }
+
 
             // JavaMail properties
             for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
@@ -258,6 +266,13 @@ public class SimpleServiceBroker implements IServiceBroker {
         
     }
 
+    @Override
+    public IEmailAccountService getEmailAccountService(PortletRequest request) {
+        PortletPreferences prefs = request.getPreferences();
+        String protocol = prefs.getValue(MailPreferences.PROTOCOL.getKey(), null);
+        return services.get(protocol);
+    }
+
     @Autowired
     public void setAuthenticationServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
@@ -266,6 +281,19 @@ public class SimpleServiceBroker implements IServiceBroker {
     @Autowired(required = false)
     public void setStringEncryptionService(IStringEncryptionService stringEncryptionService) {
         this.stringEncryptionService = stringEncryptionService;
+    }
+
+    public Map<String, IEmailAccountService> getServices() {
+        return services;
+    }
+
+    public void setServices(Map<String, IEmailAccountService> services) {
+        this.services = services;
+        this.protocols = Collections.unmodifiableSortedSet(new TreeSet<String>(services.keySet()));
+    }
+
+    public Set<String> getSupportedProtocols() {
+        return protocols;
     }
 
 }

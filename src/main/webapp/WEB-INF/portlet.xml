@@ -309,7 +309,7 @@
             </preference>
             <preference>
                 <name>protocol</name>
-                <value>imap</value><!-- This is a fib, but it's necessary to convince the controllers we support toggleSeen -->
+                <value>imap</value><!-- This is a fib, but it's necessary to convince the controllers the demo supports toggleSeen -->
             </preference>
             <preference>
                 <name>inboxUrl</name>

@@ -32,10 +32,20 @@
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
-    <util:list id="protocols">
-        <value>JSON</value>
-    </util:list>
+    <bean class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
+        <property name="services">
+            <util:map>
+                <entry key="IMAPS" value-ref="demoAccountService"/>
+            </util:map>
+        </property>
+    </bean>
+
+    <!-- List of the protocols that we do not display to users in the Edit Preferences page -->
+    <util:set id="nonUserProtocols">
+        <value>ExchangeWebServices</value>
+    </util:set>
 
 </beans>

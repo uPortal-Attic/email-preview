@@ -27,6 +27,7 @@ import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.auth.Credentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
@@ -59,6 +60,10 @@ public class DemoAuthenticationService implements IAuthenticationService {
     }
 
     public Authenticator getAuthenticator(PortletRequest req, MailStoreConfiguration config) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
         throw new UnsupportedOperationException();
     }
 
