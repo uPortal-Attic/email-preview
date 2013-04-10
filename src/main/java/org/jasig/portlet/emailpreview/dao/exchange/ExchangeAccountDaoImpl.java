@@ -163,6 +163,11 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     public void setCredentialsService(IExchangeCredentialsService credentialsService) {
         this.credentialsService = credentialsService;
     }
+
+    // ----------------------------------------------------------
+    // getEmailSummaries
+    // ----------------------------------------------------------
+
     @TriggersRemove(cacheName="inboxCache",
             keyGenerator = @KeyGenerator(
                     name="StringCacheKeyGenerator",
@@ -232,6 +237,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         }
     }
 
+    // ----------------------------------------------------------
+    // getFolder
+    // ----------------------------------------------------------
+
     private GetFolder createGetFolderSoapMessage(String folderName) {
         // GetFolder: see http://msdn.microsoft.com/en-us/library/aa580274%28v=exchg.80%29.aspx
         // Construct the SOAP request object to use
@@ -275,6 +284,8 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         FolderType folder = (FolderType) folders.get(0);
         return folder;
     }
+
+    // -------------------------- findItems ---------------------------
 
     private FindItem createFindItemsSoapMessage(FolderType folder, int start, int fetchSize) {
         // Construct the SOAP request object to use
@@ -352,6 +363,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         }
         return messages;
     }
+
+    // ----------------------------------------------------------
+    // get Email message
+    // ----------------------------------------------------------
 
     @Override
     public EmailMessage getMessage(String uuid, MailStoreConfiguration storeConfig) {
@@ -440,6 +455,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         return msg;
     }
 
+    // ----------------------------------------------------------
+    // delete messages
+    // ----------------------------------------------------------
+
     @Override
     public void deleteMessages(String[] uuids) {
         sendMessageAndExtractSingleResponse(createDeleteItemsSoapMessage(uuids), DELETE_ITEM_SOAP_ACTION);
@@ -459,6 +478,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
 
         return msg;
     }
+
+    // ----------------------------------------------------------
+    // set message read status
+    // ----------------------------------------------------------
 
     @Override
     public void setMessageReadStatus(String[] uuids, boolean read) {
@@ -500,6 +523,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         soapMessage.setConflictResolution(ConflictResolutionType.ALWAYS_OVERWRITE);
         return soapMessage;
     }
+
+    // ----------------------------------------------------------
+    // get inbox folders
+    // ----------------------------------------------------------
 
     @Override
     public List<ExchangeFolderDto> getAllUserInboxFolders() {
@@ -586,6 +613,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
 
         return msg;
     }
+
+    // ----------------------------------------------------------
+    // common send message and parse response
+    // ----------------------------------------------------------
 
     private BaseResponseMessageType sendSoapRequest (BaseRequestType soapRequest, String soapAction) {
 

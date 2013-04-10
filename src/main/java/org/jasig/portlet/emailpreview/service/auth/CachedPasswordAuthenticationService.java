@@ -79,8 +79,14 @@ public class CachedPasswordAuthenticationService implements IAuthenticationServi
             throw new EmailPreviewException("NT domain must be specified for Exchange integration");
         }
 
+        // For Exchange integration, only the username is applicable, not the email address.  This handles the case
+        // of the user specifying an email address and a password in the user config UI.
+        String username = getMailAccountName(req, config);
+        int index = username.indexOf("@");
+        username = index > 0 ? username.substring(0, index) : username;
+
         // construct a credentials object from the username and password
-        Credentials credentials = new NTCredentials(getMailAccountName(req, config), getPassword(req), "paramDoesNotSeemToMatter", ntlmDomain);
+        Credentials credentials = new NTCredentials(username, getPassword(req), "paramDoesNotSeemToMatter", ntlmDomain);
         return credentials;
     }
 
