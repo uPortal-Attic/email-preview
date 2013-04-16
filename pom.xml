@@ -497,10 +497,12 @@
                     <configuration>
                         <aggregate>true</aggregate>
                         <excludes>
+                            <exclude>.gitignore</exclude>
                             <exclude>LICENSE</exclude>
                             <exclude>NOTICE</exclude>
                             <exclude>docs/**</exclude>
                             <exclude>src/main/resources/**/*.json</exclude>
+                            <exclude>src/main/resources/com/microsoft/exchange/Services.wsdl</exclude>
                             <exclude>src/main/webapp/css/jquery.mobile.structure-1.1.1.min.css</exclude>
                         </excludes>
                         <mapping>
