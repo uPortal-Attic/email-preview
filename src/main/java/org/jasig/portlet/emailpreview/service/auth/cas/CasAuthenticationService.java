@@ -26,6 +26,7 @@ import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
+import org.apache.http.auth.Credentials;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
@@ -83,7 +84,11 @@ public class CasAuthenticationService implements IAuthenticationService {
     	String proxyTicket = casTicketService.getCasServiceToken(casAssertion, serviceUrl);    
         return new SimplePasswordAuthenticator(proxyPrincipalname, proxyTicket);
     }
-    
+
+    public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
+        throw new UnsupportedOperationException("CAS ticket doesn't make sense with Exchange integration");
+    }
+
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
     	String proxyPrincipalname = getProxyPrincipalname(request);
         return proxyPrincipalname;

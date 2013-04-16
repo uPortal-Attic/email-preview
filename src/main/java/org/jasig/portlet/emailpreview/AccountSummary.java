@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Encapsulates basic information about the email INBOX.  Typicaly sent to the
+ * Encapsulates basic information about the email INBOX.  Typically sent to the
  * browser via AJAX.
  *
  * @author Andreas Christoforides
@@ -33,7 +33,7 @@ import java.util.List;
 public final class AccountSummary {
 
     private final String inboxUrl;
-    private final List<EmailMessage> messages;
+    private final List<? extends EmailMessage> messages;
     private final int numUnreadMessages;
     private final int numTotalMessages;
     private final int messagesStart;
@@ -42,7 +42,7 @@ public final class AccountSummary {
     private final Throwable errorCause;
     private final EmailQuota quota;
 
-    public AccountSummary(String inboxUrl, List<EmailMessage> messages,
+    public AccountSummary(String inboxUrl, List<? extends EmailMessage> messages,
             int numUnreadMessages, int numTotalMessages, int messagesStart,
             int messagesMax, boolean deleteSupported, EmailQuota quota) {
 
@@ -144,7 +144,7 @@ public final class AccountSummary {
      * @return A <code>List<EmailMessage></code> containing information about
      * emails in the user's inbox
      */
-    public List<EmailMessage> getMessages() {
+    public List<? extends EmailMessage> getMessages() {
 
         return this.messages;
     }

@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletMode;
@@ -44,13 +44,11 @@ import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
 import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,25 +62,10 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("CONFIG")
-public class MailStoreConfigurationController {
+public class MailStoreConfigurationController extends BaseEmailController {
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    private IServiceBroker serviceBroker;
-    
-    @Autowired(required = true)
-    public void setServiceBroker(IServiceBroker serviceBroker) {
-        this.serviceBroker = serviceBroker;
-    }
-    
-    private List<String> protocols;
-    
-    @Resource(name="protocols")
-    @Required
-    public void setProtocols(List<String> protocols) {
-        this.protocols = protocols;
-    }
-    
     private ILinkServiceRegistry linkServiceRegistry;
     
     @Autowired(required = true)
@@ -129,6 +112,7 @@ public class MailStoreConfigurationController {
             config.setLinkServiceKey(form.getLinkServiceKey());
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());
+            config.setExchangeDomain(form.getExchangeDomain());
             
             String allowContent = request.getParameter(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey());
             if (StringUtils.isNotEmpty(allowContent)) {
@@ -180,8 +164,8 @@ public class MailStoreConfigurationController {
     }
     
     @ModelAttribute("protocols")
-    public List<String> getProtocols() {
-        return this.protocols;
+    public Set<String> getProtocols() {
+        return serviceBroker.getSupportedProtocols();
     }
     
     @ModelAttribute("linkServices")

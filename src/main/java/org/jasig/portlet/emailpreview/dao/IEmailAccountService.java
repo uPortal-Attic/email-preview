@@ -54,32 +54,36 @@ public interface IEmailAccountService {
     /**
      * Retrieve an individual message from the mail store.
      *
-     * @param req The current {@link PortletRequest}
-     * @param messageNum Index of the selected message
+     *
+     * @param req The current {@link javax.portlet.PortletRequest}
+     * @param messageId messageId
      * @return
      */
-    public EmailMessage getMessage(PortletRequest req, int messageNum);
+    public EmailMessage getMessage(PortletRequest req, String messageId);
 
     /**
      * Delete and expunge the specified massages from the store.  Supported for
      * implementations that provide UIDs (e.g. UIDFolder) only.
      *
-     * @param req The current {@link PortletRequest}
-     * @param uids Array of message UIDs to delete
+     *
+     * @param req The current {@link javax.portlet.PortletRequest}
+     * @param messageIds List of messageIds to delete
      * @return Success or failure
      */
-    boolean deleteMessages(PortletRequest req, long[] uids);
+    boolean deleteMessages(PortletRequest req, String[] messageIds);
 
     /**
      * Switch the value of the SEEN flag for the specified messages.  Supported 
      * for implementations that provide UIDs (e.g. UIDFolder) only.
      *
-     * @param req The current {@link PortletRequest}
-     * @param uids
-     * @param value The new value of the seen flag 
+     *
+     *
+     * @param req The current {@link javax.portlet.PortletRequest}
+     * @param messageIds
+     * @param read The new value of the seen flag
      * @return Success or failure
      */
-    public boolean setSeenFlag(PortletRequest req, long[] uids, boolean value);
+    public boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean read);
 
     Folder[] getAllUserInboxFolders(PortletRequest req);
 }

@@ -16,34 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview;
+package org.jasig.portlet.emailpreview.caching;
 
-import java.util.Date;
+/**
+ * Generates cache keys for user email message Ids
+ *
+ * @author James Wennmacher, jwennmacher@unicon.net
+ */
 
-import org.junit.Test;
+public class UsernameCacheKeyGeneratorImpl implements IUsernameCacheKeyGenerator {
 
-public class EmailMessageTest {
-
-    @Test
-    public void testSenderNamePruneEmail() throws Exception {
-
-        EmailMessage message = new EmailMessage(0, "123",
-                    "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                    false, false, false, null, null);
-
-        assert "Test User".equals(message.getSenderName());
-
+    @Override
+    public String getKey(String username, String prefix) {
+        final StringBuilder key = new StringBuilder();
+        key.append(prefix).append(".").append(username).toString();
+        return key.toString();
     }
-
-    @Test
-    public void testSenderNameNoEmail() throws Exception {
-
-        EmailMessage message = new EmailMessage(0, "123",
-                "Test User <testuser@nowhere.net>", null, new Date(), false, 
-                false, false, false, null, null);
-
-        assert "Test User".equals(message.getSenderName());
-
-    }
-
 }

@@ -29,7 +29,6 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
@@ -42,13 +41,9 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
  */
 @Controller
 @RequestMapping("VIEW")
-public class AjaxUpdateInboxFolderController {
-	
-	@Autowired(required = true)
-    private IEmailAccountService accountDao;
-	
-	
-    public static final String SELECTED_OPTION = "selected"; 
+public class AjaxUpdateInboxFolderController extends BaseEmailController {
+
+    public static final String SELECTED_OPTION = "selected";
     public static final String INBOX_DEFAULT_VALUE_PREF = "INBOX"; 
     public static final String AUTH_SERVICE_PREFERENCE = "authenticationServiceKey";
     public static final String AUTH_SERVICE_DEFAULT_VALUE_PREFERENCE = "dummy";
@@ -56,6 +51,7 @@ public class AjaxUpdateInboxFolderController {
     
 	@ResourceMapping("inboxFolder")
     public  ModelAndView  inboxFolder(ResourceRequest req, ResourceResponse res) throws MessagingException {
+        IEmailAccountService accountDao = serviceBroker.getEmailAccountService(req);
 		 
      PortletPreferences prefs = req.getPreferences();
      String selectedFolder= prefs.getValue(EmailAccountSummaryController.INBOX_NAME_PREFERENCE, INBOX_DEFAULT_VALUE_PREF);
@@ -63,7 +59,7 @@ public class AjaxUpdateInboxFolderController {
      
      Map<String, String> jsonData = new Hashtable<String, String>() ;
      
-     if(AUTH_SERVICE_TEST_PREFERENCE.equals(authenticationServiceKey)){    	
+     if(AUTH_SERVICE_TEST_PREFERENCE.equals(authenticationServiceKey)){
     	 jsonData.put("INBOX", "INBOX");
     	 //For demo : must have the same name that the json files in src/main/resources
     	 jsonData.put("demoTest", "demoTest");
@@ -72,19 +68,19 @@ public class AjaxUpdateInboxFolderController {
 			if(entry.getValue().equals(selectedFolder)){
 				jsonData.put(SELECTED_OPTION, entry.getValue());
 				break;
-			}    	     	 
+			}
     	 }
      }else{
             for (Folder folderName : accountDao.getAllUserInboxFolders(req)){
             	if ((folderName.getType() & javax.mail.Folder.HOLDS_MESSAGES) != 0) {
             		jsonData.put(folderName.toString(), folderName.toString());
- 
+
                 	if(selectedFolder.equals(folderName.toString())){
                 		jsonData.put(SELECTED_OPTION,folderName.toString());
                 	}
-                }         	
-    		}      	 
-     }   
+                }
+    		}
+     }
       	return new ModelAndView("json", jsonData);           
     }
 }

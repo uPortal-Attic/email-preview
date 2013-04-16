@@ -35,7 +35,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
-import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -55,7 +54,7 @@ import org.springframework.web.portlet.ModelAndView;
  */
 @Controller
 @RequestMapping("VIEW")
-public class EmailSummaryController {
+public class EmailSummaryController extends BaseEmailController {
 
     public final static String WELCOME_TITLE_PREFERENCE = "welcomeTitle";
     public final static String WELCOME_INSTRUCTIONS_PREFERENCE = "welcomeInstructions";
@@ -72,9 +71,6 @@ public class EmailSummaryController {
 
     private final Log log = LogFactory.getLog(this.getClass());
     private String adminRoleName = "admin";
-
-    @Autowired(required = true)
-    private IServiceBroker serviceBroker;
 
     @Autowired(required = true)
     private IAuthenticationServiceRegistry authServiceRegistry;
