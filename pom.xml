@@ -29,6 +29,7 @@
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
         <cas.version>3.2.1</cas.version>
+        <slf4j.version>1.7.5</slf4j.version>
     </properties>
 
     <licenses>
@@ -184,6 +185,12 @@
                 <groupId>org.jasig.resourceserver</groupId>
                 <artifactId>resource-server-utils</artifactId>
                 <version>${resource-server.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 	        <dependency> 
 	            <groupId>org.jasypt</groupId> 
@@ -194,6 +201,16 @@
                 <groupId>org.jvnet.jaxb2_commons</groupId>
                 <artifactId>jaxb2-basics-runtime</artifactId>
                 <version>${jaxb2basicsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
@@ -362,7 +379,15 @@
         <dependency> 
             <groupId>org.jasypt</groupId> 
             <artifactId>jasypt</artifactId>  
-        </dependency> 
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>antisamy</artifactId>
