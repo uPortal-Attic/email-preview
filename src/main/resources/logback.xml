@@ -90,9 +90,9 @@
   <!-- 
    | Turn up logging for portlet specific package
    +-->
-  <logger name="org.jasig.portlet.emailpreview" additivity="false" level="DEBUG">
+  <!--logger name="org.jasig.portlet.emailpreview" additivity="false" level="DEBUG">
     <appender-ref ref="LOG" />
-  </logger>
+  </logger-->
 
     <!--logger name="org.jasig.portlet.emailpreview.dao.exchange.TestingDontUseTrustEveryoneNtlmAuthHttpClient" additivity="false" level="DEBUG">
         <appender-ref ref="LOG" />
