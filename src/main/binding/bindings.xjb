@@ -48,4 +48,10 @@
         </jaxb:schemaBindings>
     </jaxb:bindings>
 
+    <jaxb:bindings schemaLocation="../xsd/autodiscover-messages.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="com.microsoft.exchange.autodiscover" />
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+
 </jaxb:bindings>

@@ -64,25 +64,25 @@ interface IExchangeAccountDao {
      * @param storeConfig mail configuration
      * @return message
      */
-    EmailMessage getMessage(String uuid, MailStoreConfiguration storeConfig);
+    EmailMessage getMessage(MailStoreConfiguration storeConfig, String uuid);
 
     /**
      * Delete the list of messages from Exchange.
      * @param uuids uuids if the messages to delete
      */
-    void deleteMessages(String[] uuids);
+    void deleteMessages(MailStoreConfiguration storeConfig, String[] uuids);
 
     /**
      * Sets the isRead status of the indicated messages to the indicated value.
      * @param uuids uuids of the messages to change the read status of
      * @param read true to indicate message has been read
      */
-    void setMessageReadStatus(String[] uuids, boolean read);
+    void setMessageReadStatus(MailStoreConfiguration storeConfig, String[] uuids, boolean read);
 
     /**
      * Gets all the user's inbox folders.
      * @return List of user's folders.
      */
-    List<ExchangeFolderDto> getAllUserInboxFolders();
+    List<ExchangeFolderDto> getAllUserInboxFolders(MailStoreConfiguration storeConfig);
 
 }

@@ -1,3 +1,4 @@
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%--
 
     Licensed to Jasig under one or more contributor license
@@ -65,6 +66,12 @@
                                     <form:label path="exchangeDomain"><spring:message code="config.preferences.exchange.domain"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="exchangeDomain"/></td>
+                            </tr>
+                            <tr>
+                                <td class="preference-name">
+                                    <form:label path="exchangeAutodiscover"><spring:message code="config.preferences.exchange.autodiscover"/></form:label>
+                                </td>
+                                <td class="value"><form:checkbox path="exchangeAutodiscover"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">

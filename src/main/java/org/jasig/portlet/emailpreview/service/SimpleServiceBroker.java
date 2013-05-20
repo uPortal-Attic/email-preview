@@ -62,7 +62,7 @@ public class SimpleServiceBroker implements IServiceBroker {
                     MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
                     MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
                     MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey(),
-                    MailPreferences.EXCHANGE_USER_DOMAIN.getKey(),
+                    MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), MailPreferences.EXCHANGE_AUTODISCOVER.getKey(),
                     MailPreferences.MARK_MESSAGES_AS_READ.getKey()
                 });    
     
@@ -84,6 +84,7 @@ public class SimpleServiceBroker implements IServiceBroker {
         config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));
 
         config.setExchangeDomain(prefs.getValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), null));
+        config.setExchangeAutodiscover(Boolean.valueOf(prefs.getValue(MailPreferences.EXCHANGE_AUTODISCOVER.getKey(), "false")));
         
         // set the port number
         try {
@@ -210,7 +211,8 @@ public class SimpleServiceBroker implements IServiceBroker {
                 prefs.setValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), String.valueOf(config.getMarkMessagesAsRead()));
             }
             if (!prefs.isReadOnly(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey())) {
-                prefs.setValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), config.getAllowableAuthenticationServiceKeys().toArray(new String[0]));
+                prefs.setValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(),
+                        config.getAllowableAuthenticationServiceKeys().toArray(new String[0]));
             }
             if (!prefs.isReadOnly(MailPreferences.USERNAME_SUFFIX.getKey())) {
                 prefs.setValue(MailPreferences.USERNAME_SUFFIX.getKey(), config.getUsernameSuffix());
@@ -221,7 +223,10 @@ public class SimpleServiceBroker implements IServiceBroker {
                                 String.valueOf(config.getAllowRenderingEmailContent()));
             }
             if (!prefs.isReadOnly(MailPreferences.EXCHANGE_USER_DOMAIN.getKey())) {
-                prefs.setValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), String.valueOf(config.getExchangeDomain()));
+                prefs.setValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), config.getExchangeDomain());
+            }
+            if (!prefs.isReadOnly(MailPreferences.EXCHANGE_AUTODISCOVER.getKey())) {
+                prefs.setValue(MailPreferences.EXCHANGE_AUTODISCOVER.getKey(), String.valueOf(config.isExchangeAutodiscover()));
             }
 
 

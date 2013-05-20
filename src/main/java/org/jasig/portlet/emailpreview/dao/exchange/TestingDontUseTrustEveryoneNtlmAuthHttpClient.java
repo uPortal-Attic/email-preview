@@ -26,6 +26,8 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 /**
@@ -34,7 +36,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 
-public class TestingDontUseTrustEveryoneNtlmAuthHttpClient extends NtlmAuthHttpClient {
+public class TestingDontUseTrustEveryoneNtlmAuthHttpClient extends DefaultHttpClient {
     static SchemeRegistry registry;
     static {
         try {
@@ -55,6 +57,6 @@ public class TestingDontUseTrustEveryoneNtlmAuthHttpClient extends NtlmAuthHttpC
         }
     }
     TestingDontUseTrustEveryoneNtlmAuthHttpClient() {
-        super(new ThreadSafeClientConnManager(registry));
+        super(new PoolingClientConnectionManager(registry));
     }
 }

@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 
 /**
@@ -53,6 +54,8 @@ public final class MailStoreConfiguration {
     private String usernameSuffix;
 
     private String exchangeDomain;
+    private boolean exchangeAutodiscover;
+    private String mailAccount;
 
     private Map<String, String> additionalProperties = new HashMap<String, String>();
     private Map<String, String> javaMailProperties = new HashMap<String, String>();
@@ -137,6 +140,22 @@ public final class MailStoreConfiguration {
         this.exchangeDomain = exchangeDomain;
     }
 
+    public boolean isExchangeAutodiscover() {
+        return exchangeAutodiscover;
+    }
+
+    public void setExchangeAutodiscover(boolean exchangeAutodiscover) {
+        this.exchangeAutodiscover = exchangeAutodiscover;
+    }
+
+    public String getMailAccount() {
+        return mailAccount;
+    }
+
+    public void setMailAccount(String mailAccount) {
+        this.mailAccount = mailAccount;
+    }
+
     public void setJavaMailProperties(Map<String, String> properties) {
         this.javaMailProperties = properties;
     }
@@ -190,8 +209,9 @@ public final class MailStoreConfiguration {
     public boolean supportsToggleSeen() {
         // To the best of my understanding, the IMAP protocol supports 
         // the SEEN flag and POP3 just doesn't  
-        String protocol = this.getProtocol().toLowerCase(); 
-        return protocol.startsWith("imap") || protocol.equals("exchangewebservices");
+        String protocol = this.getProtocol().toLowerCase(); // Left toLowerCase in case existing installations have case wrong
+        return protocol.startsWith(IEmailAccountService.IMAP.toLowerCase())
+                || protocol.equalsIgnoreCase(IEmailAccountService.EXCHANGE_WEB_SERVICES);
         // NB:  We probably *should* also be checking whether the javax.mail.Folder 
         // object implements UIDFolder, but that's not easy with the present set of 
         // class interactions.  Something to work in on refactoring.
@@ -223,6 +243,7 @@ public final class MailStoreConfiguration {
             .append(this.allowableAuthenticationServiceKeys, owner.getAllowableAuthenticationServiceKeys())
             .append(this.usernameSuffix, owner.getUsernameSuffix())
             .append(this.exchangeDomain, owner.getExchangeDomain())
+            .append(this.exchangeAutodiscover, owner.isExchangeAutodiscover())
             .append(this.additionalProperties, owner.getAdditionalProperties())
             .append(this.javaMailProperties, owner.getJavaMailProperties())
             .isEquals();
@@ -245,6 +266,7 @@ public final class MailStoreConfiguration {
             .append(this.allowableAuthenticationServiceKeys)
             .append(this.usernameSuffix)
             .append(this.exchangeDomain)
+            .append(this.exchangeAutodiscover)
             .append(this.additionalProperties)
             .append(this.javaMailProperties)
             .append(this.markMessagesAsRead)
@@ -268,6 +290,7 @@ public final class MailStoreConfiguration {
             .append("markMessagesAsRead", this.markMessagesAsRead)
             .append("allowRenderingEmailContent", this.allowRenderingEmailContent)
             .append("exchangeDomain", this.exchangeDomain)
+            .append("exchangeAutodiscover", this.exchangeAutodiscover)
             .append("Additional properties", this.additionalProperties)
             .append("Java Mail properties", this.javaMailProperties)
             .toString();

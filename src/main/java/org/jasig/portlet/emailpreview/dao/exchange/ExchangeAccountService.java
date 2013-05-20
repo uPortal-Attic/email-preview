@@ -32,6 +32,8 @@ import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,6 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 public class ExchangeAccountService implements IEmailAccountService {
+
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired(required = true)
     private IAuthenticationServiceRegistry authServiceRegistry;
@@ -57,8 +61,6 @@ public class ExchangeAccountService implements IEmailAccountService {
         this.exchangeCredentialsService = exchangeCredentialsService;
     }
 
-    protected final Log log = LogFactory.getLog(getClass());
-
     @Override
     public AccountSummary getAccountSummary(PortletRequest req, int start, int max, boolean refresh,
                                             String folder) throws EmailPreviewException {
@@ -68,11 +70,9 @@ public class ExchangeAccountService implements IEmailAccountService {
             throw new EmailPreviewException("Anonymous access is not supported");
         }
 
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
+        MailStoreConfiguration config = setupMailStoreConfig(req);
         config.setInboxFolderName(folder);
-        IAuthenticationService authService = populateCredentials(req, config);
-
-        String mailAccount = authService.getMailAccountName(req, config);
+        String mailAccount = config.getMailAccount();
 
         if (log.isDebugEnabled()) {
             log.debug("Account summary requested for " + username + ", folder=" + folder + ", start=" + start
@@ -124,40 +124,43 @@ public class ExchangeAccountService implements IEmailAccountService {
         return authService;
     }
 
-    @Override
-    public EmailMessage getMessage(PortletRequest req, String messageId) {
+    private MailStoreConfiguration setupMailStoreConfig(PortletRequest req) {
         MailStoreConfiguration config = serviceBroker.getConfiguration(req);
         IAuthenticationService authService = populateCredentials(req, config);
+        String mailAccount = authService.getMailAccountName(req, config);
+        config.setMailAccount(mailAccount);
+        return config;
+    }
 
+    @Override
+    public EmailMessage getMessage(PortletRequest req, String messageId) {
+        MailStoreConfiguration config = setupMailStoreConfig(req);
         if (config.getMarkMessagesAsRead()) {
             setSeenFlag(req, new String[] {messageId}, true);
-            dao.clearAccountSummaryCache(req.getRemoteUser(), authService.getMailAccountName(req, config));
+            dao.clearAccountSummaryCache(req.getRemoteUser(), config.getMailAccount());
         }
 
-        return dao.getMessage(messageId, config);
+        return dao.getMessage(config, messageId);
     }
 
     @Override
     public boolean deleteMessages(PortletRequest req, String[] messageIds) {
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-        IAuthenticationService authService = populateCredentials(req, config);
-        dao.deleteMessages(messageIds);
+        MailStoreConfiguration config = setupMailStoreConfig(req);
+        dao.deleteMessages(config, messageIds);
         return true;
     }
 
     @Override
     public boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean read) {
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-        IAuthenticationService authService = populateCredentials(req, config);
-        dao.setMessageReadStatus(messageIds, read);
+        MailStoreConfiguration config = setupMailStoreConfig(req);
+        dao.setMessageReadStatus(config, messageIds, read);
         return true;
     }
 
     @Override
     public Folder[] getAllUserInboxFolders(PortletRequest req) {
-        MailStoreConfiguration config = serviceBroker.getConfiguration(req);
-        IAuthenticationService authService = populateCredentials(req, config);
-        return dao.getAllUserInboxFolders().toArray(new Folder[0]);
+        MailStoreConfiguration config = setupMailStoreConfig(req);
+        return dao.getAllUserInboxFolders(config).toArray(new Folder[0]);
     }
 
 }

@@ -18,33 +18,28 @@
  */
 package org.jasig.portlet.emailpreview.service.auth;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.jasig.portlet.emailpreview.EmailPreviewException;
-import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
  * @author Jen Bourey, jbourey@unicon.net
  * @version $Revision$
  */
-public class CachedPasswordAuthenticationService implements IAuthenticationService {
+public class CachedPasswordAuthenticationService extends BaseCredentialsAuthenticationService {
     
     private static final String KEY = "cachedPassword";
     public static final String USERNAME_ATTRIBUTE = "user.login.id";
     public static final String PASSWORD_ATTRIBUTE = "password";
-    
-    private Map<String,ConfigurationParameter> configParams;
     
     public CachedPasswordAuthenticationService() {
         Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
@@ -54,12 +49,7 @@ public class CachedPasswordAuthenticationService implements IAuthenticationServi
         for (ConfigurationParameter param : getUserConfigurationParameters()) {
             m.put(param.getKey(), param);
         }
-        this.configParams = Collections.unmodifiableMap(m);
-    }
-
-    @Override
-    public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
-        return configParams;
+        setConfigParams(Collections.unmodifiableMap(m));
     }
 
     @Override
@@ -75,34 +65,21 @@ public class CachedPasswordAuthenticationService implements IAuthenticationServi
 
     public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
         String ntlmDomain = config.getExchangeDomain();
-        if (StringUtils.isBlank(ntlmDomain)) {
-            throw new EmailPreviewException("NT domain must be specified for Exchange integration");
+
+        // If the domain is specified, we are authenticating to a domain so we need to return NT credentials
+        if (StringUtils.isNotBlank(ntlmDomain)) {
+            String username = getMailAccountName(req, config);
+            return createNTCredentials(ntlmDomain, username, getPassword(req));
         }
-
-        // For Exchange integration, only the username is applicable, not the email address.  This handles the case
-        // of the user specifying an email address and a password in the user config UI.
-        String username = getMailAccountName(req, config);
-        int index = username.indexOf("@");
-        username = index > 0 ? username.substring(0, index) : username;
-
-        // construct a credentials object from the username and password
-        Credentials credentials = new NTCredentials(username, getPassword(req), "paramDoesNotSeemToMatter", ntlmDomain);
-        return credentials;
+        return new UsernamePasswordCredentials(getMailAccountName(req, config), getPassword(req));
     }
 
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {
 
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
-        String rslt = userInfo.get(USERNAME_ATTRIBUTE);
-        
-        String usernameSuffix = config.getUsernameSuffix();
-        if (rslt != null && !StringUtils.isBlank(usernameSuffix)) {
-            rslt = rslt.concat(usernameSuffix);
-        }
-        
-        return rslt;
-
+        String accountName = userInfo.get(USERNAME_ATTRIBUTE);
+        return createMailAccountName(accountName, config);
     }
 
     /*
@@ -113,22 +90,6 @@ public class CachedPasswordAuthenticationService implements IAuthenticationServi
         return KEY;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jasig.portlet.emailpreview.service.auth.IAuthenticationService#getAdminConfigurationParameters()
-     */
-    public List<ConfigurationParameter> getAdminConfigurationParameters() {
-        return Collections.<ConfigurationParameter>emptyList();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.jasig.portlet.emailpreview.service.auth.IAuthenticationService#getUserConfigurationParameters()
-     */
-    public List<ConfigurationParameter> getUserConfigurationParameters() {
-        return Collections.<ConfigurationParameter>emptyList();
-    }
-    
     private String getPassword(PortletRequest req) {
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);

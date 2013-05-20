@@ -45,6 +45,7 @@ public enum MailPreferences {
      * Settings used by the Exchange DAO
      */
     EXCHANGE_USER_DOMAIN("exchangeUserDomain"),
+    EXCHANGE_AUTODISCOVER("exchangeAutodiscover"),
 
     /*
      * Optional settings used by some auth services 

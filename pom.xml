@@ -24,6 +24,8 @@
    
     <properties>
         <jaxb2basicsVersion>0.6.0</jaxb2basicsVersion>
+        <logbackVersion>1.0.12</logbackVersion>
+        <sl4jVersion>1.7.5</sl4jVersion>
         <spring.version>3.1.2.RELEASE</spring.version>
         <resource-server.version>1.0.28</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
@@ -49,6 +51,47 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- For sl4j/logback logging, see https://wiki.jasig.org/display/PLT/Logging+Best+Practices -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${sl4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${sl4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${sl4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${sl4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logbackVersion}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <!-- End of logging section -->
+
             <dependency>
                 <groupId>com.googlecode.ehcache-spring-annotations</groupId>
                 <artifactId>ehcache-spring-annotations</artifactId>
@@ -65,11 +108,6 @@
                 <version>3.2</version>
             </dependency>
             <dependency>
-                <groupId>commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>3.1</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>1.4</version>
@@ -78,29 +116,6 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>1.1</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>logkit</groupId>
-                        <artifactId>logkit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>avalon-framework</groupId>
-                        <artifactId>avalon-framework</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
@@ -137,18 +152,12 @@
                 <artifactId>junit</artifactId>
                 <version>4.10</version>
             </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-            </dependency>
             <!-- Used w/ Exchange Web Services -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.1.1</version>
-            </dependency>
-            <dependency>
+                <version>4.2.5</version>
+            </dependency>            <dependency>
                 <groupId>org.apache.pluto</groupId>
                 <artifactId>pluto-taglib</artifactId>
                 <version>1.1.5</version>
@@ -310,6 +319,30 @@
 
     <dependencies>
 
+        <!-- Logging section -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- End of logging section -->
+
         <!-- ===== Compile Time Dependencies ============================== -->
         <dependency>
             <groupId>com.googlecode.ehcache-spring-annotations</groupId>
@@ -350,8 +383,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
+        </dependency>        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
         </dependency>
@@ -411,11 +443,6 @@
 
 
         <!-- ===== Runtime Dependencies ================================== -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -479,14 +506,14 @@
         <resource>
             <directory>src/main/resources</directory>
             <excludes>
-                <exclude>log4j.properties</exclude>
+                <exclude>logback.xml</exclude>
             </excludes>
         </resource>
         <resource>
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>log4j.properties</include>
+                    <include>logback.xml</include>
                 </includes>
             </resource>
         </resources>

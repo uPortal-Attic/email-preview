@@ -34,6 +34,9 @@ import org.jasig.portlet.emailpreview.EmailPreviewException;
  */
 public interface IEmailAccountService {
 
+    public static final String EXCHANGE_WEB_SERVICES = "ExchangeWebServices";
+    public static final String IMAP = "imap";
+
     /**
      * Obtains the {@link AccountSummary} object from the data store itself, or
      * possibly from cache.

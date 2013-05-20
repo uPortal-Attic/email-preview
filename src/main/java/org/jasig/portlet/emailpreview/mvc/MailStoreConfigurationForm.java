@@ -43,6 +43,7 @@ public class MailStoreConfigurationForm implements Serializable {
     private Boolean allowRenderingEmailContent = true;
 
     private String exchangeDomain;
+    private Boolean exchangeAutodiscover;
 
     private int timeout;
     private int connectionTimeout;
@@ -76,6 +77,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setTimeout(config.getTimeout());
         form.setAllowRenderingEmailContent(config.getAllowRenderingEmailContent());
         form.setExchangeDomain(config.getExchangeDomain());
+        form.setExchangeAutodiscover(config.isExchangeAutodiscover());
         
         for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
             form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
@@ -212,5 +214,13 @@ public class MailStoreConfigurationForm implements Serializable {
 
     public void setExchangeDomain(String exchangeDomain) {
         this.exchangeDomain = exchangeDomain;
+    }
+
+    public Boolean getExchangeAutodiscover() {
+        return exchangeAutodiscover;
+    }
+
+    public void setExchangeAutodiscover(Boolean exchangeAutodiscover) {
+        this.exchangeAutodiscover = exchangeAutodiscover;
     }
 }

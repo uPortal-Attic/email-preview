@@ -24,6 +24,7 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
     xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
@@ -44,6 +45,9 @@
 
     <bean id="exchangeFolderCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
           p:cacheManager-ref="cacheManager" p:cacheName="inboxCache"/>
+
+    <bean id="mailboxServernameCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+          p:cacheManager-ref="cacheManager" p:cacheName="ewsEndpointUriCache"/>
 
     <!-- Ref to the mbean server -->
     <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
@@ -85,47 +89,66 @@
 
     <!--
      | EXCHANGE INTEGRATION SUPPORT
-     |
-     | Uncomment the following section to enable Exchange integration.  You will
-     | also need to modify the Exchange server URL in
-     | src/main/resources/com/microsoft/exchange/Service.wsdl and uncomment the
-     | reference to the ExchangeInitializationService bean in calendar.xml.
      +-->
+    <bean id="exchangeAccountService"
+          class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountService">
+    </bean>
+
     <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPaths">
             <list>
                 <value>com.microsoft.exchange.messages</value>
                 <value>com.microsoft.exchange.types</value>
+                <value>com.microsoft.exchange.autodiscover</value>
             </list>
         </property>
     </bean>
-    <bean id="destinationProvider" class="org.springframework.ws.client.support.destination.Wsdl11DestinationProvider"
-        p:wsdl="classpath:/com/microsoft/exchange/Services.wsdl"/>
-    <bean id="credentialsProvider" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeWsCredentialsProvider"/>
-    <bean id="httpClient" class="org.jasig.portlet.emailpreview.dao.exchange.NtlmAuthHttpClient"
-        p:credentialsProvider-ref="credentialsProvider">
-        <constructor-arg>
-            <bean class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"/>
-        </constructor-arg>
+
+    <bean id="httpClientConnectionManager" class="org.apache.http.impl.conn.PoolingClientConnectionManager"
+            p:maxTotal="200"/>
+    <bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient"
+          c:conman-ref="httpClientConnectionManager"
+          p:credentialsProvider-ref="exchangeWsCredentialsProvider"
+          p:redirectStrategy-ref="autodiscoverRedirectStrategy">
     </bean>
-    <!-- For TESTING only.  Do NOT use in production.  -->
+
+    <bean id="removeHttpHeaders" class="org.jasig.portlet.emailpreview.dao.exchange.SoapHttpRequestHeaderInterceptor"/>
+    <bean id="registerHttpRequestInterceptor" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
+          p:targetObject-ref="httpClient" p:targetMethod="addRequestInterceptor">
+        <property name="arguments">
+            <array>
+                <ref bean="removeHttpHeaders"/>
+                <value>0</value>
+            </array>
+        </property>
+    </bean>
+
+    <!-- For TESTING only.  Do NOT use this client in production!!  -->
     <!--<bean id="httpClient" class="org.jasig.portlet.emailpreview.dao.exchange.TestingDontUseTrustEveryoneNtlmAuthHttpClient"-->
-          <!--p:credentialsProvider-ref="credentialsProvider">-->
+                <!--c:conman="org.apache.http.impl.conn.PoolingClientConnectionManager"-->
+                <!--p:credentialsProvider="org.jasig.portlet.emailpreview.dao.exchange.ExchangeWsCredentialsProvider"-->
+                <!--p:redirectStrategy="org.jasig.portlet.emailpreview.dao.exchange.AutodiscoverRedirectStrategy">-->
     <!--</bean>-->
+
     <bean id="webServiceMessageSender" class="org.springframework.ws.transport.http.HttpComponentsMessageSender"
-        p:httpClient-ref="httpClient" p:connectionTimeout="60000" p:readTimeout="60000"
-        p:maxTotalConnections="200">
+        p:httpClient-ref="httpClient" p:connectionTimeout="60000" p:readTimeout="60000">
     </bean>
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate"
-        p:destinationProvider-ref="destinationProvider" p:messageSender-ref="webServiceMessageSender"
+        p:messageSender-ref="webServiceMessageSender"
         p:marshaller-ref="marshaller" p:unmarshaller-ref="marshaller">
         <qualifier value="exchange" />
     </bean>
-    <bean id="exchangeAccountService"
-        class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountService">
-    </bean>
     <bean id="exchangeAccountDao" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountDaoImpl"
           p:webServiceOperations-ref="webServiceTemplate" p:idCache-ref="exchangeChangeKeyCache"
-            p:folderCache-ref="exchangeFolderCache"/>
+          p:folderCache-ref="exchangeFolderCache" p:marshaller-ref="marshaller"/>
+
+    <bean id="autodiscoverWebServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate" scope="prototype"
+          p:messageSender-ref="webServiceMessageSender"
+          p:marshaller-ref="marshaller" p:unmarshaller-ref="marshaller">
+        <qualifier value="exchangeAutodiscover" />
+    </bean>
+    <bean id="exchangeAutodiscoverDao" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAutoDiscoverDaoImpl"
+          p:webServiceOperations-ref="autodiscoverWebServiceTemplate"
+          p:ewsEndpointUriCache-ref="mailboxServernameCache" p:marshaller-ref="marshaller"/>
 
 </beans>

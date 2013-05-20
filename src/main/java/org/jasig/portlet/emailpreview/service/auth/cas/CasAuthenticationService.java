@@ -18,22 +18,17 @@
  */
 package org.jasig.portlet.emailpreview.service.auth.cas;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.apache.http.auth.Credentials;
+import org.jasig.cas.client.validation.Assertion;
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.service.auth.BaseCredentialsAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 
 import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
-import org.apache.http.auth.Credentials;
-import org.jasig.cas.client.validation.Assertion;
-import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
-import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
-
-public class CasAuthenticationService implements IAuthenticationService {
+public class CasAuthenticationService extends BaseCredentialsAuthenticationService {
     
     protected String key = "cas";
     
@@ -69,11 +64,6 @@ public class CasAuthenticationService implements IAuthenticationService {
 	}
 
     @Override
-    public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
-        return Collections.<String, ConfigurationParameter>emptyMap();
-    }
-
-    @Override
     public boolean isConfigured(PortletRequest request, MailStoreConfiguration config) {
         return true;
     }
@@ -100,14 +90,6 @@ public class CasAuthenticationService implements IAuthenticationService {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public List<ConfigurationParameter> getAdminConfigurationParameters() {
-        return Collections.<ConfigurationParameter>emptyList();
-    }
-
-    public List<ConfigurationParameter> getUserConfigurationParameters() {
-        return Collections.<ConfigurationParameter>emptyList();
     }
 
 }

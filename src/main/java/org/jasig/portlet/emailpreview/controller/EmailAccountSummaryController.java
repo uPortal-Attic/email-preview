@@ -83,7 +83,7 @@ public class EmailAccountSummaryController extends BaseEmailController {
             
             PortletPreferences prefs = req.getPreferences();
             
-            if((folder==null)||(folder.equals(INBOX_NAME_UNDEFINED))){
+            if ((folder==null)||(folder.equals(INBOX_NAME_UNDEFINED))) {
             	folder= prefs.getValue(EmailAccountSummaryController.INBOX_NAME_PREFERENCE, INBOX_NAME_DEFAULT);
             }
              

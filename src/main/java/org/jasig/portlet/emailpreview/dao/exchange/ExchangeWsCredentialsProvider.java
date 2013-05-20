@@ -26,10 +26,12 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.portlet.context.PortletRequestAttributes;
 
+@Component
 public class ExchangeWsCredentialsProvider implements CredentialsProvider, IExchangeCredentialsService {
 
     protected static final String EXCHANGE_CREDENTIALS_ATTRIBUTE = "exchangeCredentials";
@@ -41,8 +43,8 @@ public class ExchangeWsCredentialsProvider implements CredentialsProvider, IExch
     public Credentials getCredentials(AuthScope authscope) {
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         final Credentials credentials = (Credentials) requestAttributes.getAttribute(
-                ExchangeWsCredentialsProvider.EXCHANGE_CREDENTIALS_ATTRIBUTE, 
-                RequestAttributes.SCOPE_SESSION);            
+                ExchangeWsCredentialsProvider.EXCHANGE_CREDENTIALS_ATTRIBUTE,
+                RequestAttributes.SCOPE_SESSION);
         return credentials;
     }
 

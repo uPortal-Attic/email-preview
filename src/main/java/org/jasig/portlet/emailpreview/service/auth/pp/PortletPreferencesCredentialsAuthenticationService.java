@@ -18,26 +18,20 @@
  */
 package org.jasig.portlet.emailpreview.service.auth.pp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.mail.Authenticator;
-import javax.portlet.PortletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.jasig.portlet.emailpreview.EmailPreviewException;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.BaseCredentialsAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 
-public class PortletPreferencesCredentialsAuthenticationService implements IAuthenticationService {
+import javax.mail.Authenticator;
+import javax.portlet.PortletRequest;
+import java.util.*;
+
+public class PortletPreferencesCredentialsAuthenticationService extends BaseCredentialsAuthenticationService {
 
     public static final String KEY = "portletPreferences";
 
@@ -49,9 +43,6 @@ public class PortletPreferencesCredentialsAuthenticationService implements IAuth
                 null,                          // defaultValue
                 false                          // requiresEncryption
             );
-
-    private final List<ConfigurationParameter> userParameters;
-    private Map<String,ConfigurationParameter> configParams;
 
     public PortletPreferencesCredentialsAuthenticationService() {
         List<ConfigurationParameter> params = new ArrayList<ConfigurationParameter>();
@@ -68,19 +59,15 @@ public class PortletPreferencesCredentialsAuthenticationService implements IAuth
         passwordParam.setEncryptionRequired(true);
         params.add(passwordParam);
 
-        this.userParameters = Collections.unmodifiableList(params);
+        setUserParameters(Collections.unmodifiableList(params));
+        setAdminParameters(Collections.<ConfigurationParameter>singletonList(PortletPreferencesCredentialsAuthenticationService.ACCOUNT_NAME_ATTRIBUTE));
 
         Map<String,ConfigurationParameter> m = new HashMap<String,ConfigurationParameter>();
         for (ConfigurationParameter param : userParameters) {
             m.put(param.getKey(), param);
         }
-        this.configParams = Collections.unmodifiableMap(m);
+        setConfigParams(Collections.unmodifiableMap(m));
 
-    }
-
-    @Override
-    public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
-        return configParams;
     }
 
     @Override
@@ -98,59 +85,38 @@ public class PortletPreferencesCredentialsAuthenticationService implements IAuth
     public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
         String ntlmDomain = config.getExchangeDomain();
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
-        if (StringUtils.isBlank(ntlmDomain)) {
-            throw new EmailPreviewException("NT domain must be specified for Exchange integration");
+
+        // If the domain is specified, we are authenticating to a domain so we need to return NT credentials
+        if (StringUtils.isNotBlank(ntlmDomain)) {
+            String username = getMailAccountName(req, config);
+            return createNTCredentials(ntlmDomain, username, password);
         }
 
-        // For Exchange integration, only the username is applicable, not the email address.  This handles the case
-        // of the user specifying an email address and a password in the user config UI.
-        String username = getMailAccountName(req, config);
-        int index = username.indexOf("@");
-        username = index > 0 ? username.substring(0, index) : username;
-
-        // construct a credentials object from the username and password
-        Credentials credentials = new NTCredentials(username, password, "paramDoesNotSeemToMatter", ntlmDomain);
-        return credentials;
+        return new UsernamePasswordCredentials(getMailAccountName(req, config), password);
     }
 
     public String getMailAccountName(PortletRequest req, MailStoreConfiguration config) {
 
-        String rslt = null;
+        String accountName = null;
 
         /*
          * Does the account name come from user input or an attribute chosen by the admin?
          */
         final String accountNameAttribute = config.getAdditionalProperties().get(ACCOUNT_NAME_ATTRIBUTE_KEY);
-        if (!StringUtils.isBlank(accountNameAttribute)) {
+        if (StringUtils.isNotBlank(accountNameAttribute)) {
             // Chosen attribute
             @SuppressWarnings("unchecked")
             final Map<String,String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);
-            rslt = userInfo.get(accountNameAttribute);
+            accountName = userInfo.get(accountNameAttribute);
         } else {
             // User input
-            rslt = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
+            accountName = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
         }
-
-        // Use a suffix?
-        final String suffix = config.getUsernameSuffix();
-        if (rslt != null && !StringUtils.isBlank(suffix)) {
-            rslt = rslt.concat(suffix);
-        }
-
-        return rslt;
-
+        return createMailAccountName(accountName, config);
     }
 
     public String getKey() {
         return KEY;
-    }
-
-    public List<ConfigurationParameter> getAdminConfigurationParameters() {
-        return Collections.<ConfigurationParameter>singletonList(ACCOUNT_NAME_ATTRIBUTE);
-    }
-
-    public List<ConfigurationParameter> getUserConfigurationParameters() {
-        return this.userParameters;
     }
 
 }

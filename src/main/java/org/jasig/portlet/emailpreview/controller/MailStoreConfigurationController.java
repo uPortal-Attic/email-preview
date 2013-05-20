@@ -40,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
@@ -98,6 +99,13 @@ public class MailStoreConfigurationController extends BaseEmailController {
             config.setPort(form.getPort());
             config.setProtocol(form.getProtocol());
             config.setInboxFolderName(form.getInboxFolderName());
+
+            // For Exchange, the inbox is called 'Inbox' not 'INBOX'. Change it so the folder drop-down on the
+            // preview and summary pages shows the correct inbox folder.
+            if (IEmailAccountService.EXCHANGE_WEB_SERVICES.equals(config.getProtocol())
+                    && "INBOX".equals(config.getInboxFolderName())) {
+                config.setInboxFolderName("Inbox");
+            }
             List<String> allowableAuthKeys = form.getAllowableAuthenticationServiceKeys();
             // A bit of a work-around:  default the serviceKey in 
             // use to the first allowable one.  Users must select 
@@ -113,6 +121,7 @@ public class MailStoreConfigurationController extends BaseEmailController {
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());
             config.setExchangeDomain(form.getExchangeDomain());
+            config.setExchangeAutodiscover(form.getExchangeAutodiscover());
             
             String allowContent = request.getParameter(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey());
             if (StringUtils.isNotEmpty(allowContent)) {
