@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:tns="http://schemas.microsoft.com/exchange/2010/Autodiscover" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" targetNamespace="http://schemas.microsoft.com/exchange/2010/Autodiscover" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://schemas.microsoft.com/exchange/2010/Autodiscover/Imports">
+      <xsd:import namespace="http://schemas.microsoft.com/exchange/2010/Autodiscover" location="messages.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="GetUserSettingsRequestMessage">
+    <wsdl:part name="parameters" element="tns:GetUserSettingsRequestMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetUserSettingsRequestMessage_Headers">
+    <wsdl:part name="RequestedServerVersion" element="tns:RequestedServerVersion" />
+  </wsdl:message>
+  <wsdl:message name="GetUserSettingsResponseMessage">
+    <wsdl:part name="parameters" element="tns:GetUserSettingsResponseMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetUserSettingsResponseMessage_Headers">
+    <wsdl:part name="ServerVersionInfo" element="tns:ServerVersionInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDomainSettingsRequestMessage">
+    <wsdl:part name="parameters" element="tns:GetDomainSettingsRequestMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetDomainSettingsRequestMessage_Headers">
+    <wsdl:part name="RequestedServerVersion" element="tns:RequestedServerVersion" />
+  </wsdl:message>
+  <wsdl:message name="GetDomainSettingsResponseMessage">
+    <wsdl:part name="parameters" element="tns:GetDomainSettingsResponseMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetDomainSettingsResponseMessage_Headers">
+    <wsdl:part name="ServerVersionInfo" element="tns:ServerVersionInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetFederationInformationRequestMessage">
+    <wsdl:part name="parameters" element="tns:GetFederationInformationRequestMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetFederationInformationRequestMessage_Headers">
+    <wsdl:part name="RequestedServerVersion" element="tns:RequestedServerVersion" />
+  </wsdl:message>
+  <wsdl:message name="GetFederationInformationResponseMessage">
+    <wsdl:part name="parameters" element="tns:GetFederationInformationResponseMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetFederationInformationResponseMessage_Headers">
+    <wsdl:part name="ServerVersionInfo" element="tns:ServerVersionInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetOrganizationRelationshipSettingsRequestMessage">
+    <wsdl:part name="parameters" element="tns:GetOrganizationRelationshipSettingsRequestMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetOrganizationRelationshipSettingsRequestMessage_Headers">
+    <wsdl:part name="RequestedServerVersion" element="tns:RequestedServerVersion" />
+  </wsdl:message>
+  <wsdl:message name="GetOrganizationRelationshipSettingsResponseMessage">
+    <wsdl:part name="parameters" element="tns:GetOrganizationRelationshipSettingsResponseMessage" />
+  </wsdl:message>
+  <wsdl:message name="GetOrganizationRelationshipSettingsResponseMessage_Headers">
+    <wsdl:part name="ServerVersionInfo" element="tns:ServerVersionInfo" />
+  </wsdl:message>
+  <wsdl:portType name="Autodiscover">
+    <wsdl:operation name="GetUserSettings">
+      <wsdl:input wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetUserSettings" name="GetUserSettingsRequestMessage" message="tns:GetUserSettingsRequestMessage" />
+      <wsdl:output wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetUserSettingsResponse" name="GetUserSettingsResponseMessage" message="tns:GetUserSettingsResponseMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDomainSettings">
+      <wsdl:input wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetDomainSettings" name="GetDomainSettingsRequestMessage" message="tns:GetDomainSettingsRequestMessage" />
+      <wsdl:output wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetDomainSettingsResponse" name="GetDomainSettingsResponseMessage" message="tns:GetDomainSettingsResponseMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFederationInformation">
+      <wsdl:input wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetFederationInformation" name="GetFederationInformationRequestMessage" message="tns:GetFederationInformationRequestMessage" />
+      <wsdl:output wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetFederationInformationResponse" name="GetFederationInformationResponseMessage" message="tns:GetFederationInformationResponseMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetOrganizationRelationshipSettings">
+      <wsdl:input wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetOrganizationRelationshipSettings" name="GetOrganizationRelationshipSettingsRequestMessage" message="tns:GetOrganizationRelationshipSettingsRequestMessage" />
+      <wsdl:output wsaw:Action="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetOrganizationRelationshipSettingsResponse" name="GetOrganizationRelationshipSettingsResponseMessage" message="tns:GetOrganizationRelationshipSettingsResponseMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DefaultBinding_Autodiscover" type="tns:Autodiscover">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserSettings">
+      <soap:operation soapAction="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetUserSettings" style="document" />
+      <wsdl:input name="GetUserSettingsRequestMessage">
+        <soap:header message="tns:GetUserSettingsRequestMessage_Headers" part="RequestedServerVersion" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetUserSettingsResponseMessage">
+        <soap:header message="tns:GetUserSettingsResponseMessage_Headers" part="ServerVersionInfo" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDomainSettings">
+      <soap:operation soapAction="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetDomainSettings" style="document" />
+      <wsdl:input name="GetDomainSettingsRequestMessage">
+        <soap:header message="tns:GetDomainSettingsRequestMessage_Headers" part="RequestedServerVersion" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetDomainSettingsResponseMessage">
+        <soap:header message="tns:GetDomainSettingsResponseMessage_Headers" part="ServerVersionInfo" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFederationInformation">
+      <soap:operation soapAction="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetFederationInformation" style="document" />
+      <wsdl:input name="GetFederationInformationRequestMessage">
+        <soap:header message="tns:GetFederationInformationRequestMessage_Headers" part="RequestedServerVersion" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetFederationInformationResponseMessage">
+        <soap:header message="tns:GetFederationInformationResponseMessage_Headers" part="ServerVersionInfo" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOrganizationRelationshipSettings">
+      <soap:operation soapAction="http://schemas.microsoft.com/exchange/2010/Autodiscover/Autodiscover/GetOrganizationRelationshipSettings" style="document" />
+      <wsdl:input name="GetOrganizationRelationshipSettingsRequestMessage">
+        <soap:header message="tns:GetOrganizationRelationshipSettingsRequestMessage_Headers" part="RequestedServerVersion" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="GetOrganizationRelationshipSettingsResponseMessage">
+        <soap:header message="tns:GetOrganizationRelationshipSettingsResponseMessage_Headers" part="ServerVersionInfo" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>

@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Licensed to Jasig under one or more contributor license
+    agreements. See the NOTICE file distributed with this work
+    for additional information regarding copyright ownership.
+    Jasig licenses this file to you under the Apache License,
+    Version 2.0 (the "License"); you may not use this file
+    except in compliance with the License. You may obtain a
+    copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+
+<xs:schema xmlns:tns="http://schemas.microsoft.com/exchange/2010/Autodiscover" elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/exchange/2010/Autodiscover" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="GetUserSettingsRequestMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Request" nillable="true" type="tns:GetUserSettingsRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetUserSettingsRequest">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverRequest">
+        <xs:sequence>
+          <xs:element name="Users" nillable="true" type="tns:Users" />
+          <xs:element name="RequestedSettings" nillable="true" type="tns:RequestedSettings" />
+          <xs:element name="RequestedVersion" nillable="true" type="tns:ExchangeVersion" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetUserSettingsRequest" nillable="true" type="tns:GetUserSettingsRequest" />
+  <xs:complexType name="AutodiscoverRequest">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="AutodiscoverRequest" nillable="true" type="tns:AutodiscoverRequest" />
+  <xs:complexType name="Users">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="User" nillable="true" type="tns:User" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Users" nillable="true" type="tns:Users" />
+  <xs:complexType name="User">
+    <xs:sequence>
+      <xs:element name="Mailbox" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="User" nillable="true" type="tns:User" />
+  <xs:complexType name="RequestedSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Setting" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RequestedSettings" nillable="true" type="tns:RequestedSettings" />
+  <xs:simpleType name="ExchangeVersion">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Exchange2010" />
+      <xs:enumeration value="Exchange2010_SP1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="RequestedServerVersion">
+    <xs:simpleType>
+      <xs:restriction base="tns:ExchangeVersion" />
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="GetUserSettingsResponseMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Response" nillable="true" type="tns:GetUserSettingsResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetUserSettingsResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="UserResponses" nillable="true" type="tns:ArrayOfUserResponse" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetUserSettingsResponse" nillable="true" type="tns:GetUserSettingsResponse" />
+  <xs:complexType name="AutodiscoverResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ErrorCode" type="tns:ErrorCode" />
+      <xs:element minOccurs="0" name="ErrorMessage" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AutodiscoverResponse" nillable="true" type="tns:AutodiscoverResponse" />
+  <xs:simpleType name="ErrorCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NoError" />
+      <xs:enumeration value="RedirectAddress" />
+      <xs:enumeration value="RedirectUrl" />
+      <xs:enumeration value="InvalidUser" />
+      <xs:enumeration value="InvalidRequest" />
+      <xs:enumeration value="InvalidSetting" />
+      <xs:enumeration value="SettingIsNotAvailable" />
+      <xs:enumeration value="ServerBusy" />
+      <xs:enumeration value="InvalidDomain" />
+      <xs:enumeration value="NotFederated" />
+      <xs:enumeration value="InternalServerError" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="ErrorCode" nillable="true" type="tns:ErrorCode" />
+  <xs:complexType name="ArrayOfUserResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="UserResponse" nillable="true" type="tns:UserResponse" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfUserResponse" nillable="true" type="tns:ArrayOfUserResponse" />
+  <xs:complexType name="UserResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="RedirectTarget" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="UserSettingErrors" nillable="true" type="tns:UserSettingErrors" />
+          <xs:element minOccurs="0" name="UserSettings" nillable="true" type="tns:UserSettings" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="UserResponse" nillable="true" type="tns:UserResponse" />
+  <xs:complexType name="UserSettingErrors">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="UserSettingError" nillable="true" type="tns:UserSettingError" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserSettingErrors" nillable="true" type="tns:UserSettingErrors" />
+  <xs:complexType name="UserSettingError">
+    <xs:sequence>
+      <xs:element name="ErrorCode" type="tns:ErrorCode" />
+      <xs:element name="ErrorMessage" nillable="true" type="xs:string" />
+      <xs:element name="SettingName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserSettingError" nillable="true" type="tns:UserSettingError" />
+  <xs:complexType name="UserSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="UserSetting" nillable="true" type="tns:UserSetting" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserSettings" nillable="true" type="tns:UserSettings" />
+  <xs:complexType name="UserSetting">
+    <xs:sequence>
+      <xs:element name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserSetting" nillable="true" type="tns:UserSetting" />
+  <xs:complexType name="ProtocolConnectionCollectionSetting">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:UserSetting">
+        <xs:sequence>
+          <xs:element name="ProtocolConnections" nillable="true" type="tns:ProtocolConnections" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ProtocolConnectionCollectionSetting" nillable="true" type="tns:ProtocolConnectionCollectionSetting" />
+  <xs:complexType name="ProtocolConnections">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ProtocolConnection" nillable="true" type="tns:ProtocolConnection" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ProtocolConnections" nillable="true" type="tns:ProtocolConnections" />
+  <xs:complexType name="ProtocolConnection">
+    <xs:sequence>
+      <xs:element name="Hostname" nillable="true" type="xs:string" />
+      <xs:element name="Port" type="xs:int" />
+      <xs:element name="EncryptionMethod" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ProtocolConnection" nillable="true" type="tns:ProtocolConnection" />
+  <xs:complexType name="StringSetting">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:UserSetting">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="StringSetting" nillable="true" type="tns:StringSetting" />
+  <xs:complexType name="WebClientUrlCollectionSetting">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:UserSetting">
+        <xs:sequence>
+          <xs:element name="WebClientUrls" nillable="true" type="tns:WebClientUrls" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="WebClientUrlCollectionSetting" nillable="true" type="tns:WebClientUrlCollectionSetting" />
+  <xs:complexType name="WebClientUrls">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="WebClientUrl" nillable="true" type="tns:WebClientUrl" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="WebClientUrls" nillable="true" type="tns:WebClientUrls" />
+  <xs:complexType name="WebClientUrl">
+    <xs:sequence>
+      <xs:element name="AuthenticationMethods" nillable="true" type="xs:string" />
+      <xs:element name="Url" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="WebClientUrl" nillable="true" type="tns:WebClientUrl" />
+  <xs:complexType name="AlternateMailboxCollectionSetting">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:UserSetting">
+        <xs:sequence>
+          <xs:element name="AlternateMailboxes" nillable="true" type="tns:AlternateMailboxes" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="AlternateMailboxCollectionSetting" nillable="true" type="tns:AlternateMailboxCollectionSetting" />
+  <xs:complexType name="AlternateMailboxes">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AlternateMailbox" nillable="true" type="tns:AlternateMailbox" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AlternateMailboxes" nillable="true" type="tns:AlternateMailboxes" />
+  <xs:complexType name="AlternateMailbox">
+    <xs:sequence>
+      <xs:element name="Type" nillable="true" type="xs:string" />
+      <xs:element name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element name="LegacyDN" nillable="true" type="xs:string" />
+      <xs:element name="Server" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AlternateMailbox" nillable="true" type="tns:AlternateMailbox" />
+  <xs:complexType name="ServerVersionInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MajorVersion" type="xs:int" />
+      <xs:element minOccurs="0" name="MinorVersion" type="xs:int" />
+      <xs:element minOccurs="0" name="MajorBuildNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="MinorBuildNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="Version" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServerVersionInfo" nillable="true" type="tns:ServerVersionInfo" />
+  <xs:element name="GetDomainSettingsRequestMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Request" nillable="true" type="tns:GetDomainSettingsRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetDomainSettingsRequest">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverRequest">
+        <xs:sequence>
+          <xs:element name="Domains" nillable="true" type="tns:Domains" />
+          <xs:element name="RequestedSettings" nillable="true" type="tns:RequestedSettings" />
+          <xs:element name="RequestedVersion" nillable="true" type="tns:ExchangeVersion" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetDomainSettingsRequest" nillable="true" type="tns:GetDomainSettingsRequest" />
+  <xs:complexType name="Domains">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Domain" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Domains" nillable="true" type="tns:Domains" />
+  <xs:element name="GetDomainSettingsResponseMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Response" nillable="true" type="tns:GetDomainSettingsResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetDomainSettingsResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="DomainResponses" nillable="true" type="tns:ArrayOfDomainResponse" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetDomainSettingsResponse" nillable="true" type="tns:GetDomainSettingsResponse" />
+  <xs:complexType name="ArrayOfDomainResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainResponse" nillable="true" type="tns:DomainResponse" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDomainResponse" nillable="true" type="tns:ArrayOfDomainResponse" />
+  <xs:complexType name="DomainResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="DomainSettingErrors" nillable="true" type="tns:DomainSettingErrors" />
+          <xs:element minOccurs="0" name="DomainSettings" nillable="true" type="tns:DomainSettings" />
+          <xs:element minOccurs="0" name="RedirectTarget" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="DomainResponse" nillable="true" type="tns:DomainResponse" />
+  <xs:complexType name="DomainSettingErrors">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainSettingError" nillable="true" type="tns:DomainSettingError" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DomainSettingErrors" nillable="true" type="tns:DomainSettingErrors" />
+  <xs:complexType name="DomainSettingError">
+    <xs:sequence>
+      <xs:element name="ErrorCode" type="tns:ErrorCode" />
+      <xs:element name="ErrorMessage" nillable="true" type="xs:string" />
+      <xs:element name="SettingName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DomainSettingError" nillable="true" type="tns:DomainSettingError" />
+  <xs:complexType name="DomainSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainSetting" nillable="true" type="tns:DomainSetting" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DomainSettings" nillable="true" type="tns:DomainSettings" />
+  <xs:complexType name="DomainSetting">
+    <xs:sequence>
+      <xs:element name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DomainSetting" nillable="true" type="tns:DomainSetting" />
+  <xs:complexType name="DomainStringSetting">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:DomainSetting">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="DomainStringSetting" nillable="true" type="tns:DomainStringSetting" />
+  <xs:element name="GetFederationInformationRequestMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Request" nillable="true" type="tns:GetFederationInformationRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetFederationInformationRequest">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverRequest">
+        <xs:sequence>
+          <xs:element name="Domain" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetFederationInformationRequest" nillable="true" type="tns:GetFederationInformationRequest" />
+  <xs:element name="GetFederationInformationResponseMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Response" nillable="true" type="tns:GetFederationInformationResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetFederationInformationResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="ApplicationUri" nillable="true" type="xs:anyURI" />
+          <xs:element minOccurs="0" name="TokenIssuers" nillable="true" type="tns:TokenIssuers" />
+          <xs:element minOccurs="0" name="Domains" nillable="true" type="tns:Domains" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TokenIssuers">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TokenIssuer" nillable="true" type="tns:TokenIssuer" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TokenIssuer">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Uri" nillable="true" type="xs:anyURI" />
+      <xs:element minOccurs="0" name="Endpoint" nillable="true" type="xs:anyURI" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetFederationInformationResponse" nillable="true" type="tns:GetFederationInformationResponse" />
+  <xs:element name="GetOrganizationRelationshipSettingsRequestMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Request" nillable="true" type="tns:GetOrganizationRelationshipSettingsRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetOrganizationRelationshipSettingsRequest">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverRequest">
+        <xs:sequence>
+          <xs:element name="Domains" nillable="true" type="tns:Domains" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetOrganizationRelationshipSettingsRequest" nillable="true" type="tns:GetOrganizationRelationshipSettingsRequest" />
+  <xs:element name="GetOrganizationRelationshipSettingsResponseMessage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Response" nillable="true" type="tns:GetOrganizationRelationshipSettingsResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="GetOrganizationRelationshipSettingsResponse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AutodiscoverResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="OrganizationRelationshipSettingsCollection" nillable="true" type="tns:OrganizationRelationshipSettingsCollection" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="GetOrganizationRelationshipSettingsResponse" nillable="true" type="tns:GetOrganizationRelationshipSettingsResponse" />
+  <xs:complexType name="OrganizationRelationshipSettingsCollection">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="OrganizationRelationshipSettings" nillable="true" type="tns:OrganizationRelationshipSettings" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrganizationRelationshipSettingsCollection" nillable="true" type="tns:OrganizationRelationshipSettingsCollection" />
+  <xs:complexType name="OrganizationRelationshipSettings">
+    <xs:sequence>
+      <xs:element name="DeliveryReportEnabled" type="xs:boolean" />
+      <xs:element name="DomainNames" nillable="true" type="tns:Domains" /> 
+      <xs:element name="FreeBusyAccessEnabled" type="xs:boolean" />
+      <xs:element name="FreeBusyAccessLevel" nillable="true" type="xs:string" />
+      <xs:element name="MailTipsAccessEnabled" type="xs:boolean" />
+      <xs:element name="MailTipsAccessLevel" nillable="true" type="xs:string" />
+      <xs:element name="MailboxMoveEnabled" type="xs:boolean" />
+      <xs:element name="Name" nillable="true" type="xs:string" />      
+      <xs:element name="TargetApplicationUri" nillable="true" type="xs:anyURI" />
+      <xs:element name="TargetAutodiscoverEpr" nillable="true" type="xs:anyURI" />
+      <xs:element name="TargetSharingEpr" nillable="true" type="xs:anyURI" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrganizationRelationshipSettings" nillable="true" type="tns:OrganizationRelationshipSettings" />
+</xs:schema>
