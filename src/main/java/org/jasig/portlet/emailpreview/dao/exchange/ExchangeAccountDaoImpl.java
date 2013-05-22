@@ -402,13 +402,15 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
 
     private String getAllRecipients(ArrayOfRecipientsType addrs) {
         StringBuilder str = new StringBuilder();
-        for (EmailAddressType addr : addrs.getMailboxes()) {
-            str.append(formatEmailAddress(addr));
-            str.append("; ");
+        if (addrs != null) {
+            for (EmailAddressType addr : addrs.getMailboxes()) {
+                str.append(formatEmailAddress(addr));
+                str.append("; ");
+            }
+            // Delete the trailing ; space
+            str.deleteCharAt(str.length() - 1);
+            str.deleteCharAt(str.length() - 1);
         }
-        // Delete the trailing ; space
-        str.deleteCharAt(str.length() - 1);
-        str.deleteCharAt(str.length() - 1);
         return str.toString();
     }
 
