@@ -19,13 +19,13 @@
     under the License.
 
 --%>
-<jsp:directive.include file="/WEB-INF/jsp/include.jsp"/>
+<%@ include file="/WEB-INF/jsp/include.jsp"%>
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${ includeJQuery }">
     <script src="<rs:resourceURL value="/rs/jquery/1.8.3/jquery-1.8.3.min.js"/>" type="text/javascript"></script>
 </c:if>
-<script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.min.js"/>" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/js/email-admin-config.min.js" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
@@ -34,7 +34,7 @@
 </portlet:actionURL>
 <portlet:resourceURL id="parameters" var="parametersUrl" />
 
-<div class="fl-widget portlet" role="section">
+<div id="${n}container" class="fl-widget portlet" role="section">
 
     <!-- Portlet Body -->
     <div class="fl-widget-content portlet-body" role="main">
@@ -52,6 +52,7 @@
                             <tr>
                                 <th><spring:message code="config.preferences.prefName"/></th>
                                 <th><spring:message code="config.preferences.value"/></th>
+                                <th><spring:message code="config.preferences.description"/></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,61 +60,77 @@
                                 <td class="preference-name">
                                     <form:label path="protocol"><spring:message code="config.preferences.protocol"/></form:label>
                                 </td>
-                                <td class="value"><form:input path="protocol"/></td>
+                                <td>
+                                    <select name="protocol" class="value plt-email-input-protocol">
+                                        <c:forEach items="${protocols}" var="protocol">
+                                            <option<c:if test="${form.protocol eq protocol}"> selected="selected"</c:if> value="<c:out value="${protocol}"/>"><c:out value="${protocol}"/></option>
+                                        </c:forEach>
+                                    </select>
+                                </td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.protocol.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-exchange">
                                 <td class="preference-name">
                                     <form:label path="exchangeDomain"><spring:message code="config.preferences.exchange.domain"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="exchangeDomain"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.exchange.domain.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-exchange">
                                 <td class="preference-name">
                                     <form:label path="exchangeAutodiscover"><spring:message code="config.preferences.exchange.autodiscover"/></form:label>
                                 </td>
                                 <td class="value"><form:checkbox path="exchangeAutodiscover"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.exchange.autodiscover.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-exchange plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="host"><spring:message code="config.preferences.host"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="host"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.host.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="port"><spring:message code="config.preferences.port"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="port"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.port.tooltip"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="inboxFolderName"><spring:message code="config.preferences.inbox"/></form:label>
+                                    <form:label path="usernameSuffix"><spring:message code="config.preferences.username.suffix"/></form:label>
                                 </td>
-                                <td class="value"><form:input path="inboxFolderName"/></td>
+                                <td class="value"><form:input path="usernameSuffix"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.username.suffix.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="timeout"><spring:message code="config.preferences.timeout"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="timeout"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.timeout.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="connectionTimeout"><spring:message code="config.preferences.connTimeout"/></form:label>
                                 </td>
                                 <td class="value"><form:input path="connectionTimeout"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.connTimeout.tooltip"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
                                     <form:label path="allowRenderingEmailContent"><spring:message code="config.preferences.allowEmailContent"/></form:label>
                                 </td>
                                 <td class="value"><form:checkbox path="allowRenderingEmailContent"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.allowEmailContent.tooltip"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
-                                    <form:label path="usernameSuffix"><spring:message code="config.preferences.suffix"/></form:label>
+                                    <form:label path="inboxFolderName"><spring:message code="config.preferences.inbox"/></form:label>
                                 </td>
-                                <td class="value"><form:input path="usernameSuffix"/></td>
+                                <td class="value"><form:input path="inboxFolderName"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.inbox.tooltip"/></td>
                             </tr>
                         </tbody>
                     </table>
@@ -197,27 +214,9 @@
 
     var ${n} = {};
     ${n}.jQuery = jQuery<c:if test="${ includeJQuery }">.noConflict(true)</c:if>;
-    ${n}.fluid = fluid;
-    fluid = null;
-    
-    ${n}.jQuery(function(){
-       var $ = ${n}.jQuery;
-       var fluid = ${n}.fluid;
-       fluid = null;
-       fluid_1_1 = null;
-
-       var getTree = function(parameters) {
-       };
-                   
-       $(document).ready(function(){
-           $.get("${ parametersUrl }", 
-               { authService: $(".auth-service-input").val(), linkService: $(".link-service-input").val() }, 
-               function(data){
-//                   console.log(data);
-               }, 
-               "json"
-           );
-       }); 
-    });
+    (function(context) {
+        var $ = context.jQuery;
+        emailPortlet.init(context, $('#${n}container'));
+    })(${n});
 
 </script>

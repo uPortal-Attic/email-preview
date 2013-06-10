@@ -72,8 +72,8 @@ public class SimpleServiceBroker implements IServiceBroker {
         MailStoreConfiguration config = new MailStoreConfiguration();
         config.setHost(prefs.getValue(MailPreferences.HOST.getKey(), null));
         config.setInboxFolderName(prefs.getValue(MailPreferences.INBOX_NAME.getKey(), null));
-        config.setProtocol(prefs.getValue(MailPreferences.PROTOCOL.getKey(), null));
-        config.setLinkServiceKey(prefs.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), null));
+        config.setProtocol(prefs.getValue(MailPreferences.PROTOCOL.getKey(), "imaps"));
+        config.setLinkServiceKey(prefs.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), "default"));
         config.setAuthenticationServiceKey(prefs.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
         String[] authServiceKeys = prefs.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
@@ -88,7 +88,7 @@ public class SimpleServiceBroker implements IServiceBroker {
         
         // set the port number
         try {
-            int port = Integer.parseInt(prefs.getValue(MailPreferences.PORT.getKey(), "25"));
+            int port = Integer.parseInt(prefs.getValue(MailPreferences.PORT.getKey(), "-1"));
             config.setPort(port);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);

@@ -46,6 +46,9 @@
     overflow: hidden;
 }
 
+.plt-email-description {
+}
+
 .message-headers .message-header-name { font-weight: bold; color: #333; text-align: right; }
 
 .loading-message { height: 150px; background: url(../images/loading.gif) no-repeat center center; }
