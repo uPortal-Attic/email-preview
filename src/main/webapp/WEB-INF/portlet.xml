@@ -225,6 +225,18 @@
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
             </preference>
+
+            <!-- Icon to use for desktop viewing. -->
+            <preference>
+                <name>iconUrl</name>
+                <value>/ResourceServingWebapp/rs/tango/0.8.90/32x32/apps/internet-mail.png</value>
+            </preference>
+
+            <!-- Icon to use for mobile view -->
+            <preference>
+                <name>mobileIconUrl</name>
+                <value>/ResourceServingWebapp/rs/tango/0.8.90/32x32/apps/internet-mail.png</value>
+            </preference>
         </portlet-preferences>
     </portlet>
     
@@ -319,6 +331,18 @@
             <preference>
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
+            </preference>
+
+            <!-- Icon to use for desktop viewing. -->
+            <preference>
+                <name>iconUrl</name>
+                <value>/ResourceServingWebapp/rs/tango/0.8.90/32x32/apps/internet-mail.png</value>
+            </preference>
+
+            <!-- Icon to use for mobile view -->
+            <preference>
+                <name>mobileIconUrl</name>
+                <value>/ResourceServingWebapp/rs/tango/0.8.90/32x32/apps/internet-mail.png</value>
             </preference>
         </portlet-preferences>
     </portlet>
