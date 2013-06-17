@@ -92,6 +92,7 @@ public class SimpleServiceBrokerTest {
         configuration.setConnectionTimeout(-1);
         configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
         configuration.getJavaMailProperties().put("mail.debug", mailDebug);
+        configuration.setAllowRenderingEmailContent(true);
         
         preferenceMap = new HashMap<String, String[]>();
         preferenceMap.put("inboxUrl", new String[]{ inboxUrl });
@@ -103,10 +104,10 @@ public class SimpleServiceBrokerTest {
             public String nextElement() { return null; }
         });
         when(preferences.getValue("host", null)).thenReturn(host);
-        when(preferences.getValue("port", "25")).thenReturn(String.valueOf(port));
-        when(preferences.getValue("protocol", null)).thenReturn(protocol);
+        when(preferences.getValue("port", "-1")).thenReturn(String.valueOf(port));
+        when(preferences.getValue("protocol", "imaps")).thenReturn(protocol);
         when(preferences.getValue("inboxName", null)).thenReturn(inboxName);
-        when(preferences.getValue("linkServiceKey", null)).thenReturn(linkServiceKey);
+        when(preferences.getValue("linkServiceKey", "default")).thenReturn(linkServiceKey);
         when(preferences.getValues("allowableAuthenticationServiceKeys", new String[0])).thenReturn(allowableAuthServiceKeys);
         when(preferences.getValue("authenticationServiceKey", null)).thenReturn(authServiceKey);
         when(preferences.getValue("timeout", "-1")).thenReturn(String.valueOf(timeout));
