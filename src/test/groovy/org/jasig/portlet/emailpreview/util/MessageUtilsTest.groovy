@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jasig.portlet.emailpreview.util
+package org.jasig.portlet.emailpreview.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

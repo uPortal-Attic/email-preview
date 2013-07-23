@@ -27,6 +27,8 @@ public class EmailQuota {
     public static final long QUOTA_COEF_MB = 1024;
     public static final long QUOTA_COEF_GB = 1048576; //(1024*1024);
 
+    private static final long TWO_DECIMAL_PLACES = (long) 100.0;
+
     private long usage;
     private long limit;
 
@@ -64,7 +66,9 @@ public class EmailQuota {
     }
 
     public String getUsageAsPercentage() {
-        return new BigDecimal(String.valueOf(((double)(usage)/(double)(limit)))).setScale(2, BigDecimal.ROUND_DOWN).toString().concat("%");
+        double quotient = ((double)usage / (double)limit);
+        double percent = quotient * TWO_DECIMAL_PLACES;
+        return new BigDecimal(String.valueOf(percent)).setScale(2, BigDecimal.ROUND_DOWN).toString().concat("%");
     }
 
     private String getValueAsString(long value) {
