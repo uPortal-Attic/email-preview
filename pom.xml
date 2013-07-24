@@ -15,12 +15,22 @@
     <description>Read-only email portlet.</description>
     <version>2.0.5-SNAPSHOT</version>
 
-    <scm>
-        <connection>scm:git:git@github.com:Jasig/email-preview.git</connection>
-        <developerConnection>scm:git:git@github.com:Jasig/email-preview.git</developerConnection>
-        <url>scm:git:git@github.com:Jasig/email-preview.git</url>
-      <tag>HEAD</tag>
-  </scm>
+	<scm>
+		<connection>scm:git:ssh://git@github.com/GIP-RECIA/email-preview.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/GIP-RECIA/email-preview.git</developerConnection>
+		<url>https://github.com/GIP-RECIA/email-preview.git</url>
+		<tag>HEAD</tag>
+  	</scm>
+	<distributionManagement>
+		<repository>
+			<id>esco-releases</id>
+			<url>http://www.esco-portail.org/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>esco-snapshots</id>
+			<url>http://www.esco-portail.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
    
     <properties>
         <jaxb2basicsVersion>0.6.0</jaxb2basicsVersion>
