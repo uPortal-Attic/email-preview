@@ -52,8 +52,8 @@ public class SimpleServiceBrokerTest {
     private int port = 993;
     private String protocol = "imaps";
     private String inboxName = "INBOX";
-    private int timeout = -1;
-    private int connectionTimeout = -1;
+    private int timeout = 5000;
+    private int connectionTimeout = 6000;
     private String inboxUrl = "http://mail.google.com";
     private String mailDebug = "true";
     private String linkServiceKey = "default";
@@ -88,8 +88,8 @@ public class SimpleServiceBrokerTest {
         configuration.setLinkServiceKey(linkServiceKey);
         configuration.setAllowableAuthenticationServiceKeys(Arrays.asList(new String[] {authServiceKey}));
         configuration.setAuthenticationServiceKey(authServiceKey);
-        configuration.setTimeout(-1);
-        configuration.setConnectionTimeout(-1);
+        configuration.setTimeout(timeout);
+        configuration.setConnectionTimeout(connectionTimeout);
         configuration.getAdditionalProperties().put("inboxUrl", inboxUrl);
         configuration.getJavaMailProperties().put("mail.debug", mailDebug);
         configuration.setAllowRenderingEmailContent(true);
@@ -110,8 +110,8 @@ public class SimpleServiceBrokerTest {
         when(preferences.getValue("linkServiceKey", "default")).thenReturn(linkServiceKey);
         when(preferences.getValues("allowableAuthenticationServiceKeys", new String[0])).thenReturn(allowableAuthServiceKeys);
         when(preferences.getValue("authenticationServiceKey", null)).thenReturn(authServiceKey);
-        when(preferences.getValue("timeout", "-1")).thenReturn(String.valueOf(timeout));
-        when(preferences.getValue("connectionTimeout", "-1")).thenReturn(String.valueOf(connectionTimeout));
+        when(preferences.getValue("timeout", "25000")).thenReturn(String.valueOf(timeout));
+        when(preferences.getValue("connectionTimeout", "25000")).thenReturn(String.valueOf(connectionTimeout));
         when(preferences.getMap()).thenReturn(preferenceMap);
         
     }

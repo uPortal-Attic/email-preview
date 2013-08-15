@@ -96,7 +96,7 @@ public class SimpleServiceBroker implements IServiceBroker {
 
         // set the connection timeout
         try {
-            int connectionTimeout = Integer.parseInt(prefs.getValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), "-1"));
+            int connectionTimeout = Integer.parseInt(prefs.getValue(MailPreferences.CONNECTION_TIMEOUT.getKey(), "25000"));
             config.setConnectionTimeout(connectionTimeout);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
@@ -104,7 +104,7 @@ public class SimpleServiceBroker implements IServiceBroker {
 
         // set the timeout
         try {
-            int timeout = Integer.parseInt(prefs.getValue(MailPreferences.TIMEOUT.getKey(), "-1"));
+            int timeout = Integer.parseInt(prefs.getValue(MailPreferences.TIMEOUT.getKey(), "25000"));
             config.setTimeout(timeout);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
