@@ -32,6 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
+import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 
 /**
  * 
@@ -63,7 +64,8 @@ public final class MailStoreConfiguration {
     // Preferences
     private boolean markMessagesAsRead;
     private boolean allowRenderingEmailContent = true;
-    
+    private IStringEncryptionService stringEncryptionService;
+
     public String getProtocol() {
         return protocol;
     }
@@ -200,6 +202,13 @@ public final class MailStoreConfiguration {
         this.usernameSuffix = usernameSuffix;
     }
 
+    public IStringEncryptionService getStringEncryptionService() {
+        return stringEncryptionService;
+    }
+
+    public void setStringEncryptionService(IStringEncryptionService stringEncryptionService) {
+        this.stringEncryptionService = stringEncryptionService;
+    }
     
     public boolean isReadOnly(PortletRequest req, MailPreferences mp) {
         PortletPreferences prefs = req.getPreferences();
@@ -217,6 +226,14 @@ public final class MailStoreConfiguration {
         // class interactions.  Something to work in on refactoring.
     }
 
+    public boolean isUsingDefaultEncryptionKey() {
+        if (stringEncryptionService != null) {
+            return stringEncryptionService.usingDefaultEncryptionKey();
+        } else {
+        	return false;
+        }
+    }
+    
     /**
      * @see java.lang.Object#equals(Object)
      */

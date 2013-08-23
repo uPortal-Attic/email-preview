@@ -52,6 +52,7 @@ public class MailStoreConfigurationForm implements Serializable {
     private String authenticationServiceKey;
     private List<String> allowableAuthenticationServiceKeys = Collections.emptyList();
     private String usernameSuffix;
+    private Boolean isUsingDefaultEncryptionKey;
 
     @SuppressWarnings("unchecked")
     private Map<String, Attribute> additionalProperties = LazyMap.decorate(
@@ -78,6 +79,7 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setAllowRenderingEmailContent(config.getAllowRenderingEmailContent());
         form.setExchangeDomain(config.getExchangeDomain());
         form.setExchangeAutodiscover(config.isExchangeAutodiscover());
+        form.setIsUsingDefaultEncryptionKey(config.isUsingDefaultEncryptionKey());
         
         for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
             form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
@@ -223,4 +225,12 @@ public class MailStoreConfigurationForm implements Serializable {
     public void setExchangeAutodiscover(Boolean exchangeAutodiscover) {
         this.exchangeAutodiscover = exchangeAutodiscover;
     }
+
+	public Boolean getIsUsingDefaultEncryptionKey() {
+		return isUsingDefaultEncryptionKey;
+	}
+
+	public void setIsUsingDefaultEncryptionKey(Boolean isUsingDefaultEncryptionKey) {
+		this.isUsingDefaultEncryptionKey = isUsingDefaultEncryptionKey;
+	}
 }

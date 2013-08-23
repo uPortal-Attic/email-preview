@@ -21,6 +21,9 @@ package org.jasig.portlet.emailpreview.security;
 
 import org.jasypt.encryption.pbe.PBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionInitializationException;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -32,44 +35,61 @@ import org.springframework.util.Assert;
  * @author Jen Bourey
  */
 public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionService, InitializingBean {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private PBEStringEncryptor encryptor = null;
-	
-	/**
-	 * Set the PBEStringEncryptor to be used
-	 * 
-	 * @param encryptor
-	 */
-	public void setStringEncryptor(final PBEStringEncryptor encryptor) {
-		this.encryptor = encryptor;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public String encrypt(final String plaintext) {
+    private PBEStringEncryptor encryptor = null;
+    
+    /**
+     * Set the PBEStringEncryptor to be used
+     * 
+     * @param encryptor
+     */
+    public void setStringEncryptor(final PBEStringEncryptor encryptor) {
+        this.encryptor = encryptor;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String encrypt(final String plaintext) {
+        if (this.encryptor == null) {
+            logger.error("encryptor not set");
+            return null;
+        }
         try {
             return this.encryptor.encrypt(plaintext);
         } catch (EncryptionInitializationException e) {
+            logger.warn(e.getMessage(), e);
             throw new StringEncryptionException("Encryption error. Verify an encryption password"
                     + " is configured in the email preview portlet's"
                     + " stringEncryptionService bean in applicationContent.xml", e);
         }
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public String decrypt(final String cryptotet) {
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String decrypt(final String cryptotet) {
+        if (this.encryptor == null) {
+            logger.error("encryptor not set");
+            return null;
+        }
       try {
-	        return this.encryptor.decrypt(cryptotet);
+            return this.encryptor.decrypt(cryptotet);
       } catch (EncryptionInitializationException e) {
+          logger.warn(e.getMessage(), e);
           throw new StringEncryptionException("Decryption error. Was encryption password"
                   + " changed in the email preview portlet's"
                   + " stringEncryptionService bean in applicationContent.xml?", e);
+      } catch (EncryptionOperationNotPossibleException e) {
+          logger.warn("Decryption failed.  This indicates the salt has been changed.", e);
+          return "";
       }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         final String enc = this.encrypt(this.getClass().getName());
@@ -78,6 +98,17 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
         final String dec = this.decrypt(enc);
         Assert.notNull(dec, "String decryption service is not properly configured.");
         Assert.isTrue(dec.equals(this.getClass().getName()), "String decryption failed to decode the encrypted text " + enc);
+        if (usingDefaultEncryptionKey()) {
+            logger.error("Encryption key at default value.  Change it in configuration.properties for improved security!");
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean usingDefaultEncryptionKey() {
+        String result = this.decrypt("pD2vrJ0CiAbnW4k4lF84S8yXN6gSl6VUjISd8NN6AFnDGuei5rGyuw==");
+        return "EncryptionKeyStillchangeMe".equals(result);
+    }
 }
