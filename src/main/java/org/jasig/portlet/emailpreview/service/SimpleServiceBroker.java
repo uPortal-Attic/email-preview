@@ -85,6 +85,7 @@ public class SimpleServiceBroker implements IServiceBroker {
 
         config.setExchangeDomain(prefs.getValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), null));
         config.setExchangeAutodiscover(Boolean.valueOf(prefs.getValue(MailPreferences.EXCHANGE_AUTODISCOVER.getKey(), "false")));
+        config.setStringEncryptionService(stringEncryptionService);
         
         // set the port number
         try {

@@ -40,7 +40,13 @@
     <div class="fl-widget-content portlet-body" role="main">
 
         <form:form action="${ formUrl }" method="POST" commandName="form" htmlEscape="false">
-    
+            <!--  Used for warning that the encryption key hasn't been changed from the default -->
+            <form:input path="isUsingDefaultEncryptionKey" type="hidden" />
+            <c:if test="${form.isUsingDefaultEncryptionKey eq true}">
+                <div class="portlet-msg-error portlet-msg error" role="alert">
+                    <spring:message code="editPreferences.warning.message.default.password.set"/>
+                </div>
+            </c:if>
             <!-- General Configuration Section -->
             <div class="portlet-section" role="region">
                 <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.basic"/></h3>
