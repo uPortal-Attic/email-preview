@@ -18,20 +18,44 @@
  */
 
 
-package org.jasig.portlet.emailpreview.dao.exchange;
+package org.jasig.portlet.emailpreview.service;
 
+import javax.mail.Authenticator;
 import javax.portlet.PortletRequest;
 
+import org.apache.http.auth.Credentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 
 /**
- * Obtains the exchange credentials and stores them into accessible location for Exchange communication.
+ * Obtains the credentials and stores them into accessible location for mail server communication.
  *
  * @author James Wennmacher, jwennmacher@unicon.net
  */
-public interface IExchangeCredentialsService {
+public interface ICredentialsProvider {
+    /**
+     * Initializes the credentials provider service.
+     * @param request Portlet request
+     * @param config Mail configuration
+     * @param authService Authentication service
+     */
     void initialize(PortletRequest request, MailStoreConfiguration config, IAuthenticationService authService);
-    String getUsername();
 
+    /**
+     * Returns an Apache Credentials object for the current operation.
+     * @return Credentials object
+     */
+    Credentials getCredentials();
+
+    /**
+     * Returns a Javamail Authenticator object for the current operation.
+     * @return Javamail Authenticator object
+     */
+    Authenticator getAuthenticator();
+
+    /**
+     * Returns the username.
+     * @return Current user's Username
+     */
+    String getUsername();
 }

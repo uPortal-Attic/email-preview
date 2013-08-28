@@ -41,27 +41,27 @@ import org.owasp.validator.html.ScanException;
  */
 interface IJavamailAccountDao {
 
-    void clearCache(String username, String mailAccount);
-
     /**
      * Performs the heavy-lifting of {@link IEmailAccountService} but in a way 
      * that exposes Javamail implementation details.  Caching annotations can be 
      * wrapped around these methods.
      * 
+     *
      * @param storeConfig
      * @param auth
      * @param username Portal username
-     * @param mailAccount Email account 
+     * @param mailAccount Email account
      * @param start Index of the first expected message
-     * @param max Maximum size of the collection of messages in the 
-     * returned {@link AccountSummary} object
-     * @return A representation of mail account details suitable for displaying 
+     * @param max Maximum size of the collection of messages in the
+     * returned {@link org.jasig.portlet.emailpreview.AccountSummary} object
+     * @param refresh true to ignore cache and fetch from target system
+     * @return A representation of mail account details suitable for displaying
      * in the view
      * @throws EmailPreviewException
      */
-    AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration storeConfig, 
-            Authenticator auth, String username, String mailAccount, int start,
-            int max) throws EmailPreviewException;
+    AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration storeConfig,
+                                                Authenticator auth, String username, String mailAccount, int start,
+                                                int max, boolean refresh) throws EmailPreviewException;
 
     Session openMailSession(MailStoreConfiguration config, Authenticator auth);
 

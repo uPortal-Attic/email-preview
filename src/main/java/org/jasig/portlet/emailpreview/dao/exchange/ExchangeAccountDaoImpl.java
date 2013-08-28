@@ -20,25 +20,44 @@
 
 package org.jasig.portlet.emailpreview.dao.exchange;
 
-import com.googlecode.ehcache.annotations.*;
-import com.microsoft.exchange.messages.*;
+import com.microsoft.exchange.messages.BaseRequestType;
+import com.microsoft.exchange.messages.BaseResponseMessageType;
+import com.microsoft.exchange.messages.DeleteItem;
+import com.microsoft.exchange.messages.FindFolder;
+import com.microsoft.exchange.messages.FindFolderResponseMessageType;
+import com.microsoft.exchange.messages.FindItem;
+import com.microsoft.exchange.messages.FindItemResponseMessageType;
+import com.microsoft.exchange.messages.FolderInfoResponseMessageType;
+import com.microsoft.exchange.messages.GetFolder;
+import com.microsoft.exchange.messages.GetItem;
+import com.microsoft.exchange.messages.ItemInfoResponseMessageType;
+import com.microsoft.exchange.messages.ResponseMessageType;
+import com.microsoft.exchange.messages.UpdateItem;
+import com.microsoft.exchange.messages.UpdateItemResponseMessageType;
 import com.microsoft.exchange.types.*;
-import com.microsoft.exchange.types.ObjectFactory;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.protocol.HTTP;
-import org.jasig.portlet.emailpreview.*;
+import org.jasig.portlet.emailpreview.AccountSummary;
+import org.jasig.portlet.emailpreview.EmailMessage;
+import org.jasig.portlet.emailpreview.EmailMessageContent;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
+import org.jasig.portlet.emailpreview.ExchangeEmailMessage;
+import org.jasig.portlet.emailpreview.ExchangeFolderDto;
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.caching.IMailAccountCacheKeyGenerator;
 import org.jasig.portlet.emailpreview.caching.IMessageCacheKeyGenerator;
-import org.jasig.portlet.emailpreview.caching.IUsernameCacheKeyGenerator;
-import org.jasig.portlet.emailpreview.caching.UsernameCacheKeyGeneratorImpl;
+import org.jasig.portlet.emailpreview.caching.MailAccountCacheKeyGeneratorImpl;
 import org.jasig.portlet.emailpreview.caching.UsernameItemCacheKeyGeneratorImpl;
+import org.jasig.portlet.emailpreview.dao.IMailAccountDao;
+import org.jasig.portlet.emailpreview.service.ICredentialsProvider;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
 import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.oxm.Marshaller;
 import org.springframework.ws.WebServiceMessage;
 import org.springframework.ws.client.WebServiceClientException;
@@ -60,17 +79,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Data accessor that uses Exchange Web Services to access messages.
+ * DAO that uses Exchange Web Services to access messages.
  *
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 
     // TODO:  Efficiency of the NTLM authenticated connections can be significantly improved by saving the HttpContext
     // into HttpSession so subsequent requests might use the same connection and already have gone through the
-    // multi-step authentication process.
+    // multi-step authentication process.  Another approach might be to alter the http client to use NTLM auth first.
     // See http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html#ntlm
 
-public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
+public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto> {
 
     protected final static String ROOT_SOAP_ACTION = "http://schemas.microsoft.com/exchange/services/2006/messages/";
     protected final static String FIND_FOLDER_SOAP_ACTION = ROOT_SOAP_ACTION + "FindFolder";
@@ -98,18 +117,22 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     private MessageUtils messageUtils;
 
     @Autowired(required = true)
-    private IExchangeCredentialsService credentialsService;
+    private ICredentialsProvider credentialsService;
 
     private List<String> regexFoldernameExclusionPatterns;
     private List<Pattern> foldernameExclusions = new ArrayList<Pattern>();
 
+    @Autowired
+    @Qualifier("exchangeChangeKeyCache")
     private Cache idCache;  // Used for internal caching of itemIds to changeKeys
     private IMessageCacheKeyGenerator idCacheKeyGenerator = new UsernameItemCacheKeyGeneratorImpl();
 
+    @Autowired
+    @Qualifier("exchangeFolderCache")
     private Cache folderCache;
-    private IUsernameCacheKeyGenerator folderCacheKeyGenerator = new UsernameCacheKeyGeneratorImpl();
+    private IMailAccountCacheKeyGenerator folderCacheKeyGenerator = new MailAccountCacheKeyGeneratorImpl();
 
-    private String folderCacheKeyPrefix = "Exchange";
+    private String folderCacheKeyPrefix = "ExchangeFolders";
 
     public void setRegexFoldernameExclusionPatterns(List<String> regexFoldernameExclusionPatterns) {
         this.regexFoldernameExclusionPatterns = regexFoldernameExclusionPatterns;
@@ -123,7 +146,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         this.folderCache = folderCache;
     }
 
-    public void setFolderCacheKeyGenerator(IUsernameCacheKeyGenerator folderCacheKeyGenerator) {
+    public void setFolderCacheKeyGenerator(IMailAccountCacheKeyGenerator folderCacheKeyGenerator) {
         this.folderCacheKeyGenerator = folderCacheKeyGenerator;
     }
 
@@ -151,7 +174,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         this.messageUtils = messageUtils;
     }
 
-    public void setCredentialsService(IExchangeCredentialsService credentialsService) {
+    public void setCredentialsService(ICredentialsProvider credentialsService) {
         this.credentialsService = credentialsService;
     }
 
@@ -167,45 +190,11 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     // getEmailSummaries
     // ----------------------------------------------------------
 
-    @TriggersRemove(cacheName="inboxCache",
-            keyGenerator = @KeyGenerator(
-                    name="StringCacheKeyGenerator",
-                    properties = @Property( name="includeMethod", value="false" )
-            )
-    )
     @Override
-    public void clearAccountSummaryCache(String username, String mailAccount) {
-        if (log.isDebugEnabled()) {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Removing cached AccountSummary for [mailAccount=")
-                    .append(mailAccount).append(", username=")
-                    .append(username).append("]");
-            log.debug(msg.toString());
-        }
-    }
-
-    @Cacheable(cacheName="inboxCache", selfPopulating=true,
-            keyGenerator = @KeyGenerator(
-                    name="StringCacheKeyGenerator",
-                    properties = @Property(name="includeMethod", value="false")
-            )
-    )
-    @Override
-    public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config, @PartialCacheKey String username,
-                                                       @PartialCacheKey String mailAccount, int start, int max, String folder) throws EmailPreviewException {
+    public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config, String username,
+                                                       String mailAccount, String folder, int start, int max) {
 
         try {
-
-            if (log.isDebugEnabled()) {
-                StringBuilder msg = new StringBuilder();
-                msg.append("Creating new AccountSummary for Exchange [")
-                        .append("mailAccount=").append(mailAccount)
-                        .append(", username=").append(username)
-                        .append(", folder=").append(folder)
-                        .append(", start=").append(start)
-                        .append(", max=").append(max).append("]");
-                log.debug(msg.toString());
-            }
 
             long startTime = System.currentTimeMillis();
             FolderType folderType = getFolder(folder, config);
@@ -354,8 +343,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
 
         for (ItemType itemType : items) {
             MessageType item = (MessageType) itemType;
+            // From can be null if you have a draft email that isn't filled out
+            String from = item.getFrom() != null ? item.getFrom().getMailbox().getName() : "";
             ExchangeEmailMessage message = new ExchangeEmailMessage(messageNumber, item.getItemId().getId(),
-                    item.getItemId().getChangeKey(), item.getFrom().getMailbox().getName(),
+                    item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
                     messageUtils.cleanHTML(item.getSubject()),
                     new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
                     !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null);
@@ -463,8 +454,9 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     // ----------------------------------------------------------
 
     @Override
-    public void deleteMessages(MailStoreConfiguration storeConfig, String[] uuids) {
+    public boolean deleteMessages(MailStoreConfiguration storeConfig, String[] uuids) {
         sendMessageAndExtractSingleResponse(createDeleteItemsSoapMessage(uuids), DELETE_ITEM_SOAP_ACTION, storeConfig);
+        return true;
     }
 
     private DeleteItem createDeleteItemsSoapMessage(String[] uuids) {
@@ -487,7 +479,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     // ----------------------------------------------------------
 
     @Override
-    public void setMessageReadStatus(MailStoreConfiguration storeConfig, String[] uuids, boolean read) {
+    public boolean setMessageReadStatus(MailStoreConfiguration storeConfig, String[] uuids, boolean read) {
         UpdateItemResponseMessageType soapResponse = (UpdateItemResponseMessageType)
                 sendMessageAndExtractSingleResponse(
                         createUpdateItemSoapMessage(uuids, read, storeConfig),
@@ -499,6 +491,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
             ItemIdType itemId = updatedItem.getItemId();
             insertChangeKeyIntoCache(itemId);
         }
+        return true;
     }
 
     private UpdateItem createUpdateItemSoapMessage(String[] uuids, boolean read, MailStoreConfiguration config) {
@@ -536,14 +529,13 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
     @Override
     public List<ExchangeFolderDto> getAllUserInboxFolders(MailStoreConfiguration storeConfig) {
 
-        log.debug("Requested fetching all folders");
-        String key = folderCacheKeyGenerator.getKey(credentialsService.getUsername(), folderCacheKeyPrefix);
+        String key = folderCacheKeyGenerator.getKey(credentialsService.getUsername(), storeConfig.getMailAccount(), folderCacheKeyPrefix);
         Element element = folderCache.get(key);
         if (element != null) {
-            return (List<ExchangeFolderDto>) element.getValue();
+            return (List<ExchangeFolderDto>) element.getObjectValue();
         }
 
-        log.debug("Item not in cache. Fetching all folders");
+        log.debug("User {} folders not in cache. Fetching all folders", storeConfig.getMailAccount());
         FindFolderResponseMessageType response = (FindFolderResponseMessageType)
                 sendMessageAndExtractSingleResponse(createFindFoldersSoapMessage(), FIND_FOLDER_SOAP_ACTION, storeConfig);
         FindFolderParentType rootFolder = response.getRootFolder();
@@ -573,10 +565,10 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         List<ExchangeFolderDto> folders;
 
         // Retrieve from cache or fetch
-        String key = folderCacheKeyGenerator.getKey(credentialsService.getUsername(), folderCacheKeyPrefix);
+        String key = folderCacheKeyGenerator.getKey(credentialsService.getUsername(), config.getMailAccount(), folderCacheKeyPrefix);
         Element element = folderCache.get(key);
         if (element != null) {
-            folders = (List<ExchangeFolderDto>) element.getValue();
+            folders = (List<ExchangeFolderDto>) element.getObjectValue();
         } else {
             folders = getAllUserInboxFolders(config);
         }
@@ -646,7 +638,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
                 StringResult message = new StringResult();
                 try {
                     marshaller.marshal(soapRequest, message);
-                    log.debug("Attempting to send SOAP request to {}\nSoap Action: {}\nSoap message body"
+                    log.trace("Attempting to send SOAP request to {}\nSoap Action: {}\nSoap message body"
                             +" (not exact, log org.apache.http.wire to see actual message):\n{}",
                             uri, soapAction, message);
                 } catch (IOException ex) {
@@ -662,7 +654,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
                 StringResult messageResponse = new StringResult();
                 try {
                     marshaller.marshal(response, messageResponse);
-                    log.debug("Soap response body (not exact, log org.apache.http.wire to see actual message):\n{}", messageResponse);
+                    log.trace("Soap response body (not exact, log org.apache.http.wire to see actual message):\n{}", messageResponse);
                 } catch (IOException ex) {
                     log.debug("IOException attempting to display soap response", ex);
                 }
@@ -741,7 +733,7 @@ public class ExchangeAccountDaoImpl implements IExchangeAccountDao {
         }
         ItemIdType itemIdType = new ItemIdType();
         itemIdType.setId(uuid);
-        itemIdType.setChangeKey((String) changeKey.getValue());
+        itemIdType.setChangeKey((String) changeKey.getObjectValue());
         return itemIdType;
     }
 

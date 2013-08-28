@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.jasig.portlet.emailpreview.caching;
 
 /**
- * 
+ * Generates cache keys for user email accounts
+ *
  * @author James Wennmacher, jwennmacher@unicon.net
  */
-public interface IUsernameCacheKeyGenerator {
 
-	/**
-	 * Returns a cache key for the user and prefix
-	 * 
-	 * @param username username
-	 * @param prefix prefix to apply to cache key
-	 * @return cache key for the user
-	 */
-	String getKey(String username, String prefix);
+public class AccountSummaryCacheKeyGeneratorImpl implements IAccountSummaryCacheKeyGenerator {
 
+    @Override
+    public String getKey(String loginId, String hostSystem, String folder, String protocol) {
+        final StringBuilder key = new StringBuilder();
+        key.append(protocol).append(".").append(loginId).append(".").append(folder).append(".").append(hostSystem).toString();
+        return key.toString();
+    }
 }

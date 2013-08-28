@@ -253,7 +253,7 @@ public final class DemoAccountService implements IEmailAccountService {
         return unreadCount;
     }
     
-    public Folder [] getAllUserInboxFolders(PortletRequest req) { 
-     	return null;
+    public List<Folder> getAllUserInboxFolders(PortletRequest req) {
+     	return new ArrayList<Folder>();
     }
 }

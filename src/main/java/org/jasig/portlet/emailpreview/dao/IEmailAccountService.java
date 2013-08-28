@@ -25,12 +25,15 @@ import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 
+import java.util.List;
+
 /**
  * IEmailAccountDao is repsonsible for retrieving email messages from an
  * arbitrary email store.
  *
  * @author Jen Bourey, jbourey@unicon.net
  * @author Drew Wills, drew@unicon.net
+ * @author James Wennmacher, jwennmacher@unicon.net
  */
 public interface IEmailAccountService {
 
@@ -38,20 +41,16 @@ public interface IEmailAccountService {
     public static final String IMAP = "imap";
 
     /**
-     * Obtains the {@link AccountSummary} object from the data store itself, or
-     * possibly from cache.
+     * Obtains the {@link AccountSummary} object from the data store itself, or possibly from cache.
      *
      * @param req The current {@link PortletRequest}
      * @param start
-     * @param max The maximum number of messages (header info) that may be 
-     * returned with the summary
-     * @param refresh True if the concrete service implementation must not 
-     * return cached data;  otherwise false
+     * @param max The maximum number of messages (header info) that may be returned with the summary
+     * @param refresh True if the concrete service implementation must not return cached data;  otherwise false
      * @return
-     * @throws MailAuthenticationException When authentication with the mail server fails
      * @throws EmailPreviewException On other errors
      */
-    public AccountSummary getAccountSummary(PortletRequest req, int start,
+    AccountSummary getAccountSummary(PortletRequest req, int start,
             int max, boolean refresh, String folder) throws EmailPreviewException;
 
     /**
@@ -62,7 +61,7 @@ public interface IEmailAccountService {
      * @param messageId messageId
      * @return
      */
-    public EmailMessage getMessage(PortletRequest req, String messageId);
+    EmailMessage getMessage(PortletRequest req, String messageId);
 
     /**
      * Delete and expunge the specified massages from the store.  Supported for
@@ -86,7 +85,7 @@ public interface IEmailAccountService {
      * @param read The new value of the seen flag
      * @return Success or failure
      */
-    public boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean read);
+    boolean setSeenFlag(PortletRequest req, String[] messageIds, boolean read);
 
-    Folder[] getAllUserInboxFolders(PortletRequest req);
+    List<Folder> getAllUserInboxFolders(PortletRequest req);
 }

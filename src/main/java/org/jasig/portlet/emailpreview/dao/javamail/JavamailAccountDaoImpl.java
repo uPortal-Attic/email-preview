@@ -18,23 +18,39 @@
  */
 package org.jasig.portlet.emailpreview.dao.javamail;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.sun.mail.imap.IMAPFolder;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.jasig.portlet.emailpreview.AccountSummary;
+import org.jasig.portlet.emailpreview.EmailMessage;
+import org.jasig.portlet.emailpreview.EmailMessageContent;
+import org.jasig.portlet.emailpreview.EmailPreviewException;
+import org.jasig.portlet.emailpreview.EmailQuota;
+import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.IMailAccountDao;
+import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
+import org.jasig.portlet.emailpreview.service.ICredentialsProvider;
+import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
+import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
+import org.owasp.validator.html.AntiSamy;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
+import org.owasp.validator.html.PolicyException;
+import org.owasp.validator.html.ScanException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.FetchProfile;
+import javax.mail.Flags;
+import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -43,52 +59,36 @@ import javax.mail.Quota;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
-import javax.mail.Flags.Flag;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.SharedByteArrayInputStream;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jasig.portlet.emailpreview.AccountSummary;
-import org.jasig.portlet.emailpreview.EmailMessage;
-import org.jasig.portlet.emailpreview.EmailMessageContent;
-import org.jasig.portlet.emailpreview.EmailPreviewException;
-import org.jasig.portlet.emailpreview.EmailQuota;
-import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
-import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
-import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
-import org.owasp.validator.html.AntiSamy;
-import org.owasp.validator.html.CleanResults;
-import org.owasp.validator.html.Policy;
-import org.owasp.validator.html.PolicyException;
-import org.owasp.validator.html.ScanException;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
-
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.PartialCacheKey;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-import com.sun.mail.imap.IMAPFolder;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * This class does the heavy-lifting for Javamail integration and implements the
- * caching.
+ * This class accesses the Javamail host for mailbox operations.
+ *
+ * NOTE: With Javamail, uuids are not globally-unique within the user's mail store as they are with Exchange for
+ * instance.  With Javamail the messageIds are index numbers within the mailbox store (which is really per-folder).
+ * Thus, many mail folders for a user may have a messageId=1.  This does not present many problems as long as we
+ * insure we are only dealing with one folder at a time.
  *
  * @author awills
+ * @author James Wennmacher, jwennmacher@unicon.net
  */
 @Component
-public final class JavamailAccountDaoImpl implements IJavamailAccountDao, InitializingBean, ApplicationContextAware {
+public final class JavamailAccountDaoImpl implements IMailAccountDao {
 
     private static final String CONTENT_TYPE_ATTACHMENTS_PATTERN = "multipart/mixed;";
     private static final String INTERNET_ADDRESS_TYPE = "rfc822";
@@ -96,16 +96,24 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
     @Autowired(required = true)
     private ILinkServiceRegistry linkServiceRegistry;
 
+    @Autowired
+    private ICredentialsProvider credentialsProvider;
+
     /**
      * Value for the 'mail.debug' setting in JavaMail
      */
     private boolean debug = false;
 
     private String filePath = "classpath:antisamy.xml";  // default
+    @Autowired(required = true)
     private ApplicationContext ctx;
     private Policy policy;
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    public void setCredentialsProvider(ICredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
+    }
 
     /**
      * Set the file path to the Anti-samy policy file to be used for cleaning
@@ -117,62 +125,25 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             this.filePath = path;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        this.ctx = ctx;
-    }
-
-    @Override
+    @PostConstruct
     public void afterPropertiesSet() throws Exception {
         InputStream stream = ctx.getResource(filePath).getInputStream();
         policy = Policy.getInstance(stream);
     }
 
-    @TriggersRemove(cacheName="inboxCache",
-        keyGenerator = @KeyGenerator(
-            name="StringCacheKeyGenerator",
-            properties = @Property( name="includeMethod", value="false" )
-        )
-    )
     @Override
-    public void clearCache(String username, String mailAccount) {
-        if (log.isDebugEnabled()) {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Removing cached AccountSummary for [mailAccount=")
-                        .append(mailAccount).append(", username=")
-                        .append(username).append("]");
-            log.debug(msg.toString());
-        }
-    }
+    public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config, String username,
+                                                String mailAccount, String folder, int start, int max) {
 
-    @Cacheable(cacheName="inboxCache", selfPopulating=true,
-        keyGenerator = @KeyGenerator(
-            name="StringCacheKeyGenerator",
-            properties = @Property(name="includeMethod", value="false")
-        )
-    )
-    @Override
-    public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config,
-            Authenticator auth, @PartialCacheKey String username,
-            @PartialCacheKey String mailAccount, int start, int max)
-            throws EmailPreviewException {
+        Authenticator auth = credentialsProvider.getAuthenticator();
 
-        if (log.isDebugEnabled()) {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Creating new AccountSummary for [mailAccount=")
-                        .append(mailAccount).append(", username=")
-                        .append(username).append(", start=")
-                        .append(start).append(", max=")
-                        .append(max).append("]");
-            log.debug(msg.toString());
-        }
-
+        AccountSummary summary;
         Folder inbox = null;
         try {
 
-            // Retrieve user's inbox
+            // Retrieve user's folder
             Session session = openMailSession(config, auth);
-            inbox = getUserInbox(session, config.getInboxFolderName());
+            inbox = getUserInbox(session, folder);
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
             List<EmailMessage> messages = getEmailMessages(inbox, start, max, session);
@@ -194,7 +165,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             }
 
             // Initialize account information with information retrieved from inbox
-            AccountSummary rslt = new AccountSummary(inboxUrl, messages,
+            summary = new AccountSummary(inboxUrl, messages,
                     inbox.getUnreadMessageCount(), inbox.getMessageCount(),
                     start, max, isDeleteSupported(inbox), getQuota(inbox));
 
@@ -202,7 +173,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
                 log.debug("Successfully retrieved email AccountSummary");
             }
 
-            return rslt;
+            return summary;
 
         } catch (MailAuthenticationException mae) {
             // We used just to allow this exception to percolate up the chain,
@@ -226,21 +197,19 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             if ( inbox != null ) {
                 try {
                     inbox.close(false);
-		} catch ( Exception e ) {
-                    log.warn("Can't close correctly javamail inbox connection");
-		}
-		try {
-		    inbox.getStore().close();
                 } catch ( Exception e ) {
-		    log.warn("Can't close correctly javamail store connection");
-		}
+                    log.warn("Can't close correctly javamail inbox connection");
+                }
+                try {
+                    inbox.getStore().close();
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail store connection");
+                }
             }
         }
-
     }
 
-    @Override
-    public Session openMailSession(MailStoreConfiguration config, Authenticator auth) {
+    private Session openMailSession(MailStoreConfiguration config, Authenticator auth) {
 
         // Assertions.
         if (config == null) {
@@ -285,7 +254,68 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
     }
 
     @Override
-    public Folder getUserInbox(Session session, String folderName)
+    public EmailMessage getMessage(MailStoreConfiguration config, String messageId) {
+        Authenticator auth = credentialsProvider.getAuthenticator();
+        Folder inbox = null;
+        try {
+            int mode = config.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
+
+            // Retrieve user's inbox
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
+            inbox.open(mode);
+
+            Message message;
+            if (inbox instanceof UIDFolder) {
+                message = ((UIDFolder)inbox).getMessageByUID(Long.parseLong(messageId));
+            } else {
+                message = inbox.getMessage(Integer.parseInt(messageId));
+            }
+            boolean unread = !message.isSet(Flags.Flag.SEEN);
+            if (config.getMarkMessagesAsRead()) {
+                message.setFlag(Flag.SEEN, true);
+            }
+            EmailMessage emailMessage = wrapMessage(message, true, session);
+            if (!config.getMarkMessagesAsRead()) {
+                // NOTE:  This is more than a little bit annoying.  Apparently
+                // the mere act of accessing the body content of a message in
+                // Javamail flags the in-memory representation of that message
+                // as SEEN.  It does *nothing* to the mail server (the message
+                // is still unread in the SOR), but it wreaks havoc on local
+                // functions that key off that value and expect it to be
+                // accurate.  We're obligated, therefore, to restore the value
+                // to what it was before the call to wrapMessage().
+                emailMessage.setUnread(unread);
+            }
+
+            return emailMessage;
+        } catch (MessagingException e) {
+            log.error("Messaging exception while retrieving individual message", e);
+        } catch (IOException e) {
+            log.error("IO exception while retrieving individual message", e);
+        } catch (ScanException e) {
+            log.error("AntiSamy scanning exception while retrieving individual message", e);
+        } catch (PolicyException e) {
+            log.error("AntiSamy policy exception while retrieving individual message", e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(false);
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+                }
+                try {
+                    inbox.getStore().close();
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail store connection");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Folder getUserInbox(Session session, String folderName)
             throws MessagingException {
 
         // Assertions.
@@ -299,7 +329,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             store.connect();
 
             if (log.isDebugEnabled()) {
-                log.debug("Mail store connection established");
+                log.debug("Mail store connection established to get user inbox");
             }
 
             // Retrieve user's inbox folder
@@ -313,8 +343,8 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
 
     }
 
-    @Override
-    public EmailMessage wrapMessage(Message msg, boolean populateContent, Session session) throws MessagingException, IOException, ScanException, PolicyException {
+    private EmailMessage wrapMessage(Message msg, boolean populateContent, Session session)
+            throws MessagingException, IOException, ScanException, PolicyException {
 
         // Prepare subject
         String subject = msg.getSubject();
@@ -409,7 +439,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
             // Message was digitally signed and we are unable to read it;
             // logging as DEBUG because this issue is known/expected, and
             // because the user's experience is in no way affected (at this point)
-            log.debug("Message content unabailable (digitally signed?);  " +
+            log.debug("Message content unavailable (digitally signed?);  " +
                         "message will appear in the preview table correctly, " +
                         "but the body will not be viewable");
             log.trace(me.getMessage(), me);
@@ -445,8 +475,7 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         mailFolder.fetch(messages, profile);
 
         if (log.isDebugEnabled()) {
-            log.debug("Time elapsed while fetching message headers:"
-                    + (System.currentTimeMillis() - startTime));
+            log.debug("Time elapsed while fetching message headers; {}ms", System.currentTimeMillis() - startTime);
         }
 
         List<EmailMessage> emails = new LinkedList<EmailMessage>();
@@ -529,6 +558,136 @@ public final class JavamailAccountDaoImpl implements IJavamailAccountDao, Initia
         }
 
         return false;
+    }
+
+    @Override
+    public boolean deleteMessages(MailStoreConfiguration config, String[] uuids) {
+        Authenticator auth = credentialsProvider.getAuthenticator();
+        Folder inbox = null;
+        try {
+
+            // Retrieve user's inbox
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
+
+            // Verify that we can even perform this operation
+            if (!(inbox instanceof UIDFolder)) {
+                String msg = "Delete feature is supported only for UIDFolder instances";
+                throw new UnsupportedOperationException(msg);
+            }
+
+            inbox.open(Folder.READ_WRITE);
+
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(getMessageUidsAsLong(uuids));
+            inbox.setFlags(msgs, new Flags(Flag.DELETED), true);
+
+            return true;  // Indicate success
+
+        } catch (MessagingException e) {
+            log.error("Messaging exception while deleting messages", e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(false);
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+                }
+                try {
+                    inbox.getStore().close();
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail store connection");
+                }
+            }
+        }
+
+        return false;  // We failed if we reached this point
+    }
+
+    private long[] getMessageUidsAsLong(String[] messageIds) {
+        long[] ids = new long[messageIds.length];
+        int i = 0;
+        for (String id : messageIds) {
+            ids[i++] = Long.parseLong(id);
+        }
+        return ids;
+    }
+
+    @Override
+    public boolean setMessageReadStatus(MailStoreConfiguration config, String[] uuids, boolean read) {
+        Authenticator auth = credentialsProvider.getAuthenticator();
+        Folder inbox = null;
+        try {
+            // Retrieve user's inbox
+            Session session = openMailSession(config, auth);
+            inbox = getUserInbox(session, config.getInboxFolderName());
+
+            // Verify that we can even perform this operation
+            if (!(inbox instanceof UIDFolder)) {
+                String msg = "Toggle unread feature is supported only for UIDFolder instances";
+                throw new UnsupportedOperationException(msg);
+            }
+
+            inbox.open(Folder.READ_WRITE);
+
+            Message[] msgs = ((UIDFolder) inbox).getMessagesByUID(getMessageUidsAsLong(uuids));
+            inbox.setFlags(msgs, new Flags(Flag.SEEN), read);
+
+            return true;  // Indicate success
+
+        } catch (MessagingException e) {
+            log.error("Messaging exception while deleting messages", e);
+        } finally {
+            if ( inbox != null ) {
+                try {
+                    inbox.close(false);
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail inbox connection");
+                }
+                try {
+                    inbox.getStore().close();
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail store connection");
+                }
+            }
+        }
+
+        return false;  // We failed if we reached this point
+    }
+
+    @Override
+    public List<Folder> getAllUserInboxFolders(MailStoreConfiguration config) {
+        Authenticator auth = credentialsProvider.getAuthenticator();
+        Store store = null;
+        try {
+            Session session = openMailSession(config, auth);
+
+            // Assertions.
+            if (session == null) {
+                String msg = "Argument 'session' cannot be null";
+                throw new IllegalArgumentException(msg);
+            }
+
+            store = session.getStore();
+            store.connect();
+
+            if (log.isDebugEnabled()) {
+                log.debug("Mail store connection established to get all user inbox folders");
+            }
+
+            // Retrieve user's inbox folder
+            return Arrays.asList(store.getDefaultFolder().list("*"));
+        } catch ( Exception e ) {
+            log.error("Can't get all user Inbox folders");
+            return null;
+        } finally {
+            if (store != null) {
+                try {
+                    store.close();
+                } catch ( Exception e ) {
+                    log.warn("Can't close correctly javamail store connection");
+                }
+            }
+        }
     }
 
     private boolean isDeleteSupported(Folder f) {

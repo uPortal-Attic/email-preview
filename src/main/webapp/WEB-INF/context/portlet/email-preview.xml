@@ -25,11 +25,9 @@
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:c="http://www.springframework.org/schema/c"
-    xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-            http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.javamail"/>
@@ -37,17 +35,23 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
-    <ehcache:annotation-driven />
     <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
 
-    <bean id="exchangeChangeKeyCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
-          p:cacheManager-ref="cacheManager" p:cacheName="exchangeChangeKeyCache"/>
+    <bean id="inboxCache" factory-bean="cacheManager" factory-method="getCache">
+        <constructor-arg value="inboxCache" />
+    </bean>
 
-    <bean id="exchangeFolderCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
-          p:cacheManager-ref="cacheManager" p:cacheName="inboxCache"/>
+    <bean id="exchangeChangeKeyCache" factory-bean="cacheManager" factory-method="getCache">
+        <constructor-arg value="exchangeChangeKeyCache" />
+    </bean>
 
-    <bean id="mailboxServernameCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"
-          p:cacheManager-ref="cacheManager" p:cacheName="ewsEndpointUriCache"/>
+    <bean id="exchangeFolderCache" factory-bean="cacheManager" factory-method="getCache">
+        <constructor-arg value="inboxCache" />
+    </bean>
+
+    <bean id="mailboxServernameCache" factory-bean="cacheManager" factory-method="getCache">
+        <constructor-arg value="ewsEndpointUriCache" />
+    </bean>
 
     <!-- Ref to the mbean server -->
     <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
@@ -70,7 +74,7 @@
         </property>
     </bean>
 
-    <bean class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
+    <bean id="simpleServiceBroker" class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
         <property name="services">
             <util:map>
                 <entry key="pop3" value-ref="javamailAccountService"/>
@@ -87,11 +91,16 @@
         <value>ExchangeWebServices</value>
     </util:set>
 
+    <bean id="javamailAccountService"
+          class="org.jasig.portlet.emailpreview.dao.EmailAccountService"
+          p:dao-ref="javamailAccountDaoImpl">
+    </bean>
+
     <!--
      | EXCHANGE INTEGRATION SUPPORT
      +-->
-    <bean id="exchangeAccountService"
-          class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountService">
+    <bean id="exchangeAccountService" class="org.jasig.portlet.emailpreview.dao.EmailAccountService"
+          p:dao-ref="exchangeAccountDao">
     </bean>
 
     <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
@@ -108,7 +117,7 @@
             p:maxTotal="200"/>
     <bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient"
           c:conman-ref="httpClientConnectionManager"
-          p:credentialsProvider-ref="exchangeWsCredentialsProvider"
+          p:credentialsProvider-ref="mailCredentialsProvider"
           p:redirectStrategy-ref="autodiscoverRedirectStrategy">
     </bean>
 
@@ -123,7 +132,7 @@
         </property>
     </bean>
 
-    <!-- For TESTING only.  Do NOT use this client in production!!  -->
+    <!-- For TESTING only.  Do NOT use this client in production!! It ignores SSL cert errors. -->
     <!--<bean id="httpClient" class="org.jasig.portlet.emailpreview.dao.exchange.TestingDontUseTrustEveryoneNtlmAuthHttpClient"-->
                 <!--c:conman="org.apache.http.impl.conn.PoolingClientConnectionManager"-->
                 <!--p:credentialsProvider="org.jasig.portlet.emailpreview.dao.exchange.ExchangeWsCredentialsProvider"-->
@@ -139,8 +148,7 @@
         <qualifier value="exchange" />
     </bean>
     <bean id="exchangeAccountDao" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountDaoImpl"
-          p:webServiceOperations-ref="webServiceTemplate" p:idCache-ref="exchangeChangeKeyCache"
-          p:folderCache-ref="exchangeFolderCache" p:marshaller-ref="marshaller"/>
+          p:webServiceOperations-ref="webServiceTemplate" p:marshaller-ref="marshaller"/>
 
     <bean id="autodiscoverWebServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate" scope="prototype"
           p:messageSender-ref="webServiceMessageSender"
@@ -148,7 +156,6 @@
         <qualifier value="exchangeAutodiscover" />
     </bean>
     <bean id="exchangeAutodiscoverDao" class="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAutoDiscoverDaoImpl"
-          p:webServiceOperations-ref="autodiscoverWebServiceTemplate"
-          p:ewsEndpointUriCache-ref="mailboxServernameCache" p:marshaller-ref="marshaller"/>
+          p:webServiceOperations-ref="autodiscoverWebServiceTemplate" p:marshaller-ref="marshaller"/>
 
 </beans>

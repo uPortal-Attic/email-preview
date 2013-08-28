@@ -84,6 +84,8 @@ public class ExchangeAutoDiscoverDaoImpl implements IExchangeAutoDiscoverDao {
     private final ObjectFactory objectFactory = new ObjectFactory();
     private Marshaller marshaller;
 
+    @Autowired
+    @Qualifier("mailboxServernameCache")
     private Cache ewsEndpointUriCache;
     private IEWSEndpoingUriCacheKeyGenerator ewsEndpointUriCacheKeyGenerator = new EWSEndpointUriCacheKeyGeneratorImpl();
 

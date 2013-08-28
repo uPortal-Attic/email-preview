@@ -19,17 +19,17 @@
 package org.jasig.portlet.emailpreview.caching;
 
 /**
- * Generates cache keys for user email message Ids
+ * Generates cache keys for user email accounts
  *
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 
-public class UsernameCacheKeyGeneratorImpl implements IUsernameCacheKeyGenerator {
+public class MailAccountCacheKeyGeneratorImpl implements IMailAccountCacheKeyGenerator {
 
     @Override
-    public String getKey(String username, String prefix) {
+    public String getKey(String loginId, String hostSystem, String prefix) {
         final StringBuilder key = new StringBuilder();
-        key.append(prefix).append(".").append(username).toString();
+        key.append(prefix).append(".").append(loginId).append(".").append(hostSystem).toString();
         return key.toString();
     }
 }
