@@ -128,19 +128,9 @@
     <bean id="cachedPasswordAuthenticationService" 
             class="org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService"/>
 
-    <!-- Uncomment the following 2 beans to use the portletPreferencesCredentialsAuthenticationService
-
-         NOTE:  Read carefully the instructions for the 'stringEncryptionService' bean (below).
-    -->
-    <bean id="portletPreferencesCredentialsAuthenticationService" 
+    <bean id="portletPreferencesCredentialsAuthenticationService"
             class="org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService"/>
 
-    <!-- Before using the string encryption service you MUST first set a password.
-
-         WARNING:  Do NOT change this password once users have entered
-         their credentials into the portlet configuration. The system
-         won't be able to decrypt them, and users will get an error.
-    -->
     <bean id="stringEncryptionService" class="org.jasig.portlet.emailpreview.security.JasyptPBEStringEncryptionServiceImpl">
         <property name="stringEncryptor">
             <bean class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">

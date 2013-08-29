@@ -40,13 +40,7 @@
     <div class="fl-widget-content portlet-body" role="main">
 
         <form:form action="${ formUrl }" method="POST" commandName="form" htmlEscape="false">
-            <!--  Used for warning that the encryption key hasn't been changed from the default -->
-            <form:input path="isUsingDefaultEncryptionKey" type="hidden" />
-            <c:if test="${form.isUsingDefaultEncryptionKey eq true}">
-                <div class="portlet-msg-error portlet-msg error" role="alert">
-                    <spring:message code="editPreferences.warning.message.default.password.set"/>
-                </div>
-            </c:if>
+
             <!-- General Configuration Section -->
             <div class="portlet-section" role="region">
                 <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.basic"/></h3>
@@ -182,26 +176,36 @@
                 <p><spring:message code="config.preferences.comment"/></p>
                 <div class="portlet-section-body">
 	                <c:forEach items="${authServices}" var="auth">
+                    <div>
 	                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/>
-	                    <table class="auth-service-parameters">
-	                        <thead>
-	                            <tr>
-	                                <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>
-	                                <th><spring:message code="config.preferences.value"/></th>
-	                            </tr>
-	                        </thead>
-	                        <tbody>
-	                            <c:forEach items="${auth.adminConfigurationParameters}" var="parameter">
-	                                <c:set var="path" value="additionalProperties['${ parameter.key }'].value"/>
-	                                <tr class="parameter-row">
-	                                    <td class="preference-name">
-	                                        <form:label path="${ path }">${ parameter.label }</form:label>
-	                                    </td>
-	                                    <td class="value"><form:input path="${ path }"/></td>
-	                                </tr>
-	                            </c:forEach>
-	                        </tbody>
-	                    </table>
+                      <c:if test="${!empty auth.adminConfigurationParameters}">
+                        <!--  Used for warning that the encryption key hasn't been changed from the default -->
+                        <c:if test="${auth.key eq 'portletPreferences' && usingDefaultEncryptionKey eq true}">
+                          <div class="portlet-msg-alert portlet-msg alert" role="alert">
+                            <spring:message code="editPreferences.warning.message.default.password.set"/>
+                          </div>
+                        </c:if>
+                        <table class="auth-service-parameters">
+                            <thead>
+                                <tr>
+                                    <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>
+                                    <th><spring:message code="config.preferences.value"/></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${auth.adminConfigurationParameters}" var="parameter">
+                                    <c:set var="path" value="additionalProperties['${ parameter.key }'].value"/>
+                                    <tr class="parameter-row">
+                                        <td class="preference-name">
+                                            <form:label path="${ path }">${ parameter.label }</form:label>
+                                        </td>
+                                        <td class="value"><form:input path="${ path }"/></td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                      </c:if>
+                    </div>
 	                </c:forEach>
                 </div>
             </div>

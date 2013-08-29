@@ -44,6 +44,7 @@ import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
+import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
@@ -67,18 +68,23 @@ public class MailStoreConfigurationController extends BaseEmailController {
     
     protected final Log log = LogFactory.getLog(getClass());
 
-    private ILinkServiceRegistry linkServiceRegistry;
-    
     @Autowired(required = true)
+    private IAuthenticationServiceRegistry authServiceRegistry;
+    @Autowired(required = true)
+    private ILinkServiceRegistry linkServiceRegistry;
+    @Autowired(required = true)
+    private IStringEncryptionService encryptionService;
+    
     public void setLinkServiceRegistry(ILinkServiceRegistry linkServiceRegistry) {
         this.linkServiceRegistry = linkServiceRegistry;
     }
 
-    private IAuthenticationServiceRegistry authServiceRegistry;
-    
-    @Autowired(required = true)
     public void setAuthServiceRegistry(IAuthenticationServiceRegistry authServiceRegistry) {
         this.authServiceRegistry = authServiceRegistry;
+    }
+
+    public void setEncryptionService(IStringEncryptionService encryptionService) {
+        this.encryptionService = encryptionService;
     }
 
     @RequestMapping
@@ -146,7 +152,12 @@ public class MailStoreConfigurationController extends BaseEmailController {
         
         response.setPortletMode(PortletMode.VIEW);
     }
-    
+
+    @ModelAttribute("usingDefaultEncryptionKey")
+    public Boolean isUsingDefaultEncryptionKey() {
+        return encryptionService.usingDefaultEncryptionKey();
+    }
+
     @ModelAttribute("form")
     public MailStoreConfigurationForm getConfigurationForm(PortletRequest req) {
         final MailStoreConfiguration config = serviceBroker.getConfiguration(req);
