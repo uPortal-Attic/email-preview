@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 
@@ -96,6 +97,13 @@ public class JasyptPBEStringEncryptionServiceImpl implements IStringEncryptionSe
      */
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
+        final String enc = this.encrypt(this.getClass().getName());
+        Assert.notNull(enc, "String encryption service is not properly configured.");
+
+        final String dec = this.decrypt(enc);
+        Assert.notNull(dec, "String decryption service is not properly configured.");
+        Assert.isTrue(dec.equals(this.getClass().getName()), "String decryption failed to decode the encrypted text " + enc);
+
         if (usingDefaultEncryptionKey()) {
             logger.error("Encryption key at default value.  Change it in configuration.properties for improved security!");
         }

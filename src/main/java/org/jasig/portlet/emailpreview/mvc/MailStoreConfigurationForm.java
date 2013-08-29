@@ -32,7 +32,6 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 
 public class MailStoreConfigurationForm implements Serializable {
 
-    public static final String UNCHANGED_SECURE_VALUE = "uNch@ng3d.S3cur3!"; 
     private static final long serialVersionUID = 1L;
 
     private String protocol;
