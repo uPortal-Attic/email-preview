@@ -121,6 +121,12 @@ margin-right: 10px;
 margin-left: 40px;
 font-weight: bold;
 }
+.email-list .flc-pager-links .flc-pager-pageLink a {
+	text-decoration: underline; color: #5A95CF;
+}
+.email-list .flc-pager-links .flc-pager-pageLink a:hover {
+	text-decoration: underline; color: #6db5fb;
+}
 .hidden {
     display: none;
 }
