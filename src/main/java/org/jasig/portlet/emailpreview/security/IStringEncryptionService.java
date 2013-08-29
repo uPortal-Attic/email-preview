@@ -27,23 +27,29 @@ package org.jasig.portlet.emailpreview.security;
  * @author bourey
  */
 public interface IStringEncryptionService {
-	
-	/**
-	 * Encrypt a string
-	 * 
-	 * @param plaintext
-	 * @return encrypted version of the plaintext
-	 * @throws StringEncryptionException
-	 */
-	public String encrypt(String plaintext);
-	
-	/**
-	 * Decrypt a string
-	 * 
-	 * @param cryptotext
-	 * @return decrypted version of the cryptotext
-	 * @throws StringEncryptionException
-	 */
-	public String decrypt(String cryptotext);
+    
+    /**
+     * Encrypt a string
+     * 
+     * @param plaintext
+     * @return encrypted version of the plaintext
+     * @throws StringEncryptionException
+     */
+    public String encrypt(String plaintext);
+    
+    /**
+     * Decrypt a string
+     * 
+     * @param cryptotext
+     * @return decrypted version of the cryptotext
+     * @throws StringEncryptionException
+     */
+    public String decrypt(String cryptotext);
+
+    /**
+     * Returns true if the encryptor is configured to use the default encryption key.
+     * @return true if encryption key is default value
+     */
+    public boolean usingDefaultEncryptionKey();
 
 }
