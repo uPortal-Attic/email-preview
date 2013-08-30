@@ -34,9 +34,8 @@ public class ExchangeEmailMessage extends EmailMessage {
 
     public ExchangeEmailMessage(int messageNumber, String uid, String exchangeChangeKey, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
-                        boolean multipart, String contentType, EmailMessageContent content, String toRecipients, String ccRecipients) {
-        super(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted,
-                multipart, contentType, content, toRecipients, ccRecipients);
+                        boolean multipart, String contentType, EmailMessageContent content, String to, String cc, String bcc) {
+        super(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, content, to, cc, bcc);
         this.exchangeChangeKey = exchangeChangeKey;
     }
 
