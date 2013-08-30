@@ -349,7 +349,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                     item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
                     messageUtils.cleanHTML(item.getSubject()),
                     new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
-                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null);
+                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null);
             messages.add(message);
             messageNumber++;
         }
@@ -374,12 +374,13 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         String contentType = message.getBody().getBodyType().value();
         EmailMessageContent content = new EmailMessageContent(messageUtils.cleanHTML(message.getBody().getValue()),
                 BodyTypeType.HTML.equals(message.getBody().getBodyType()));
-        String allRecipients = getAllToRecipients(message);
+        String toRecipients = getToRecipients(message);
+        String ccRecipients = getCcRecipients(message);
 
         ExchangeEmailMessage msg =  new ExchangeEmailMessage(0, message.getItemId().getId(), message.getItemId().getChangeKey(),
                 sender, messageUtils.cleanHTML(message.getSubject()),
                 new Date(message.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
-                !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, content, allRecipients);
+                !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, content, toRecipients, ccRecipients);
 
         // Insert the changeKey into cache in case the message read status is changed again.
         insertChangeKeyIntoCache(msg.getMessageId(), msg.getExchangeChangeKey());
@@ -387,11 +388,15 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         return msg;
     }
 
-    private String getAllToRecipients(MessageType message) {
-        return getAllRecipients(message.getToRecipients());
+    private String getToRecipients(MessageType message) {
+        return getRecipients(message.getToRecipients());
+    }
+    
+    private String getCcRecipients(MessageType message) {
+        return getRecipients(message.getCcRecipients());
     }
 
-    private String getAllRecipients(ArrayOfRecipientsType addrs) {
+    private String getRecipients(ArrayOfRecipientsType addrs) {
         StringBuilder str = new StringBuilder();
         if (addrs != null) {
             for (EmailAddressType addr : addrs.getMailboxes()) {

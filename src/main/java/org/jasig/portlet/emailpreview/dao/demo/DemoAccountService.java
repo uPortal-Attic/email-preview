@@ -128,7 +128,7 @@ public final class DemoAccountService implements IEmailAccountService {
                 EmailMessage msg = !m.equals(rslt) ? m
                         : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                             m.getSentDate(), false, m.isAnswered(), m.isDeleted(),
-                            m.isMultipart(), m.getContentType(), m.getContent(), m.getAllRecipients());
+                            m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(), m.getCcRecipients());
                 newList.add(msg);
             }
             session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
@@ -184,7 +184,7 @@ public final class DemoAccountService implements IEmailAccountService {
             EmailMessage msg = !changed.contains(m.getMessageId()) ? m
                     : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                         m.getSentDate(), !seenValue, m.isAnswered(), m.isDeleted(),
-                        m.isMultipart(), m.getContentType(), m.getContent(), m.getAllRecipients());
+                        m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(), m.getCcRecipients());
             newList.add(msg);
         }
 
@@ -220,11 +220,12 @@ public final class DemoAccountService implements IEmailAccountService {
                 boolean answered = false; // didn't consider to change this
                 boolean deleted = false; // more testing is available here
                 EmailMessageContent content = new EmailMessageContent(msg.path("body").getTextValue(), true);
-                String allRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
+                String toRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
+                String ccRecipients = "ccTest@test.univ.eu; ccTest1@test1.univ.eu";
 
                 messages.add(new EmailMessage(messages.size(), uid,
                         sender, subject, sentDate, unread, answered, deleted,
-                        false, "text/plain", content, allRecipients));
+                        false, "text/plain", content, toRecipients, ccRecipients));
 
             }
         } catch (Exception e) {
