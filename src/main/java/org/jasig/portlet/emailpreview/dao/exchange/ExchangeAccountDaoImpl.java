@@ -431,7 +431,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
     }
 
     private String formatEmailAddress(EmailAddressType emailAddr) {
-        return emailAddr.getName() + "<" + emailAddr.getEmailAddress() + ">";
+        return emailAddr.getName() + " &lt;" + emailAddr.getEmailAddress() + "&gt;";
     }
 
     public ItemIdType getMessageChangeKey(String uuid, MailStoreConfiguration config) {

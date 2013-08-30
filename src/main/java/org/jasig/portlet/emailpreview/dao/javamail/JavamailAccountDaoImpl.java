@@ -290,9 +290,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
                 // to what it was before the call to wrapMessage().
                 emailMessage.setUnread(unread);
             }
-            emailMessage.setToRecipients(getTo(message));
-            emailMessage.setCcRecipients(getCc(message));
-            emailMessage.setBccRecipients(getBcc(message));
+
             return emailMessage;
         } catch (MessagingException e) {
             log.error("Messaging exception while retrieving individual message", e);
@@ -405,7 +403,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         }
 
         Address[] addr = msg.getFrom();
-        String sender = getFormattedSender(addr);
+        String sender = getFormattedAddresses(addr);
         Date sentDate = msg.getSentDate();
 
         boolean unread = !msg.isSet(Flag.SEEN);
@@ -426,8 +424,10 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
                         "but the body will not be viewable");
             log.trace(me.getMessage(), me);
         }
-
-        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, msgContent);
+        String to = getTo(msg);
+        String cc = getCc(msg);
+        String bcc = getBcc(msg);
+        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, msgContent, to, cc, bcc);
     }
 
     /*
@@ -706,20 +706,6 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         Address[] bccRecipients = message.getRecipients(RecipientType.BCC);
         return getFormattedAddresses(bccRecipients);
     }
-
-    private String getFormattedSender(Address[] addr) {
-		String sender = null;
-        if (addr != null && addr.length != 0) {
-            Address a = addr[0];
-            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
-                InternetAddress inet = (InternetAddress) a;
-                sender = inet.toUnicodeString();
-            } else {
-                sender = a.toString();
-            }
-        }
-		return sender;
-	}
 
 	private String getFormattedAddresses(Address[] addresses) {
 		List <String> recipientsList = new ArrayList <String>();

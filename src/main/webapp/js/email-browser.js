@@ -41,7 +41,7 @@ var jasig = jasig || {};
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
         that.container.find(".message-content").html(html);
         that.container.find(".email-message .subject").html(message.subject);
-		that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
+		that.container.find(".email-message .from").html(message.sender);
         that.container.find(".email-message .sentDate").html(message.sentDateString);
     	that.container.find(".email-message .toRecipients").html(message.toRecipients);
     	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);
@@ -322,36 +322,6 @@ var jasig = jasig || {};
                         components: function(row, index) {
                             return {
                                 value: "\${*.sentDateString}",
-                                decorators: [
-                                    { type: "addClass", classes: getClasses(index, row) }
-                                ]
-                            }
-                        }
-                    },
-                    { key: "to", valuebinding: "*.to",
-                        components: function(row, index) {
-                            return {
-                            	value: "\${*.to}",
-                                decorators: [
-                                    { type: "addClass", classes: getClasses(index, row) }
-                                ]
-                            }
-                        }
-                    },
-                    { key: "cc", valuebinding: "*.cc",
-                        components: function(row, index) {
-                            return {
-                            	value: "\${*.cc}",
-                                decorators: [
-                                    { type: "addClass", classes: getClasses(index, row) }
-                                ]
-                            }
-                        }
-                    },
-                    { key: "bcc", valuebinding: "*.bcc",
-                        components: function(row, index) {
-                            return {
-                            	value: "\${*.bcc}",
                                 decorators: [
                                     { type: "addClass", classes: getClasses(index, row) }
                                 ]

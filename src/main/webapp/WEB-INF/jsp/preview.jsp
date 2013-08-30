@@ -151,11 +151,11 @@
     <c:if test="${allowRenderingEmailContent}">
       <div class="email-message" style="display:none">
           <table cellpadding="0" cellspacing="0" class="message-headers">
-              <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="sender"></td></tr>
+              <tr><td class="message-header-name"><spring:message code="preview.message.from"/></td><td class="from"></td></tr>
               <tr><td class="message-header-name"><spring:message code="preview.message.subject"/></td><td class="subject"></td></tr>
               <tr><td class="message-header-name"><spring:message code="preview.message.date"/></td><td class="sentDate"></td></tr>
 			  <tr><td class="message-header-name"><spring:message code="preview.message.to"/></td><td class="toRecipients"></td></tr>
-              <tr><td class="message-header-name"><spring:message code="preview.message.cc"/></td><td class="ccRecipients"></td></tr>
+              <tr class="ccInfo"><td class="message-header-name"><spring:message code="preview.message.cc"/></td><td class="ccRecipients"></td></tr>
               <tr class="bccInfo"><td class="message-header-name"><spring:message code="preview.message.bcc"/></td><td class="bccRecipients"></td></tr>
           </table>
           <hr/>

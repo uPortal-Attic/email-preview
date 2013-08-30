@@ -47,9 +47,9 @@ public class EmailMessage {
     private boolean multipart;
     private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
-    private String toRecipients;
-    private String ccRecipients;
-    private String bccRecipients;
+    private final String toRecipients;
+    private final String ccRecipients;
+    private final String bccRecipients;
 
 
 	/*
@@ -136,7 +136,13 @@ public class EmailMessage {
 	}
 
     public String getSenderName() {
-        return getSender().split("\\s*<")[0];
+        String senderName = getSender();
+        if (getSender().contains("&lt;")) {
+            senderName = getSender().split("\\s*&lt;")[0];
+        } else if (getSender().contains("<")) {
+            senderName = getSender().split("\\s*<")[0];
+        }
+        return senderName;
     }
 
     /**
@@ -185,24 +191,12 @@ public class EmailMessage {
 		return toRecipients;
 	}
 
-	public void setToRecipients(String toRecipients) {
-		this.toRecipients = toRecipients;
-	}
-
 	public String getCcRecipients() {
 		return ccRecipients;
 	}
 
-	public void setCcRecipients(String ccRecipients) {
-		this.ccRecipients = ccRecipients;
-	}
-
 	public String getBccRecipients() {
 		return bccRecipients;
-	}
-
-	public void setBccRecipients(String bccRecipients) {
-		this.bccRecipients = bccRecipients;
 	}
 
 }
