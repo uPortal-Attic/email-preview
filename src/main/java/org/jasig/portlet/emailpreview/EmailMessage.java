@@ -47,7 +47,8 @@ public class EmailMessage {
     private boolean multipart;
     private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
-    private final String allRecipients;
+    private final String toRecipients;
+    private final String ccRecipients;
 
 	/*
 	 * Public API.
@@ -59,7 +60,7 @@ public class EmailMessage {
      */
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
-                boolean multipart, String contentType, EmailMessageContent content, String allRecipients) {
+                boolean multipart, String contentType, EmailMessageContent content, String toRecipients, String ccRecipients) {
 	    	    
 	    // Instance Members.
         this.messageNumber = messageNumber;
@@ -73,14 +74,15 @@ public class EmailMessage {
         this.multipart = multipart;
         this.contentType = contentType;  // NB:  may be null
         this.content = content;
-        this.allRecipients = allRecipients;
+        this.toRecipients = toRecipients;
+        this.ccRecipients = ccRecipients;
 	    
 	}
 
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
                         boolean multipart, String contentType, EmailMessageContent content) {
-        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null);
+        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null);
     }
 
 	public int getMessageNumber() {
@@ -176,7 +178,11 @@ public class EmailMessage {
         return content;
     }
 
-    public String getAllRecipients() {
-    	return allRecipients;
+    public String getToRecipients() {
+    	return toRecipients;
+    }
+    
+    public String getCcRecipients() {
+       	return ccRecipients;
     }
 }

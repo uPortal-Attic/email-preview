@@ -121,7 +121,8 @@
             <li><span class="message-header-name"><spring:message code="preview.message.from"/></span><span class="sender"></span></li>
             <li><span class="message-header-name"><spring:message code="preview.message.subject"/></span><span class="subject"></span></li>
             <li><span class="message-header-name"><spring:message code="preview.message.date"/></span><span class="sentDate"></span></li>
-            <li><span class="message-header-name"><spring:message code="preview.message.to"/></span><span class="allRecipients"></span></li>
+			<li><span class="message-header-name"><spring:message code="preview.message.to"/></span><span class="toRecipients"></span></li>
+            <li class="ccInfo"><span class="message-header-name"><spring:message code="preview.message.cc"/></span><span class="ccRecipients"></span></li>            
         </ul>
         <hr/>
 		<p class="pager-msg">        

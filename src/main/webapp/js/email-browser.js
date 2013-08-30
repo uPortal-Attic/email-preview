@@ -43,7 +43,12 @@ var jasig = jasig || {};
         that.container.find(".email-message .subject").html(message.subject);
 		that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
         that.container.find(".email-message .sentDate").html(message.sentDateString);
-		that.container.find(".email-message .allRecipients").html(message.allRecipients);
+    	that.container.find(".email-message .toRecipients").html(message.toRecipients);
+    	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);	
+    	that.container.find(".email-message .ccInfo").show();
+    	if(that.container.find(".email-message .ccRecipients").text() == ""){
+    		that.container.find(".email-message .ccInfo").hide();
+    	}
         that.container.find(".email-message .message-uid").val(message.messageId);
 
         // Mark messages read?
@@ -545,7 +550,8 @@ var jasig = jasig || {};
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
             stats: ".stats",
-			allRecipients: ".all-recipients",
+            ccRecipients: ".cc-recipients",
+            toRecipients: ".to-recipients",
             previousMsg: ".previous-msg",
             nextMsg: ".next-msg",
             mobileSelect: "#mobileSelect"

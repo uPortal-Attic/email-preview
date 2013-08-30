@@ -411,21 +411,39 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
             }
         }
         Date sentDate = msg.getSentDate();
-        Address[] allRecipients = msg.getAllRecipients();
-        List <String> allRecipientsList = new ArrayList <String>();
-        String receiver = null;
-        if (allRecipients != null && allRecipients.length != 0) {
-	        for (Address adress : allRecipients){
+        Address[] toRecipients = msg.getRecipients(Message.RecipientType.TO);
+        List <String> toRecipientsList = new ArrayList <String>();
+        String toReceiver = null;
+        String toRecipientsString = null;
+        if (toRecipients != null && toRecipients.length != 0) {
+	        for (Address adress : toRecipients){
 	            if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
 	                InternetAddress inet = (InternetAddress) adress;
-	                receiver = inet.toUnicodeString();
+	                toReceiver = inet.toUnicodeString();
 	            } else {
-	            	receiver = adress.toString();
+	            	toReceiver = adress.toString();
 	            }      	
-	        	allRecipientsList.add(receiver);
+	            toRecipientsList.add(toReceiver);
 	        }
         }
-        String allRecipientsString = StringUtils.join(allRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");        
+        toRecipientsString = StringUtils.join(toRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");   
+
+        Address[] ccRecipients = msg.getRecipients(Message.RecipientType.CC);
+        List <String> ccRecipientsList = new ArrayList <String>();
+        String ccReceiver = null;
+        String ccRecipientsString = null;
+        if (ccRecipients != null && ccRecipients.length != 0) {
+                for (Address adress : ccRecipients){
+                    if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
+                        InternetAddress inet = (InternetAddress) adress;
+                        ccReceiver = inet.toUnicodeString();
+                    } else {
+                        ccReceiver = adress.toString();
+                    }
+                    ccRecipientsList.add(ccReceiver);
+                }
+        }
+        ccRecipientsString = StringUtils.join(ccRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");      
         boolean unread = !msg.isSet(Flag.SEEN);
         boolean answered = msg.isSet(Flag.ANSWERED);
         boolean deleted = msg.isSet(Flag.DELETED);
@@ -446,7 +464,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         }
 
         return new EmailMessage(messageNumber, uid, sender, subject, sentDate,
-                unread, answered, deleted, multipart, contentType, msgContent, allRecipientsString);
+                unread, answered, deleted, multipart, contentType, msgContent, toRecipientsString, ccRecipientsString);
 
     }
 
