@@ -349,7 +349,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                     item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
                     messageUtils.cleanHTML(item.getSubject()),
                     new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
-                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null);
+                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null);
             messages.add(message);
             messageNumber++;
         }
@@ -376,11 +376,15 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                 BodyTypeType.HTML.equals(message.getBody().getBodyType()));
         String toRecipients = getToRecipients(message);
         String ccRecipients = getCcRecipients(message);
+        String bccRecipients = getBccRecipients(message);
+
 
         ExchangeEmailMessage msg =  new ExchangeEmailMessage(0, message.getItemId().getId(), message.getItemId().getChangeKey(),
                 sender, messageUtils.cleanHTML(message.getSubject()),
                 new Date(message.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
-                !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, content, toRecipients, ccRecipients);
+                !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, 
+                content, toRecipients, ccRecipients, bccRecipients);
+
 
         // Insert the changeKey into cache in case the message read status is changed again.
         insertChangeKeyIntoCache(msg.getMessageId(), msg.getExchangeChangeKey());
@@ -388,12 +392,17 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         return msg;
     }
 
+
     private String getToRecipients(MessageType message) {
         return getRecipients(message.getToRecipients());
     }
     
     private String getCcRecipients(MessageType message) {
         return getRecipients(message.getCcRecipients());
+    }
+    
+    private String getBccRecipients(MessageType message) {
+        return getRecipients(message.getBccRecipients());
     }
 
     private String getRecipients(ArrayOfRecipientsType addrs) {

@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview.dao.javamail;
 
 import com.sun.mail.imap.IMAPFolder;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.AccountSummary;
@@ -53,6 +54,7 @@ import javax.mail.Flags;
 import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Quota;
@@ -63,6 +65,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.SharedByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -287,7 +290,9 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
                 // to what it was before the call to wrapMessage().
                 emailMessage.setUnread(unread);
             }
-
+            emailMessage.setToRecipients(getTo(message));
+            emailMessage.setCcRecipients(getCc(message));
+            emailMessage.setBccRecipients(getBcc(message));
             return emailMessage;
         } catch (MessagingException e) {
             log.error("Messaging exception while retrieving individual message", e);
@@ -400,50 +405,9 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         }
 
         Address[] addr = msg.getFrom();
-        String sender = null;
-        if (addr != null && addr.length != 0) {
-            Address a = addr[0];
-            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
-                InternetAddress inet = (InternetAddress) a;
-                sender = inet.toUnicodeString();
-            } else {
-                sender = a.toString();
-            }
-        }
+        String sender = getFormattedSender(addr);
         Date sentDate = msg.getSentDate();
-        Address[] toRecipients = msg.getRecipients(Message.RecipientType.TO);
-        List <String> toRecipientsList = new ArrayList <String>();
-        String toReceiver = null;
-        String toRecipientsString = null;
-        if (toRecipients != null && toRecipients.length != 0) {
-	        for (Address adress : toRecipients){
-	            if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
-	                InternetAddress inet = (InternetAddress) adress;
-	                toReceiver = inet.toUnicodeString();
-	            } else {
-	            	toReceiver = adress.toString();
-	            }      	
-	            toRecipientsList.add(toReceiver);
-	        }
-        }
-        toRecipientsString = StringUtils.join(toRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");   
 
-        Address[] ccRecipients = msg.getRecipients(Message.RecipientType.CC);
-        List <String> ccRecipientsList = new ArrayList <String>();
-        String ccReceiver = null;
-        String ccRecipientsString = null;
-        if (ccRecipients != null && ccRecipients.length != 0) {
-                for (Address adress : ccRecipients){
-                    if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
-                        InternetAddress inet = (InternetAddress) adress;
-                        ccReceiver = inet.toUnicodeString();
-                    } else {
-                        ccReceiver = adress.toString();
-                    }
-                    ccRecipientsList.add(ccReceiver);
-                }
-        }
-        ccRecipientsString = StringUtils.join(ccRecipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");      
         boolean unread = !msg.isSet(Flag.SEEN);
         boolean answered = msg.isSet(Flag.ANSWERED);
         boolean deleted = msg.isSet(Flag.DELETED);
@@ -463,9 +427,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
             log.trace(me.getMessage(), me);
         }
 
-        return new EmailMessage(messageNumber, uid, sender, subject, sentDate,
-                unread, answered, deleted, multipart, contentType, msgContent, toRecipientsString, ccRecipientsString);
-
+        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, msgContent);
     }
 
     /*
@@ -503,9 +465,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         }
 
         Collections.reverse(emails);
-
         return emails;
-
     }
 
     private EmailMessageContent getMessageContent(Object content, String mimeType) throws IOException, MessagingException {
@@ -546,12 +506,9 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
                 if (result != null) {
                     return result;
                 }
-
             }
         }
-
         return null;
-
     }
 
     /**
@@ -734,4 +691,50 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
     	}
     	return null;
     }
+    
+    private String getTo(Message message) throws MessagingException {
+        Address[] toRecipients = message.getRecipients(RecipientType.TO);
+        return getFormattedAddresses(toRecipients);
+    }
+    
+    private String getCc(Message message) throws MessagingException {
+        Address[] ccRecipients = message.getRecipients(RecipientType.CC);
+        return getFormattedAddresses(ccRecipients);
+    }
+    
+    private String getBcc(Message message) throws MessagingException {
+        Address[] bccRecipients = message.getRecipients(RecipientType.BCC);
+        return getFormattedAddresses(bccRecipients);
+    }
+
+    private String getFormattedSender(Address[] addr) {
+		String sender = null;
+        if (addr != null && addr.length != 0) {
+            Address a = addr[0];
+            if (INTERNET_ADDRESS_TYPE.equals(a.getType())) {
+                InternetAddress inet = (InternetAddress) a;
+                sender = inet.toUnicodeString();
+            } else {
+                sender = a.toString();
+            }
+        }
+		return sender;
+	}
+
+	private String getFormattedAddresses(Address[] addresses) {
+		List <String> recipientsList = new ArrayList <String>();
+        String receiver = null;
+        if (addresses != null && addresses.length != 0) {
+            for (Address adress : addresses){
+                if (INTERNET_ADDRESS_TYPE.equals(adress.getType())) {
+                    InternetAddress inet = (InternetAddress) adress;
+                    receiver = inet.toUnicodeString();
+                } else {
+                    receiver = adress.toString();
+                }          
+                recipientsList.add(receiver);
+            }
+        }
+        return StringUtils.join(recipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");
+	}
 }

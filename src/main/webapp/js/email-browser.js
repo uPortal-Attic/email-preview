@@ -44,13 +44,18 @@ var jasig = jasig || {};
 		that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
         that.container.find(".email-message .sentDate").html(message.sentDateString);
     	that.container.find(".email-message .toRecipients").html(message.toRecipients);
-    	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);	
-    	that.container.find(".email-message .ccInfo").show();
-    	if(that.container.find(".email-message .ccRecipients").text() == ""){
-    		that.container.find(".email-message .ccInfo").hide();
+    	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);
+    	that.container.find(".email-message .bccRecipients").html(message.bccRecipients);
+    	
+    	if (that.container.find(".email-message .bccRecipients").text() == ""){
+    		that.container.find(".email-message .bccInfo").hide();
+    	} else {
+    		that.container.find(".email-message .bccInfo").show();
     	}
+
         that.container.find(".email-message .message-uid").val(message.messageId);
 
+        
         // Mark messages read?
         if (that.options.markMessagesAsRead || !message.unread) {
             that.locate("markMessageReadButton").hide();
@@ -322,7 +327,37 @@ var jasig = jasig || {};
                                 ]
                             }
                         }
-                }
+                    },
+                    { key: "to", valuebinding: "*.to",
+                        components: function(row, index) {
+                            return {
+                            	value: "\${*.to}",
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                    },
+                    { key: "cc", valuebinding: "*.cc",
+                        components: function(row, index) {
+                            return {
+                            	value: "\${*.cc}",
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                    },
+                    { key: "bcc", valuebinding: "*.bcc",
+                        components: function(row, index) {
+                            return {
+                            	value: "\${*.bcc}",
+                                decorators: [
+                                    { type: "addClass", classes: getClasses(index, row) }
+                                ]
+                            }
+                        }
+                    }
                 ],
                 bodyRenderer: {
                     type: "fluid.pager.selfRender",
@@ -550,6 +585,7 @@ var jasig = jasig || {};
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
             stats: ".stats",
+            bccRecipients: ".bcc-recipients",
             ccRecipients: ".cc-recipients",
             toRecipients: ".to-recipients",
             previousMsg: ".previous-msg",

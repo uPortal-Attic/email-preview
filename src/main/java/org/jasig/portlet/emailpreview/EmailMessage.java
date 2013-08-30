@@ -47,8 +47,10 @@ public class EmailMessage {
     private boolean multipart;
     private String contentType;
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
-    private final String toRecipients;
-    private final String ccRecipients;
+    private String toRecipients;
+    private String ccRecipients;
+    private String bccRecipients;
+
 
 	/*
 	 * Public API.
@@ -60,8 +62,9 @@ public class EmailMessage {
      */
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
-                boolean multipart, String contentType, EmailMessageContent content, String toRecipients, String ccRecipients) {
-	    	    
+                boolean multipart, String contentType, EmailMessageContent content, 
+                String toRecipients, String ccRecipients, String bccRecipients) {
+
 	    // Instance Members.
         this.messageNumber = messageNumber;
         this.uid = uid;  // NB:  may be null
@@ -76,13 +79,13 @@ public class EmailMessage {
         this.content = content;
         this.toRecipients = toRecipients;
         this.ccRecipients = ccRecipients;
-	    
+        this.bccRecipients = bccRecipients;
 	}
 
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
                         boolean multipart, String contentType, EmailMessageContent content) {
-        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null);
+        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null,null);
     }
 
 	public int getMessageNumber() {
@@ -178,11 +181,28 @@ public class EmailMessage {
         return content;
     }
 
-    public String getToRecipients() {
-    	return toRecipients;
-    }
-    
-    public String getCcRecipients() {
-       	return ccRecipients;
-    }
+	public String getToRecipients() {
+		return toRecipients;
+	}
+
+	public void setToRecipients(String toRecipients) {
+		this.toRecipients = toRecipients;
+	}
+
+	public String getCcRecipients() {
+		return ccRecipients;
+	}
+
+	public void setCcRecipients(String ccRecipients) {
+		this.ccRecipients = ccRecipients;
+	}
+
+	public String getBccRecipients() {
+		return bccRecipients;
+	}
+
+	public void setBccRecipients(String bccRecipients) {
+		this.bccRecipients = bccRecipients;
+	}
+
 }
