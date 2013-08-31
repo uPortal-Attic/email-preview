@@ -128,7 +128,9 @@ public final class DemoAccountService implements IEmailAccountService {
                 EmailMessage msg = !m.equals(rslt) ? m
                         : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                             m.getSentDate(), false, m.isAnswered(), m.isDeleted(),
-                            m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(), m.getCcRecipients());
+                            m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(),
+                            m.getCcRecipients(), m.getBccRecipients());
+
                 newList.add(msg);
             }
             session.setAttribute(ACCOUNT_SUMMARY_KEY, new AccountSummary(INBOX_URL,
@@ -184,7 +186,9 @@ public final class DemoAccountService implements IEmailAccountService {
             EmailMessage msg = !changed.contains(m.getMessageId()) ? m
                     : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                         m.getSentDate(), !seenValue, m.isAnswered(), m.isDeleted(),
-                        m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(), m.getCcRecipients());
+                        m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(),
+                        m.getCcRecipients(), m.getBccRecipients());
+
             newList.add(msg);
         }
 
@@ -222,11 +226,10 @@ public final class DemoAccountService implements IEmailAccountService {
                 EmailMessageContent content = new EmailMessageContent(msg.path("body").getTextValue(), true);
                 String toRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
                 String ccRecipients = "ccTest@test.univ.eu; ccTest1@test1.univ.eu";
-
+                String bccRecipients = "bccTest@test.univ.eu; bccTest1@test1.univ.eu";
                 messages.add(new EmailMessage(messages.size(), uid,
                         sender, subject, sentDate, unread, answered, deleted,
-                        false, "text/plain", content, toRecipients, ccRecipients));
-
+                        false, "text/plain", content, toRecipients, ccRecipients, bccRecipients));
             }
         } catch (Exception e) {
             log.error("Failed to load messages collection", e);

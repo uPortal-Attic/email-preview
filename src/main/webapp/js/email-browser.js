@@ -41,16 +41,21 @@ var jasig = jasig || {};
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
         that.container.find(".message-content").html(html);
         that.container.find(".email-message .subject").html(message.subject);
-		that.container.find(".email-message .sender").html(message.sender.replace("<","&lt;").replace(">","&gt;"));
+		that.container.find(".email-message .from").html(message.sender);
         that.container.find(".email-message .sentDate").html(message.sentDateString);
     	that.container.find(".email-message .toRecipients").html(message.toRecipients);
-    	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);	
-    	that.container.find(".email-message .ccInfo").show();
-    	if(that.container.find(".email-message .ccRecipients").text() == ""){
-    		that.container.find(".email-message .ccInfo").hide();
+    	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);
+    	that.container.find(".email-message .bccRecipients").html(message.bccRecipients);
+    	
+    	if (that.container.find(".email-message .bccRecipients").text() == ""){
+    		that.container.find(".email-message .bccInfo").hide();
+    	} else {
+    		that.container.find(".email-message .bccInfo").show();
     	}
+
         that.container.find(".email-message .message-uid").val(message.messageId);
 
+        
         // Mark messages read?
         if (that.options.markMessagesAsRead || !message.unread) {
             that.locate("markMessageReadButton").hide();
@@ -322,7 +327,7 @@ var jasig = jasig || {};
                                 ]
                             }
                         }
-                }
+                    }
                 ],
                 bodyRenderer: {
                     type: "fluid.pager.selfRender",
@@ -550,6 +555,7 @@ var jasig = jasig || {};
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
             stats: ".stats",
+            bccRecipients: ".bcc-recipients",
             ccRecipients: ".cc-recipients",
             toRecipients: ".to-recipients",
             previousMsg: ".previous-msg",

@@ -49,6 +49,8 @@ public class EmailMessage {
     private final EmailMessageContent content;  // Optional;  passed in separately AntiSamy treatment
     private final String toRecipients;
     private final String ccRecipients;
+    private final String bccRecipients;
+
 
 	/*
 	 * Public API.
@@ -60,8 +62,9 @@ public class EmailMessage {
      */
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
-                boolean multipart, String contentType, EmailMessageContent content, String toRecipients, String ccRecipients) {
-	    	    
+                boolean multipart, String contentType, EmailMessageContent content, 
+                String toRecipients, String ccRecipients, String bccRecipients) {
+
 	    // Instance Members.
         this.messageNumber = messageNumber;
         this.uid = uid;  // NB:  may be null
@@ -76,13 +79,13 @@ public class EmailMessage {
         this.content = content;
         this.toRecipients = toRecipients;
         this.ccRecipients = ccRecipients;
-	    
+        this.bccRecipients = bccRecipients;
 	}
 
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
                         boolean multipart, String contentType, EmailMessageContent content) {
-        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null);
+        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null,null);
     }
 
 	public int getMessageNumber() {
@@ -133,7 +136,13 @@ public class EmailMessage {
 	}
 
     public String getSenderName() {
-        return getSender().split("\\s*<")[0];
+        String senderName = getSender();
+        if (getSender().contains("&lt;")) {
+            senderName = getSender().split("\\s*&lt;")[0];
+        } else if (getSender().contains("<")) {
+            senderName = getSender().split("\\s*<")[0];
+        }
+        return senderName;
     }
 
     /**
@@ -178,11 +187,16 @@ public class EmailMessage {
         return content;
     }
 
-    public String getToRecipients() {
-    	return toRecipients;
-    }
-    
-    public String getCcRecipients() {
-       	return ccRecipients;
-    }
+	public String getToRecipients() {
+		return toRecipients;
+	}
+
+	public String getCcRecipients() {
+		return ccRecipients;
+	}
+
+	public String getBccRecipients() {
+		return bccRecipients;
+	}
+
 }
