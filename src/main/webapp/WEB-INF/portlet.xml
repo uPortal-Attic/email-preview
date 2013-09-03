@@ -333,11 +333,13 @@
         <name>password</name>
     </user-attribute>
     
+    <!-- Uncomment the following comment block to leverage CAS Validation -->
+    <!-- 
     <user-attribute>
         <description>casProxyTicket</description>
         <name>casProxyTicket</name>
     </user-attribute>
-    
+    -->
     <user-attribute>
         <description>Campus email address (e.g. for use with ACCOUNT_NAME_ATTRIBUTE setting)</description>
         <name>mail</name>

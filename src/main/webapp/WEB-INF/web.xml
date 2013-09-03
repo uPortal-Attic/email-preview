@@ -31,7 +31,8 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>
             /WEB-INF/context/applicationContext.xml
-            /WEB-INF/context/casContext.xml
+            <!-- Uncomment the following comment block to leverage CAS Validation -->
+            <!-- /WEB-INF/context/casContext.xml  -->
         </param-value>
     </context-param>
 
@@ -52,6 +53,8 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+<!-- Uncomment the following comment block to leverage CAS Validation -->
+<!-- 
     <filter>
         <filter-name>CAS Validation Filter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -60,12 +63,12 @@
             <param-value>ticketValidationFilter</param-value>
         </init-param>
     </filter>
-
+ 
 	<filter-mapping>
         <filter-name>CAS Validation Filter</filter-name>
         <url-pattern>/proxy/receptor</url-pattern>
     </filter-mapping>
-
+-->
 
     <servlet>
         <servlet-name>ViewRendererServlet</servlet-name>
