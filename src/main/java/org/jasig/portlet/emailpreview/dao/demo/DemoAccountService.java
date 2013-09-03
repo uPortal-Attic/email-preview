@@ -217,7 +217,8 @@ public final class DemoAccountService implements IEmailAccountService {
                 String subject = msg.path("subject").getTextValue();
                 Date sentDate = new Date(msg.path("sentDate").getLongValue());
                 boolean unread = msg.path("unread").getBooleanValue();
-                boolean answered = false; // didn't consider to change this
+                boolean answered = msg.path("answered").getBooleanValue();
+                boolean multipart = msg.path("multipart").getBooleanValue();
                 boolean deleted = false; // more testing is available here
                 EmailMessageContent content = new EmailMessageContent(msg.path("body").getTextValue(), true);
                 String toRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
@@ -225,7 +226,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
                 messages.add(new EmailMessage(messages.size(), uid,
                         sender, subject, sentDate, unread, answered, deleted,
-                        false, "text/plain", content, toRecipients, ccRecipients));
+                        multipart, "text/plain", content, toRecipients, ccRecipients));
 
             }
         } catch (Exception e) {

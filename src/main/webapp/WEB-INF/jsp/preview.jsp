@@ -120,10 +120,10 @@
                     <tr>
                         <th class="select"><input type="checkbox" class="select-all"></th>
                         <th class="flags-header">
-                            <span class="flags-span">&nbsp;</span>
+                            <span class="flags-span"></span>
                         </th>
                         <th class="flags-header">
-                            <span class="attached-span">&nbsp;</span>
+                            <span class="attached-span"></span>
                         </th>
                         <th><spring:message code="preview.column.subject"/></th>
                         <th><spring:message code="preview.column.sender"/></th>
@@ -131,11 +131,11 @@
                     </tr>
                     <tr rsf:id="row:" class="email-row">
                         <td rsf:id="select" class="select"></td>
-                        <td rsf:id="flags" class="flags">
-                            <span class="answered-span">&nbsp;</span>
+                        <td rsf:id="flags">
+                            <span class="answered-span"></span>
                         </td>
-                        <td rsf:id="attachments" class="flags">
-                            <span class="attached-span">&nbsp;</span>
+                        <td rsf:id="attachments">
+                            <span class="attached-span"></span>
                         </td>
                         <td rsf:id="subject" class="subject"></td>
                         <td rsf:id="sender" class="sender"></td>
