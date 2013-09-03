@@ -240,7 +240,11 @@ public final class EditPreferencesController extends BaseEmailController {
             if (log.isDebugEnabled()) {
                 log.debug("Receieved the following user input for markMessagesAsRead:  '" + markMessagesAsRead + "'");
             }
-            form.setMarkMessagesAsRead(Boolean.valueOf(markMessagesAsRead));
+            if (markMessagesAsRead != null && markMessagesAsRead.equalsIgnoreCase("on")) {
+                form.setMarkMessagesAsRead(true);
+            } else {
+                form.setMarkMessagesAsRead(false);
+            }
         }
         
         if (!config.isReadOnly(req, MailPreferences.INBOX_NAME)) {

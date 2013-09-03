@@ -599,10 +599,11 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
             Session session = openMailSession(config, auth);
             inbox = getUserInbox(session, config.getInboxFolderName());
 
-            // Verify that we can even perform this operation
+            // Verify that we can even perform this operation log info if it isn't capable of operation
             if (!(inbox instanceof UIDFolder)) {
                 String msg = "Toggle unread feature is supported only for UIDFolder instances";
-                throw new UnsupportedOperationException(msg);
+                log.info(msg);
+                return false;
             }
 
             inbox.open(Folder.READ_WRITE);
