@@ -44,6 +44,8 @@ import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +61,7 @@ public final class EditPreferencesController extends BaseEmailController {
     private static final String DEFAULT_FOCUS_ON_PREVIEW = "true";
 
     private IAuthenticationServiceRegistry authServiceRegistry;
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Resource (name = "nonUserProtocols")
     private Set<String> nonUserProtocols;
@@ -236,15 +238,8 @@ public final class EditPreferencesController extends BaseEmailController {
         
         if (!config.isReadOnly(req, MailPreferences.MARK_MESSAGES_AS_READ)) {
             String markMessagesAsRead = req.getParameter(MailPreferences.MARK_MESSAGES_AS_READ.getKey());
-            // No need to handle missing value because absence will (correctly) be converted to 'false' 
-            if (log.isDebugEnabled()) {
-                log.debug("Receieved the following user input for markMessagesAsRead:  '" + markMessagesAsRead + "'");
-            }
-            if (markMessagesAsRead != null && markMessagesAsRead.equalsIgnoreCase("on")) {
-                form.setMarkMessagesAsRead(true);
-            } else {
-                form.setMarkMessagesAsRead(false);
-            }
+            log.debug("Received the following user input for markMessagesAsRead: {}", markMessagesAsRead);
+            form.setMarkMessagesAsRead("on".equalsIgnoreCase(markMessagesAsRead));
         }
         
         if (!config.isReadOnly(req, MailPreferences.INBOX_NAME)) {
