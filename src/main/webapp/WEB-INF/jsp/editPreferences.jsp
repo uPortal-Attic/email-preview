@@ -75,7 +75,14 @@
         </c:if>
         <div class="plt-email-row">
             <label><spring:message code="editPreferences.preferences.markMessagesAsRead"/></label>
-            <input type="checkbox" name="markMessagesAsRead" id="plt-email-input-markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" value="true"<c:if test="${form.markMessagesAsRead}"> checked="checked"</c:if>/>
+            <c:choose>
+                <c:when test="${form.protocol eq 'pop3' || form.protocol eq 'pop3s'}">
+                    <input type="checkbox" name="markMessagesAsRead" id="plt-email-input-markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" disabled/>
+                </c:when>
+                <c:otherwise>
+                    <input type="checkbox" name="markMessagesAsRead" id="plt-email-input-markMessagesAsRead" title="<spring:message code="editPreferences.preferences.markMessagesAsRead.tooltip"/>" <c:if test="${form.markMessagesAsRead}">checked="checked"</c:if>/>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>          
 
@@ -210,7 +217,15 @@
                 $(that.options.selectors.authtype_preferences).click(function() {
                     $(that.options.selectors.fieldset_preferences).slideDown(400);
                 });
-                
+                $(that.options.selectors.email_input_protocol).change(function() {
+                    if($(that.options.selectors.email_input_protocol).val() == 'pop3' || $(that.options.selectors.email_input_protocol).val() == 'pop3s') {
+                        $(that.options.selectors.email_input_markMessagesAsRead).prop('checked', false);
+                        $(that.options.selectors.email_input_markMessagesAsRead).attr("disabled", true);
+                    } else {
+                        $(that.options.selectors.email_input_markMessagesAsRead).prop('checked', true);
+                        $(that.options.selectors.email_input_markMessagesAsRead).attr("disabled", false);
+                    }
+                });
             };//end:function
             
             var validateForm = function (){
@@ -307,6 +322,8 @@
                 submission_error: "#plt-email-submission-error",
                 authtype_cache: "#authtype_cache",
                 authtype_preferences: "#authtype_preferences",
+                email_input_protocol: "#plt-email-input-protocol",
+                email_input_markMessagesAsRead: "#plt-email-input-markMessagesAsRead",
                 fieldset_preferences: ".plt-email-fieldset-ppauth"
             },
             disableProtocol: false,
