@@ -452,6 +452,9 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         profile.add(FetchProfile.Item.ENVELOPE);
         profile.add(FetchProfile.Item.FLAGS);
         profile.add(FetchProfile.Item.CONTENT_INFO);
+        if (mailFolder instanceof UIDFolder) {
+            profile.add(UIDFolder.FetchProfileItem.UID);
+        }
         mailFolder.fetch(messages, profile);
 
         if (log.isDebugEnabled()) {
