@@ -138,6 +138,10 @@ public class EmailSummaryController extends BaseEmailController {
                 // portlet preference, and (normally) overridden by users as a
                 // user-defined portlet preference.
                 int pageSize = Integer.parseInt(prefs.getValue(PAGE_SIZE_PREFERENCE, "10"));
+
+                // James W - Removed option for 50 because it has some issues with behavior needing addressing.  See EMAILPLT-119
+                pageSize = pageSize == 50 ? 20 : pageSize;
+
                 model.put(PAGE_SIZE_PREFERENCE, pageSize);
 
                 // Check to see if the portlet is configured to display a link
