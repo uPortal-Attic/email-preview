@@ -535,6 +535,8 @@
                             <exclude>src/main/resources/com/microsoft/exchange/Services.wsdl</exclude>
                             <exclude>src/main/resources/com/microsoft/exchange/autodiscover/Services.wsdl</exclude>
                             <exclude>src/main/webapp/css/jquery.mobile.structure-1.1.1.min.css</exclude>
+                            <exclude>.idea/**</exclude> <!-- for IntelliJ working folders -->
+                            <exclude>overlays/**</exclude> <!-- for IntelliJ working folders -->
                         </excludes>
                         <mapping>
                             <channel>XML_STYLE</channel>

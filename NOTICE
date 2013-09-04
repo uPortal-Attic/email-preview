@@ -25,7 +25,6 @@ This project includes:
   Commons Logging under The Apache Software License, Version 2.0
   Data Mapper for Jackson under The Apache Software License, Version 2.0
   Ehcache Core under The Apache Software License, Version 2.0
-  Ehcache Spring Annotations under Apache 2
   Ehcache Web Filters under The Apache Software License, Version 2.0
   Email Preview Portlet under JA-SIG Collaborative Licence
   GMaven Common under The Apache Software License, Version 2.0
@@ -90,6 +89,7 @@ This project includes:
   spring-webmvc under The Apache Software License, Version 2.0
   spring-webmvc-portlet under The Apache Software License, Version 2.0
   standard under Apache License, Version 2.0
+  Streaming API for XML under Sun Binary Code License
   WSDL4J under CPL
   WSS4J under The Apache Software License, Version 2.0
   Xalan Java under The Apache Software License, Version 2.0
