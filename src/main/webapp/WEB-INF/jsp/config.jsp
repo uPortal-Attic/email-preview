@@ -37,7 +37,7 @@
 <div id="${n}container" class="fl-widget portlet" role="section">
 
     <!-- Portlet Body -->
-    <div class="fl-widget-content portlet-body" role="main">
+    <div class="fl-widget-content portlet-body email-admin-config" role="main">
 
         <form:form action="${ formUrl }" method="POST" commandName="form" htmlEscape="false">
 
@@ -177,7 +177,7 @@
                 <div class="portlet-section-body">
 	                <c:forEach items="${authServices}" var="auth">
                     <div>
-	                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/>
+	                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/> <span class="auth-type-description"><spring:message code="config.preferences.auth.description.${auth.key}" text=""/></span>
                       <c:if test="${!empty auth.adminConfigurationParameters}">
                         <!--  Used for warning that the encryption key hasn't been changed from the default -->
                         <c:if test="${auth.key eq 'portletPreferences' && usingDefaultEncryptionKey eq true}">

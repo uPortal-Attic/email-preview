@@ -332,11 +332,16 @@
         <description>Password attribute name for uPortal user</description>
         <name>password</name>
     </user-attribute>
-    
+
+    <!-- Enable the following user attribute for uPortal to obtain and populate a CAS proxy tickets for email authentication.
+         uPortal itself must also be configured to obtain CAS proxy tickets from CAS for the target email system (see the uPortal
+         manual).  CAS must also be configured to grant CAS proxy tickets from uPortal to the target email system (see the CAS manual). -->
+    <!--
     <user-attribute>
         <description>casProxyTicket</description>
         <name>casProxyTicket</name>
     </user-attribute>
+    -->
     
     <user-attribute>
         <description>Campus email address (e.g. for use with ACCOUNT_NAME_ATTRIBUTE setting)</description>

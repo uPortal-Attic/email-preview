@@ -52,6 +52,7 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+    <!-- Filter used for CAS proxy granting ticket functionality. Will do nothing if not using CAS proxy tickets -->
     <filter>
         <filter-name>CAS Validation Filter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -61,6 +62,7 @@
         </init-param>
     </filter>
 
+  <!-- Filter used for CAS proxy granting ticket functionality. Will do nothing if not using CAS proxy tickets -->
 	<filter-mapping>
         <filter-name>CAS Validation Filter</filter-name>
         <url-pattern>/proxy/receptor</url-pattern>
