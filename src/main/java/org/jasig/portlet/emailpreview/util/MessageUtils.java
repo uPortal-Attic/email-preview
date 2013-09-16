@@ -128,7 +128,7 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
         }
         m.appendTail(rslt);
 
-        return MessageUtils.addMissingTargetToAnchors(rslt.toString());
+        return rslt.toString();
         
     }
 
