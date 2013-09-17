@@ -74,14 +74,14 @@ public class EmailMessage {
         this.allRecipients = allRecipients;
 	    
         // sender can be null
-        if (this.sender == null) {
+        if (sender == null) {
         	this.sender = "-";
         } else {
         	this.sender = sender;
         }
         
         // subject can be null
-        if (this.subject == null) {
+        if (subject == null) {
         	this.subject = "-";
         } else {
         	this.subject = subject;
