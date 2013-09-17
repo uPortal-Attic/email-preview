@@ -64,8 +64,6 @@ public class EmailMessage {
 	    // Instance Members.
         this.messageNumber = messageNumber;
         this.uid = uid;  // NB:  may be null
-        this.sender = sender;
-        this.subject = subject;
         this.sentDate = sentDate;  // NB:  possibly null in some circumstances
         this.unread = unread;
         this.answered = answered;
@@ -75,6 +73,19 @@ public class EmailMessage {
         this.content = content;
         this.allRecipients = allRecipients;
 	    
+        // sender can be null
+        if (this.sender == null) {
+        	this.sender = "-";
+        } else {
+        	this.sender = sender;
+        }
+        
+        // subject can be null
+        if (this.subject == null) {
+        	this.subject = "-";
+        } else {
+        	this.subject = subject;
+        }
 	}
 
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
