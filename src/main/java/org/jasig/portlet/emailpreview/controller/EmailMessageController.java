@@ -63,12 +63,17 @@ public class EmailMessageController extends BaseEmailController {
              * A bit of after-market work on messages in certain circumstances
              */
 
+            String messageBody = message.getContent().getContentString();
+            
             // Make links embedded in text/plain messages clickable
             String contentType = message.getContentType();  // might be null if there was an error
             if (contentType != null && contentType.startsWith(CONTENT_TYPE_TEXT_PREFIX)) {
-                String messageBody = message.getContent().getContentString();
-                message.getContent().setContentString(MessageUtils.addClickableUrlsToMessageBody(messageBody));
+            	messageBody = MessageUtils.addClickableUrlsToMessageBody(messageBody);
             }
+            
+            messageBody = MessageUtils.addMissingTargetToAnchors(messageBody);
+            
+            message.getContent().setContentString(messageBody);
 
             model.put("message", message);
 

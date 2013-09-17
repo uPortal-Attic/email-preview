@@ -52,6 +52,13 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
     private static final String CLICKABLE_URLS_PART1 = "<a href=\"";
     private static final String CLICKABLE_URLS_PART2 = "\" target=\"_new\">";
     private static final String CLICKABLE_URLS_PART3 = "</a>";
+    
+	/** Pattern to find HTML anchors without target. */ 
+	private static final String ANCHOR_WITHOUT_TARGET_REGEX = "<a(((?!target=)[^>])*)>";
+
+	/** Replacement to add target to HTML anchors. */ 
+	private static final String ADD_TARGET_TO_ANCHOR_REPLACEMENT = "<a$1 target=\"_new\">";
+	
     private static final Log LOG = LogFactory.getLog(MessageUtils.class);
 
     private String filePath = "classpath:antisamy.xml";  // default
@@ -125,4 +132,17 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
         
     }
 
+    public static String addMissingTargetToAnchors(final String msgBody) {
+        
+        // Assertions.
+        if (msgBody == null) {
+            String msg = "Argument 'msgBody' cannot be null";
+            throw new IllegalArgumentException(msg);
+        }
+
+        final String targetAddedContents = msgBody.replaceAll(ANCHOR_WITHOUT_TARGET_REGEX, ADD_TARGET_TO_ANCHOR_REPLACEMENT);
+
+        return targetAddedContents;
+        
+    }
 }
