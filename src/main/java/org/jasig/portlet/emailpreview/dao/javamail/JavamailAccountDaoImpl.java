@@ -481,7 +481,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         else if (content instanceof MimeMultipart) {
             Multipart m = (Multipart) content;
             int parts = m.getCount();
-
+            ArrayList <String> inlineTextDisposition  = new ArrayList<String>();
             // iterate backwards through the parts list
             for (int i = parts-1; i >= 0; i--) {
                 EmailMessageContent result = null;
@@ -491,10 +491,24 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
                 String contentType = part.getContentType();
                 boolean isHtml = isHtml(contentType);
                 log.debug("Examining Multipart " + i + " with type " + contentType + " and class " + partContent.getClass());
+                
+                if ((partContent instanceof String)&&(("inline".equals(part.getDisposition()))||("attachment".equals(part.getDisposition())))) {        
+                    String splitContentType [] = contentType.split("name=");
+                    String title =splitContentType [1];
+                    inlineTextDisposition.add("<h3>".concat(title).concat("</h3>").concat((String) partContent));
+                 }
+                
+				if ((partContent instanceof String)
+						&& (!"inline".equals(part.getDisposition()))
+						&& (!"attachment".equals(part.getDisposition()))) {
+					String stringPartContent = (String) partContent;
 
-                if (partContent instanceof String) {
-                    result = new EmailMessageContent((String) partContent, isHtml);
-                }
+					for (int j = 0; j < inlineTextDisposition.size(); j++) {
+						stringPartContent = stringPartContent
+								.concat(inlineTextDisposition.get(j));
+					}
+					result = new EmailMessageContent(stringPartContent, isHtml);
+				}
 
                 else if (partContent instanceof InputStream && (contentType.startsWith("text/html"))) {
                     StringWriter writer = new StringWriter();

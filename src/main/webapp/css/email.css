@@ -133,3 +133,9 @@ font-weight: bold;
 /* css for email admin config page */
 .email-admin-config .auth-type-description {
 }
+.message-content pre h3{
+        font-weight: bold;
+        border-bottom: 1px solid black;
+        border-bottom-width: 100%;
+        padding-bottom: 8px;
+}
