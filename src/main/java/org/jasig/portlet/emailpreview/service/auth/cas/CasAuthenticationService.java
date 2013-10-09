@@ -18,21 +18,26 @@
  */
 package org.jasig.portlet.emailpreview.service.auth.cas;
 
+import javax.mail.Authenticator;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletSession;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.auth.Credentials;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.auth.BaseCredentialsAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
 
-import javax.mail.Authenticator;
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletSession;
-
 public class CasAuthenticationService extends BaseCredentialsAuthenticationService {
+
+    protected final Log log = LogFactory.getLog(getClass());
     
     protected String key = "cas";
     
     protected ICASProxyTicketService casTicketService;
+    
     protected String serviceUrl;  
     
     protected String CAS_ASSERTION_KEY = "CAS_ASSERTION_KEY";
@@ -76,7 +81,8 @@ public class CasAuthenticationService extends BaseCredentialsAuthenticationServi
     }
 
     public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
-        throw new UnsupportedOperationException("CAS ticket doesn't make sense with Exchange integration");
+        log.trace("CAS ticket doesn't make sense with Exchange integration");
+        return null;
     }
 
     public String getMailAccountName(PortletRequest request, MailStoreConfiguration config) {

@@ -108,7 +108,10 @@ public class MailCredentialsProvider implements CredentialsProvider, ICredential
 
     @Override
     public String getUsername() {
-        return getCredentials(null).getUserPrincipal().getName();
+    	Credentials credentials = getCredentials(null);
+    	if(credentials == null)
+    		return null;
+        return credentials.getUserPrincipal().getName();
     }
 
 }
