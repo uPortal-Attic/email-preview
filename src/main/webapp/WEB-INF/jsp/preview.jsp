@@ -116,7 +116,7 @@
                     </ul>
                 </div>
 
-                <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font">
+                <table cellpadding="3" cellspacing="0" class="email-portlet-table portlet-font table table-hover">
                     <tr>
                         <th class="select"><input type="checkbox" class="select-all"></th>
                         <th class="flags-header">
