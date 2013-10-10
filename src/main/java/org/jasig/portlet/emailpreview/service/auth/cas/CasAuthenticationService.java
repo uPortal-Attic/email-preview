@@ -57,7 +57,7 @@ public class CasAuthenticationService extends BaseCredentialsAuthenticationServi
 	    if(casAssertion == null) {
 	    	casAssertion = casTicketService.getProxyTicket(request);
 			if(casAssertion == null)
-				throw new RuntimeException("CasAssertion is null : Auth ProxyCAS failed ? Please check yours CAS configurations.");
+				throw new RuntimeException("CasAssertion is null : Auth ProxyCAS failed. Please check your CAS configuration.");
 		    session.setAttribute(CAS_ASSERTION_KEY, casAssertion);     
 	    }
 	    return casAssertion;
