@@ -11,7 +11,7 @@ import org.junit.Test;
  * @author GIP RECIA 2013 - Maxime BOSSARD.
  *
  */
-public class MessageUtilsTest {
+public class MessageUtilsTestJ {
 
 	private static final String MESSAGE_BODY_WITHOUD_TARGET = "<html><head>" +
 			"<link rel=\"shortcut icon\" href=\"/sites/all/themes/jasig3/favicon.ico\" type=\"image/x-icon\">" +
