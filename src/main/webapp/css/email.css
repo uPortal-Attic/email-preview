@@ -133,3 +133,22 @@ font-weight: bold;
 /* css for email admin config page */
 .email-admin-config .auth-type-description {
 }
+/**
+ * Respondr Theme overrides
+ */
+.respondr .flags-span, 
+.respondr .answered-span, 
+.respondr .attached-span {
+  width: 16px;
+  height: 16px;
+  margin-left: 0;
+}
+.respondr .portlet-section-alternate {
+background-color: #eee;
+}
+.respondr .email-portlet-table a {
+  font-weight: normal;
+}
+.respondr .email-list li label {
+  display: inline;
+}
