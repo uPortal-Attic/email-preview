@@ -117,7 +117,10 @@ public class EmailAccountService implements IEmailAccountService {
         config.setInboxFolderName(folder);
         String mailAccount = config.getMailAccount();
 
-        String key = accountSummaryCacheKeyGenerator.getKey(credentialsService.getUsername(), mailAccount, folder, config.getProtocol());
+        String credUsername = credentialsService.getUsername();
+        credUsername = credUsername == null ? username : credUsername;
+        
+        String key = accountSummaryCacheKeyGenerator.getKey(credUsername, mailAccount, folder, config.getProtocol());
         if (!refresh) {
             Element element = inboxCache.get(key);
             if (element != null) {
