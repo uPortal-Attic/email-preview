@@ -111,7 +111,7 @@ public final class DemoAccountService implements IEmailAccountService {
 
         List<? extends EmailMessage> messages = summary.getMessages();
         for (EmailMessage m : messages) {
-            if (m.getMessageId() == messageId) {
+            if (m.getMessageId().equals(messageId)) {
                 rslt = m;
                 break;
             }
