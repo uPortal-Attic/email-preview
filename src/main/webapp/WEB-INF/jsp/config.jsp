@@ -175,9 +175,12 @@
                 <h3 class="portlet-section-header" role="heading"><spring:message code="config.preferences.authentication"/></h3>
                 <p><spring:message code="config.preferences.comment"/></p>
                 <div class="portlet-section-body">
-	                <c:forEach items="${authServices}" var="auth">
+	                <c:forEach items="${authServices}" var="auth" varStatus="authIndex">
                     <div>
-	                    <form:checkbox path="allowableAuthenticationServiceKeys" label="${auth.key}" value="${auth.key}"/> <span class="auth-type-description"><spring:message code="config.preferences.auth.description.${auth.key}" text=""/></span>
+                        <label for="allowableAuthenticationServiceKeys${authIndex.count}">
+                            <form:checkbox path="allowableAuthenticationServiceKeys" value="${auth.key}"/>
+                            <c:out value="${auth.key} "/><span class="auth-type-description"><spring:message code="config.preferences.auth.description.${auth.key}" text=""/></span>
+                        </label>
                       <c:if test="${!empty auth.adminConfigurationParameters}">
                         <!--  Used for warning that the encryption key hasn't been changed from the default -->
                         <c:if test="${auth.key eq 'portletPreferences' && usingDefaultEncryptionKey eq true}">
