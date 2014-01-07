@@ -102,7 +102,7 @@
    float: left;
    display: table-cell; 
    white-space: nowrap; 
-   width: 20em;
+   width: 22em;
 }
 .plt-email-row input, .plt-email-row select {
    display:table-cell; 

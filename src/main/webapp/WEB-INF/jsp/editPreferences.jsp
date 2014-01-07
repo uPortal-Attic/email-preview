@@ -138,8 +138,8 @@
         </div>
     </div>          
 
-    <input type="submit" name="submit_email" value=" <spring:message code="editPreferences.buttonGroup.saveSettings"/> " id="plt-email-input-submit"/>
-    <a id="plt-email-input-cancel" href="<portlet:renderURL portletMode="view"/>"><spring:message code="editPreferences.buttonGroup.cancel"/></a>
+    <input type="submit" name="submit_email" value='<spring:message code="editPreferences.buttonGroup.saveSettings"/>' id="plt-email-input-submit" class="btn btn-default"/>
+    <a id="plt-email-input-cancel" href='<portlet:renderURL portletMode="view"/>' role="button" class="btn btn-default"><spring:message code="editPreferences.buttonGroup.cancel"/></a>
 
 </form>
 
