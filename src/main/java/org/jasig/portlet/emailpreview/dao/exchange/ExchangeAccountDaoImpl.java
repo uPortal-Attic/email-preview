@@ -20,6 +20,17 @@
 
 package org.jasig.portlet.emailpreview.dao.exchange;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
+
 import com.microsoft.exchange.messages.BaseRequestType;
 import com.microsoft.exchange.messages.BaseResponseMessageType;
 import com.microsoft.exchange.messages.DeleteItem;
@@ -57,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.oxm.Marshaller;
 import org.springframework.ws.WebServiceMessage;
 import org.springframework.ws.client.WebServiceClientException;
@@ -67,16 +77,6 @@ import org.springframework.ws.soap.SoapHeaderElement;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.xml.transform.StringResult;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * DAO that uses Exchange Web Services to access messages.
@@ -286,7 +286,11 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         msg.setTraversal(ItemQueryTraversalType.SHALLOW);
 
         ItemResponseShapeType shapeType = new ItemResponseShapeType();
-        shapeType.setBaseShape(DefaultShapeNamesType.DEFAULT);
+        // EMAILPLT-159: Use ALL_PROPERTIES because meeting requests will not have a dateSent without it.
+        // Ran tests and it seemed to add around 250ms to the response time which is not great but not bad.
+        // Since we cache aggressively, it is probably not worth adding all the specific properties we need and
+        // testing under all conditions.
+        shapeType.setBaseShape(DefaultShapeNamesType.ALL_PROPERTIES);
         addAdditionalPropertyReplied(shapeType);
         msg.setItemShape(shapeType);
 
@@ -313,16 +317,15 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
 
     private void addAdditionalPropertyReplied(ItemResponseShapeType shapeType) {
 
-        // NOTE:  This is not working yet, The element is not coming out as ExtendedFieldURI
-
         // For replied-to flag.  See PR_LAST_VERB_EXECUTED.  See
         // http://social.msdn.microsoft.com/Forums/en-US/outlookdev/thread/a965e87b-1051-45e2-b093-35cba4b82e05
         // http://msdn.microsoft.com/en-us/library/cc433482%28v=EXCHG.80%29.aspx
+        // http://www.outlookforums.com/threads/24025-ews-soap-how-tell-if-message-has-been-forwarded-replied/
         NonEmptyArrayOfPathsToElementType props = new NonEmptyArrayOfPathsToElementType();
-        PathToExtendedFieldType fieldType = new PathToExtendedFieldType();
-        fieldType.setPropertyTag("0x1081");
-        fieldType.setPropertyType(MapiPropertyTypeType.INTEGER);
-        props.getPaths().add(typeObjectFactory.createPath(fieldType));
+        PathToExtendedFieldType prLastVerbExecuted = new PathToExtendedFieldType();
+        prLastVerbExecuted.setPropertyTag("0x1081");
+        prLastVerbExecuted.setPropertyType(MapiPropertyTypeType.INTEGER);
+        props.getPaths().add(typeObjectFactory.createExtendedFieldURI(prLastVerbExecuted));
         shapeType.setAdditionalProperties(props);
     }
 
@@ -338,18 +341,27 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         List<ExchangeEmailMessage> messages = new ArrayList<ExchangeEmailMessage>();
         int messageNumber = start;
         String contentType = null; //sensible default
-        boolean answered = false; //sensible default
         boolean deleted = false; //sensible default
 
         for (ItemType itemType : items) {
             MessageType item = (MessageType) itemType;
             // From can be null if you have a draft email that isn't filled out
             String from = item.getFrom() != null ? item.getFrom().getMailbox().getName() : "";
+            Date dateSent = item.getDateTimeSent() != null ?
+                    new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()) : new Date();
+            boolean answered = false; //sensible default
+            if (item.getExtendedProperties().size() > 0) {
+                ExtendedPropertyType prLastVerbExecuted = item.getExtendedProperties().iterator().next();
+                String propValue = prLastVerbExecuted.getValue();
+                // From MS-OXOMG protocol document: 102 = ReplyToSender, 103 = ReplyToAll, 104 = Forward
+                answered = "102".equals(propValue) || "103".equals(propValue);
+            }
             ExchangeEmailMessage message = new ExchangeEmailMessage(messageNumber, item.getItemId().getId(),
                     item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
-                    messageUtils.cleanHTML(item.getSubject()),
-                    new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
+                    messageUtils.cleanHTML(item.getSubject()), dateSent,
                     !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null);
+            // EMAILPLT-162 Can add importance someday to model using
+            // boolean highImportance = item.getImportance() != null ? item.getImportance().value().equals(ImportanceChoicesType.HIGH.value()) : false;
             messages.add(message);
             messageNumber++;
         }
