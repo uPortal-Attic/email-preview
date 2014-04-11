@@ -23,10 +23,13 @@ package org.jasig.portlet.emailpreview.dao.exchange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.MessagingException;
+import javax.portlet.PortletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
@@ -192,7 +195,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
 
     @Override
     public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config, String username,
-                                                       String mailAccount, String folder, int start, int max) {
+                                                       String mailAccount, String folder, int start, int max, PortletRequest req) {
 
         try {
 
@@ -359,7 +362,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
             ExchangeEmailMessage message = new ExchangeEmailMessage(messageNumber, item.getItemId().getId(),
                     item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
                     messageUtils.cleanHTML(item.getSubject()), dateSent,
-                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null);
+                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null, null);
             // EMAILPLT-162 Can add importance someday to model using
             // boolean highImportance = item.getImportance() != null ? item.getImportance().value().equals(ImportanceChoicesType.HIGH.value()) : false;
             messages.add(message);
@@ -373,7 +376,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
     // ----------------------------------------------------------
 
     @Override
-    public EmailMessage getMessage(MailStoreConfiguration storeConfig, String uuid) {
+    public EmailMessage getMessage(MailStoreConfiguration storeConfig, String uuid, PortletRequest req) {
 
         ItemInfoResponseMessageType response = (ItemInfoResponseMessageType)
                 sendMessageAndExtractSingleResponse(
@@ -389,13 +392,14 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         String toRecipients = getToRecipients(message);
         String ccRecipients = getCcRecipients(message);
         String bccRecipients = getBccRecipients(message);
-
+        //TODO to change
+        List <String> allAttachments = getAllAttachments(message);
 
         ExchangeEmailMessage msg =  new ExchangeEmailMessage(0, message.getItemId().getId(), message.getItemId().getChangeKey(),
                 sender, messageUtils.cleanHTML(message.getSubject()),
                 new Date(message.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
                 !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, 
-                content, toRecipients, ccRecipients, bccRecipients);
+                content, toRecipients, ccRecipients, bccRecipients, allAttachments);
 
 
         // Insert the changeKey into cache in case the message read status is changed again.
@@ -431,6 +435,12 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         return str.toString();
     }
 
+    //TODO to change
+    private List <String> getAllAttachments(MessageType message) {
+        List <String> allAttachments = new ArrayList<String>();
+        return allAttachments;
+    }
+     
     // Returns originator's email address.  Should be the from, but if not specified check the
     // sender just in case to try and return something useful.
     private String getOriginatorEmailAddress (MessageType message) {
@@ -762,5 +772,12 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         itemIdType.setChangeKey((String) changeKey.getObjectValue());
         return itemIdType;
     }
-
+    
+   @Override
+   public HashMap<String, Object> getAttachmentInfos(PortletRequest request,
+                   String filename, String index, int msgNum) throws IOException,
+                   MessagingException {
+           // TODO Auto-generated method stub
+           return null;
+   }
 }

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.mail.Folder;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
@@ -39,6 +40,7 @@ import org.jasig.portlet.emailpreview.EmailMessageContent;
 import org.jasig.portlet.emailpreview.EmailQuota;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.service.IServiceBroker;
+import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -129,7 +131,7 @@ public final class DemoAccountService implements IEmailAccountService {
                         : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                             m.getSentDate(), false, m.isAnswered(), m.isDeleted(),
                             m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(),
-                            m.getCcRecipients(), m.getBccRecipients());
+                            m.getCcRecipients(), m.getBccRecipients(), m.getAllAttachments());
 
                 newList.add(msg);
             }
@@ -187,7 +189,7 @@ public final class DemoAccountService implements IEmailAccountService {
                     : new EmailMessage(m.getMessageNumber(), m.getUid(), m.getSender(), m.getSubject(),
                         m.getSentDate(), !seenValue, m.isAnswered(), m.isDeleted(),
                         m.isMultipart(), m.getContentType(), m.getContent(), m.getToRecipients(),
-                        m.getCcRecipients(), m.getBccRecipients());
+                        m.getCcRecipients(), m.getBccRecipients(), m.getAllAttachments());
 
             newList.add(msg);
         }
@@ -228,9 +230,30 @@ public final class DemoAccountService implements IEmailAccountService {
                 String toRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
                 String ccRecipients = "ccTest@test.univ.eu; ccTest1@test1.univ.eu";
                 String bccRecipients = "bccTest@test.univ.eu; bccTest1@test1.univ.eu";
+                List<String> allAttachments = new ArrayList <String>();
+                String contentType = "text/plain";
+                if(multipart){
+                    PortletPreferences prefs = req.getPreferences();
+                       String fname = prefs.getValue(MessageUtils.PREF_FNAME,null);
+                       String fileName1 = "emailpreview.pdf";                                        
+                       String test1 = "<a class='download' href='/uPortal/p/".concat(fname).
+                    		   concat("/max/fileDownload.resource.uP?pP_fileName=").concat(fileName1).
+                    		   concat("&pP_partNumber=demo&pP_msgNumber=").concat(uid).
+                    		   concat("' style='background:url(/email-preview/images/icons/pdf.png) no-repeat left; padding-left:20px; margin-left:20px;' >").
+                    		   concat(fileName1).concat("</a> <span>(25Ko)</span>");
+                        allAttachments.add(test1);
+                        String fileName2 = "EmailPreviewPortlet.png";                                        
+                        String test2 = "<a class='download' href='/uPortal/p/".concat(fname).
+                     		   concat("/max/fileDownload.resource.uP?pP_fileName=").concat(fileName2).
+                     		   concat("&pP_partNumber=demo&pP_msgNumber=").concat(uid).
+                     		   concat("' style='background:url(/email-preview/images/icons/image.png) no-repeat left; padding-left:20px; margin-left:20px;' >").
+                     		   concat(fileName2).concat("</a> <span>(28Ko)</span>");
+                         allAttachments.add(test2);                      
+                }
+
                 messages.add(new EmailMessage(messages.size(), uid,
                         sender, subject, sentDate, unread, answered, deleted,
-                        multipart, "text/plain", content, toRecipients, ccRecipients, bccRecipients));
+                        multipart, contentType, content, toRecipients, ccRecipients, bccRecipients, allAttachments));
 
             }
         } catch (Exception e) {

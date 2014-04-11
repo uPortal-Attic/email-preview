@@ -52,6 +52,12 @@ var jasig = jasig || {};
     	} else {
     		that.container.find(".email-message .bccInfo").show();
     	}
+       that.container.find(".email-message .allAttachments").html(message.allAttachments);
+       if (that.container.find(".email-message .allAttachments").text() == ""){
+               that.container.find(".email-message .allAttachmentsInfo").hide();
+       } else {
+               that.container.find(".email-message .allAttachmentsInfo").show();
+       }
 
         that.container.find(".email-message .message-uid").val(message.messageId);
 
@@ -560,7 +566,8 @@ var jasig = jasig || {};
             toRecipients: ".to-recipients",
             previousMsg: ".previous-msg",
             nextMsg: ".next-msg",
-            mobileSelect: "#mobileSelect"
+            mobileSelect: "#mobileSelect",
+            allAttachments: ".allAttachments"
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},

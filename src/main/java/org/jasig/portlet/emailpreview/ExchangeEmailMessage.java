@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Exchange email messages.  Exchange messages have a change key that must be sent back on
@@ -34,8 +35,8 @@ public class ExchangeEmailMessage extends EmailMessage {
 
     public ExchangeEmailMessage(int messageNumber, String uid, String exchangeChangeKey, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
-                        boolean multipart, String contentType, EmailMessageContent content, String to, String cc, String bcc) {
-        super(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, content, to, cc, bcc);
+                        boolean multipart, String contentType, EmailMessageContent content, String to, String cc, String bcc, List<String> allAttachments) {
+        super(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, content, to, cc, bcc, allAttachments);
         this.exchangeChangeKey = exchangeChangeKey;
     }
 

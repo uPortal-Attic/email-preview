@@ -59,6 +59,10 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
 	/** Replacement to add target to HTML anchors. */ 
 	private static final String ADD_TARGET_TO_ANCHOR_REPLACEMENT = "<a$1 target=\"_new\">";
 	
+    public static final String URL_TYPE_RENDER = "render.uP";
+    public static final String URL_TYPE_DOWNLOAD = "fileDownload.resource.uP";
+    public static final String PREF_FNAME = "fname";
+	
     private static final Log LOG = LogFactory.getLog(MessageUtils.class);
 
     private String filePath = "classpath:antisamy.xml";  // default

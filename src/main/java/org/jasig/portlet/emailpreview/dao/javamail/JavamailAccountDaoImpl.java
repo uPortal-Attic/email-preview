@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview.dao.javamail;
 
 import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.util.BASE64DecoderStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,8 +32,13 @@ import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IMailAccountDao;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.service.ICredentialsProvider;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
+import org.jasig.portlet.emailpreview.service.ResourceUtils;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
+import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
 import org.jasig.portlet.emailpreview.service.link.ILinkServiceRegistry;
+import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
@@ -45,6 +51,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Authenticator;
@@ -57,14 +64,19 @@ import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.Quota;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.UIDFolder;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.SharedByteArrayInputStream;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -74,6 +86,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +114,16 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
 
     @Autowired
     private ICredentialsProvider credentialsProvider;
+    
+    @Autowired(required = true)
+    private IServiceBroker serviceBroker;
+    
+    @Autowired(required = true)
+    private IAuthenticationServiceRegistry authServiceRegistry;
+
+    @Resource
+    public ResourceUtils resourceUtils;
+
 
     /**
      * Value for the 'mail.debug' setting in JavaMail
@@ -136,7 +159,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
 
     @Override
     public AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration config, String username,
-                                                String mailAccount, String folder, int start, int max) {
+                                                String mailAccount, String folder, int start, int max, PortletRequest request) {
 
         Authenticator auth = credentialsProvider.getAuthenticator();
 
@@ -149,7 +172,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
             inbox = getUserInbox(session, folder);
             inbox.open(Folder.READ_ONLY);
             long startTime = System.currentTimeMillis();
-            List<EmailMessage> messages = getEmailMessages(inbox, start, max, session);
+            List<EmailMessage> messages = getEmailMessages(inbox, start, max, session, request);
 
             if ( log.isDebugEnabled() ) {
                 long elapsedTime = System.currentTimeMillis() - startTime;
@@ -257,7 +280,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
     }
 
     @Override
-    public EmailMessage getMessage(MailStoreConfiguration config, String messageId) {
+    public EmailMessage getMessage(MailStoreConfiguration config, String messageId, PortletRequest request) {
         Authenticator auth = credentialsProvider.getAuthenticator();
         Folder inbox = null;
         try {
@@ -278,7 +301,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
             if (config.getMarkMessagesAsRead()) {
                 message.setFlag(Flag.SEEN, true);
             }
-            EmailMessage emailMessage = wrapMessage(message, true, session);
+            EmailMessage emailMessage = wrapMessage(message, true, session, request);
             if (!config.getMarkMessagesAsRead()) {
                 // NOTE:  This is more than a little bit annoying.  Apparently
                 // the mere act of accessing the body content of a message in
@@ -346,7 +369,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
 
     }
 
-    private EmailMessage wrapMessage(Message msg, boolean populateContent, Session session)
+    private EmailMessage wrapMessage(Message msg, boolean populateContent, Session session, PortletRequest request)
             throws MessagingException, IOException, ScanException, PolicyException {
 
         // Prepare subject
@@ -412,6 +435,9 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         // Defend against the dreaded: "Unable to load BODYSTRUCTURE"
         boolean multipart = false;  // sensible default;
         String contentType = null;  // sensible default
+        List <String> allAttachments = new ArrayList <String>();
+        allAttachments=this.getMessageAttachments(msg, msg.getContentType(),request);
+        
         try {
             multipart = msg.getContentType().toLowerCase().startsWith(CONTENT_TYPE_ATTACHMENTS_PATTERN);
             contentType = msg.getContentType();
@@ -427,7 +453,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         String to = getTo(msg);
         String cc = getCc(msg);
         String bcc = getBcc(msg);
-        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, msgContent, to, cc, bcc);
+        return new EmailMessage(messageNumber, uid, sender, subject, sentDate, unread, answered, deleted, multipart, contentType, msgContent, to, cc, bcc, allAttachments);
     }
 
     /*
@@ -435,7 +461,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
      */
 
     private List<EmailMessage> getEmailMessages(Folder mailFolder, int pageStart,
-            int messageCount, Session session) throws MessagingException, IOException, ScanException, PolicyException {
+            int messageCount, Session session, PortletRequest request) throws MessagingException, IOException, ScanException, PolicyException {
 
         int totalMessageCount = mailFolder.getMessageCount();
         int start = Math.max(1, totalMessageCount - pageStart - (messageCount - 1));
@@ -463,7 +489,7 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
 
         List<EmailMessage> emails = new LinkedList<EmailMessage>();
         for (Message currentMessage : messages) {
-            EmailMessage emailMessage = wrapMessage(currentMessage, false, session);
+            EmailMessage emailMessage = wrapMessage(currentMessage, false, session, request);
             emails.add(emailMessage);
         }
 
@@ -514,6 +540,106 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         return null;
     }
 
+    private List <String> getMessageAttachments(Message msg, String mimeType, PortletRequest request) throws IOException, MessagingException {
+
+    	final PortletPreferences prefs = request.getPreferences();
+		String fname = prefs.getValue(MessageUtils.PREF_FNAME,null);
+    	List <String>allAttachments = new ArrayList <String>();
+        if (mimeType.contains("multipart/mixed")) {
+            Multipart m = (Multipart) msg.getContent();
+            int parts = m.getCount();
+            // iterate backwards through the parts list
+            for (int i = parts-1; i >= 0; i--) {
+            	MimeBodyPart part = (MimeBodyPart) m.getBodyPart(i);
+                Object partContent = part.getContent();
+
+                String contentType = part.getContentType();
+                log.debug("Examining Multipart " + i + " with type " + contentType + " and class " + partContent.getClass());
+
+                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+                	String fileName = MimeUtility.decodeText(part.getFileName());                	
+                	String urlIcon = resourceUtils.getIcon(fileName);              	
+                	
+                    String msgNumber = String.valueOf(msg.getMessageNumber());         	               	
+                    //Size
+            		int contentSize = part.getSize();
+
+            		int realSize = contentSize*100/137;
+                    String unit = "o";
+                    	int coef = 1;
+
+                    if((realSize > 999) && (realSize < 1000000)) {
+                        unit = "Ko";
+                         coef = 1024;
+                    }else if(realSize > 999999){
+                    	unit = "Mo";
+                    	coef=1048576;
+                    }
+                    realSize=realSize/coef;
+                    String strContentSize = "(".concat(String.valueOf(realSize)).concat(unit).concat(")");                	
+
+                	allAttachments.add(setFiledownloadUrl(fname, fileName, String.valueOf(i), msgNumber, urlIcon, strContentSize));         
+                }
+            }
+            return allAttachments;
+        }else{
+        	return null;
+        }
+    }
+    
+    public HashMap<String, Object> getAttachmentInfos(PortletRequest request, String filename, String index, int msgNum) throws IOException, MessagingException{
+    	
+        Folder inbox = null;
+        HashMap<String, Object> attachmentInfos = new HashMap<String, Object>();       
+
+	    MailStoreConfiguration config = serviceBroker.getConfiguration(request);
+	    int mode = config.getMarkMessagesAsRead() ? Folder.READ_WRITE : Folder.READ_ONLY;
+
+        IAuthenticationService authService = authServiceRegistry.getAuthenticationService(config.getAuthenticationServiceKey());
+        if (authService == null) {
+            String msg = "Unrecognized authentication service:  "
+                            + config.getAuthenticationServiceKey();
+            log.error(msg);
+            throw new EmailPreviewException(msg);
+        }
+        Authenticator auth = authService.getAuthenticator(request, config);
+
+        // Retrieve user's inbox
+        Session session = this.openMailSession(config, auth);
+        inbox = this.getUserInbox(session, config.getInboxFolderName());
+        inbox.open(mode);
+        Message message = inbox.getMessage(msgNum);
+
+    	Multipart m = (Multipart) message.getContent();		
+		MimeBodyPart part = (MimeBodyPart) m.getBodyPart(Integer.valueOf(index));
+		Object partContent = part.getContent();		 
+		 
+		if (part.getContent() instanceof BASE64DecoderStream){
+			BASE64DecoderStream base64DecoderStream = (BASE64DecoderStream) part.getContent();
+			byte[] byteArray = IOUtils.toByteArray(base64DecoderStream);
+			attachmentInfos.put("content", byteArray);
+		}else{
+			attachmentInfos.put("content", partContent);
+		}
+		
+		//split contentType
+		String splitString = ";";
+		String splitContentType [] = part.getContentType().split(splitString);
+		String contentType = splitContentType[0];
+		int contentTypeLength = splitContentType.length;
+		for (int i=0; i<contentTypeLength;i++){
+			if(splitContentType[i].contains("charset=")){
+				String splitOptions []= splitContentType[i].split("=");
+				attachmentInfos.put("contentCharset", splitOptions[1]);
+			}
+		}	
+
+		attachmentInfos.put("contentType", contentType);
+		attachmentInfos.put("contentFilename", filename);
+		
+		return attachmentInfos; 	
+    }
+    
     /**
      * Determine if the supplied MIME type represents HTML content.  This
      * implementation assumes that the inclusion of the string "text/html"
@@ -727,4 +853,18 @@ public final class JavamailAccountDaoImpl implements IMailAccountDao {
         }
         return StringUtils.join(recipientsList, "; ").replaceAll("<","&lt;").replaceAll(">","&gt;");
 	}
+	
+	public String setFiledownloadUrl(String fname, String fileName, String partNumber, String msgNumber, String urlIcon, String strContentSize){
+        // Url example from uportal  ("/f/folderName" is optionnal): /uPortal/f/folderName/p/portletName.subscribeId/state/render.uP
+		String resourceActionUrl = "/uPortal/p/".concat(fname).concat("/max/").concat(MessageUtils.URL_TYPE_DOWNLOAD);
+		String filedownloadUrl = "<a ".concat("class='download' href='").concat(resourceActionUrl)
+				.concat("?pP_fileName=").concat(fileName)
+				.concat("&pP_partNumber=")
+				.concat(partNumber).concat("&pP_msgNumber=")
+				.concat(msgNumber).concat("' style='background:url(").concat(urlIcon).concat(") no-repeat left; padding-left:20px; margin-left:20px;' ").concat(">").concat(fileName)
+				.concat("</a>  ").concat("<span>")
+				.concat(strContentSize).concat("</span>");      
+		return filedownloadUrl;
+	}
+	
 }

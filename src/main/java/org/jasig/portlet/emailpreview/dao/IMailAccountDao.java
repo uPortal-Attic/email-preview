@@ -23,6 +23,11 @@ import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 
 import javax.mail.Folder;
+import javax.mail.MessagingException;
+import javax.portlet.PortletRequest;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -45,7 +50,7 @@ public interface IMailAccountDao<T extends Folder> {
      * @return A representation of mail account details suitable for displaying in the view
      */
     AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration storeConfig, String username,
-                                                String mailAccount, String folder, int start, int max);
+                                                String mailAccount, String folder, int start, int max, PortletRequest request);
 
     /**
      * Gets a message from the mail server.
@@ -53,7 +58,7 @@ public interface IMailAccountDao<T extends Folder> {
      * @param storeConfig mail configuration
      * @return message
      */
-    EmailMessage getMessage(MailStoreConfiguration storeConfig, String uuid);
+    EmailMessage getMessage(MailStoreConfiguration storeConfig, String uid, PortletRequest request);
 
     /**
      * Delete the list of messages from Exchange.
@@ -76,4 +81,5 @@ public interface IMailAccountDao<T extends Folder> {
      */
     List<T> getAllUserInboxFolders(MailStoreConfiguration storeConfig);
 
+    HashMap<String, Object> getAttachmentInfos(PortletRequest request, String filename, String index, int msgNum) throws IOException, MessagingException;
 }

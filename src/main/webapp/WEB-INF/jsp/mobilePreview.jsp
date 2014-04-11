@@ -124,6 +124,7 @@
 			<li><span class="message-header-name"><spring:message code="preview.message.to"/></span><span class="toRecipients"></span></li>
             <li class="ccInfo"><span class="message-header-name"><spring:message code="preview.message.cc"/></span><span class="ccRecipients"></span></li>
             <li class="bccInfo"><span class="message-header-name"><spring:message code="preview.message.bcc"/></span><span class="bccRecipients"></span></li>
+			<li class="allAttachmentsInfo"><span class="message-header-name"><spring:message code="preview.message.attachment"/></span><span class="allAttachments"></span></li>       
         </ul>
         <hr/>
 		<p class="pager-msg">        

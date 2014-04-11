@@ -137,7 +137,7 @@ public class EmailAccountService implements IEmailAccountService {
         log.debug("Creating new AccountSummary for [username={}, mailAccount={}, folder={}, start={}, max={}]",
                 username, mailAccount, folder, start, max);
 
-        AccountSummary summary = dao.fetchAccountSummaryFromStore(config, username, mailAccount, folder, start, max);
+        AccountSummary summary = dao.fetchAccountSummaryFromStore(config, username, mailAccount, folder, start, max, req);
         Element element = new Element(key, summary);
         inboxCache.put(element);
         return summary;
@@ -183,7 +183,7 @@ public class EmailAccountService implements IEmailAccountService {
             clearInboxCache(config);
         }
         log.debug("Getting message id={}", messageId);
-        return dao.getMessage(config, messageId);
+        return dao.getMessage(config, messageId, req);
     }
 
     @Override

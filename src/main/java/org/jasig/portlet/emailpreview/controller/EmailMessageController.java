@@ -139,5 +139,27 @@ public class EmailMessageController extends BaseEmailController {
         return new ModelAndView("json", model);
 
     }
+    
+    @ResourceMapping(value = "emailAttachment")
+    public ModelAndView getAttachments(ResourceRequest req, ResourceResponse res,
+            @RequestParam("fileName") String fileName,  @RequestParam("pathName") String pathName, @RequestParam("msgNumber") String msgNumber){
 
+        Map<String, Object> model = new HashMap<String, Object>();
+        
+        try {
+               String splitPathName []= pathName.split(MessageUtils.URL_TYPE_RENDER);
+               String fileDownloadUrl =splitPathName[0].concat(MessageUtils.URL_TYPE_DOWNLOAD).concat("?pP_fileName=").concat(fileName)
+                                       .concat("&pP_partNumber=")
+                                       .concat(String.valueOf(1)).concat("&pP_msgNumber=")
+                                       .concat(msgNumber);
+
+            model.put("url", fileDownloadUrl);
+
+        } catch (Exception ex) {
+            log.error("Error encountered while attempting to retrieve attachment", ex);
+        }
+        
+        return new ModelAndView("json", model);
+
+    }
 }

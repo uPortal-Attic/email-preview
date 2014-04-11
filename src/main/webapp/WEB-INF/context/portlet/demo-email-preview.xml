@@ -31,7 +31,7 @@
             http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
-    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo"/>
+    <context:component-scan base-package="org.jasig.portlet.emailpreview.dao"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
