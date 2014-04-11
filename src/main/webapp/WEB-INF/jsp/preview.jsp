@@ -157,6 +157,7 @@
 			  <tr><td class="message-header-name"><spring:message code="preview.message.to"/></td><td class="toRecipients"></td></tr>
               <tr class="ccInfo"><td class="message-header-name"><spring:message code="preview.message.cc"/></td><td class="ccRecipients"></td></tr>
               <tr class="bccInfo"><td class="message-header-name"><spring:message code="preview.message.bcc"/></td><td class="bccRecipients"></td></tr>
+          	  <tr class="allAttachmentsInfo"><td class="message-header-name"><spring:message code="preview.message.attachment"/></td><td class="allAttachments"></td></tr>
           </table>
           <hr/>
 		  <span class="previous-msg"><a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a></span>

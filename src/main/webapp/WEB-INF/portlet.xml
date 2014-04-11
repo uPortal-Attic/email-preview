@@ -225,6 +225,13 @@
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
             </preference>
+             <!-- 
+                Indicate the fname value of the portlet,  use for the link of download file
+            -->
+            <preference>
+                <name>fname</name>
+                <value>email-preview-dummy</value>
+            </preference>           
         </portlet-preferences>
     </portlet>
     
@@ -320,6 +327,13 @@
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
             </preference>
+             <!-- 
+                Indicate the fname value of the portlet,  use for the link of download file
+            -->
+            <preference>
+                <name>fname</name>
+                <value>email-preview-dummy</value>
+            </preference>            
         </portlet-preferences>
     </portlet>
 

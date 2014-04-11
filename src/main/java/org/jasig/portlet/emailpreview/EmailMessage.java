@@ -19,6 +19,7 @@
 package org.jasig.portlet.emailpreview;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -50,6 +51,7 @@ public class EmailMessage {
     private final String toRecipients;
     private final String ccRecipients;
     private final String bccRecipients;
+    private final List <String> allAttachments;
 
 
 	/*
@@ -63,7 +65,7 @@ public class EmailMessage {
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                 Date sentDate, boolean unread, boolean answered, boolean deleted, 
                 boolean multipart, String contentType, EmailMessageContent content, 
-                String toRecipients, String ccRecipients, String bccRecipients) {
+                String toRecipients, String ccRecipients, String bccRecipients, List<String> allAttachments) {
 
 	    // Instance Members.
         this.messageNumber = messageNumber;
@@ -80,12 +82,13 @@ public class EmailMessage {
         this.toRecipients = toRecipients;
         this.ccRecipients = ccRecipients;
         this.bccRecipients = bccRecipients;
+        this.allAttachments = allAttachments;
 	}
 
     public EmailMessage(int messageNumber, String uid, String sender, String subject,
                         Date sentDate, boolean unread, boolean answered, boolean deleted,
                         boolean multipart, String contentType, EmailMessageContent content) {
-        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null,null);
+        this(messageNumber,uid,sender,subject,sentDate,unread,answered,deleted,multipart,contentType,content,null,null,null,null);
     }
 
 	public int getMessageNumber() {
@@ -198,5 +201,7 @@ public class EmailMessage {
 	public String getBccRecipients() {
 		return bccRecipients;
 	}
-
+	public List <String> getAllAttachments() {
+	     return allAttachments;
+	}    
 }

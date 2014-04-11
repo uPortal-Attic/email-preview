@@ -19,12 +19,14 @@
 package org.jasig.portlet.emailpreview.dao.javamail;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.mail.Authenticator;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
@@ -39,7 +41,7 @@ import org.owasp.validator.html.ScanException;
  * 
  * @author awills
  */
-interface IJavamailAccountDao {
+public interface IJavamailAccountDao {
 
     /**
      * Performs the heavy-lifting of {@link IEmailAccountService} but in a way 
@@ -61,14 +63,15 @@ interface IJavamailAccountDao {
      */
     AccountSummary fetchAccountSummaryFromStore(MailStoreConfiguration storeConfig,
                                                 Authenticator auth, String username, String mailAccount, int start,
-                                                int max, boolean refresh) throws EmailPreviewException;
+                                                int max, boolean refresh, PortletRequest request) throws EmailPreviewException;
 
     Session openMailSession(MailStoreConfiguration config, Authenticator auth);
 
     Folder getUserInbox(Session session, String folderName) throws MessagingException;
 
     EmailMessage wrapMessage(Message msg, boolean populateContent,
-            Session session) throws MessagingException, IOException,
+            Session session, PortletRequest request) throws MessagingException, IOException,
             ScanException, PolicyException;
-
+    
+    HashMap<String, Object> getAttachmentInfos(PortletRequest request, String filename, String index, int msgNum) throws IOException, MessagingException;
 }
