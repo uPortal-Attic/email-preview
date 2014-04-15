@@ -48,6 +48,7 @@ public class AjaxUpdateInboxFolderController extends BaseEmailController {
     public static final String AUTH_SERVICE_PREFERENCE = "authenticationServiceKey";
     public static final String AUTH_SERVICE_DEFAULT_VALUE_PREFERENCE = "dummy";
     public static final String AUTH_SERVICE_TEST_PREFERENCE = "demoAuthService";
+    public static final String UNREAD_MSG_FLAG = ":unread";
     
 	@ResourceMapping("inboxFolder")
     public  ModelAndView  inboxFolder(ResourceRequest req, ResourceResponse res) throws MessagingException {
@@ -73,8 +74,11 @@ public class AjaxUpdateInboxFolderController extends BaseEmailController {
      }else{
             for (Folder folderName : accountDao.getAllUserInboxFolders(req)){
             	if ((folderName.getType() & javax.mail.Folder.HOLDS_MESSAGES) != 0) {
-            		jsonData.put(folderName.toString(), folderName.toString());
-
+            		String unreadMsgCount = "";
+            		if(folderName.getUnreadMessageCount()!=0 && (!selectedFolder.equals(folderName.toString()))){
+            			unreadMsgCount = "(".concat(String.valueOf(folderName.getUnreadMessageCount())).concat(")").concat(UNREAD_MSG_FLAG);
+            		}
+            		jsonData.put(folderName.toString().concat(unreadMsgCount), folderName.toString());
                 	if(selectedFolder.equals(folderName.toString())){
                 		jsonData.put(SELECTED_OPTION,folderName.toString());
                 	}

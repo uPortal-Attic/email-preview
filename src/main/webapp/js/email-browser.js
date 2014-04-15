@@ -435,7 +435,7 @@ var jasig = jasig || {};
 		                		selected = response;
 		                	}
 		                	else{
-		                    	options[options.length] = new Option(response,response);
+		                    	options[options.length] = new Option(index,response);
 		                    }
 		                });  
 		                // Sort by name
@@ -445,7 +445,11 @@ var jasig = jasig || {};
 		                select.val(selected);            
 		                $(".styled-select .ui-btn-text").html(selected);
 		                select.find("option[value='INBOX']").css("color","red").css("font-weight","bold");
-		                select.find("option[value='inbox']").css("color","red").css("font-weight","bold");		                
+		                select.find("option[value='inbox']").css("color","red").css("font-weight","bold");
+		                $("option:contains(':unread')").css("font-weight","bold");	
+		                $("option:contains(':unread')").html(function(i, text) {
+		                    return text.replace(/:unread/g, '');
+		                });
 		                console.log("list completed");
 	                },
 	                error: function(e){
