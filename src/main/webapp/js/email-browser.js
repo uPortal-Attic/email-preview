@@ -447,9 +447,6 @@ var jasig = jasig || {};
 		                select.find("option[value='INBOX']").css("color","red").css("font-weight","bold");
 		                select.find("option[value='inbox']").css("color","red").css("font-weight","bold");		                
 		                console.log("list completed");
-	                },
-	                error: function(e){
-	                    alert('Error: ' + e);
 	                }
 	            };
 	    		$.ajax(ajaxOptions);
