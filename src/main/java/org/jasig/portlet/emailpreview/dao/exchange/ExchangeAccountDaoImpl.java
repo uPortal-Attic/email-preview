@@ -344,24 +344,54 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
         boolean deleted = false; //sensible default
 
         for (ItemType itemType : items) {
-            MessageType item = (MessageType) itemType;
-            // From can be null if you have a draft email that isn't filled out
-            String from = item.getFrom() != null ? item.getFrom().getMailbox().getName() : "";
-            Date dateSent = item.getDateTimeSent() != null ?
-                    new Date(item.getDateTimeSent().toGregorianCalendar().getTimeInMillis()) : new Date();
-            boolean answered = false; //sensible default
-            if (item.getExtendedProperties().size() > 0) {
-                ExtendedPropertyType prLastVerbExecuted = item.getExtendedProperties().iterator().next();
-                String propValue = prLastVerbExecuted.getValue();
-                // From MS-OXOMG protocol document: 102 = ReplyToSender, 103 = ReplyToAll, 104 = Forward
-                answered = "102".equals(propValue) || "103".equals(propValue);
+            ExchangeEmailMessage message;
+            Date dateSent = itemType.getDateTimeSent() != null ?
+                    new Date(itemType.getDateTimeSent().toGregorianCalendar().getTimeInMillis()) : new Date();
+            if (itemType instanceof MessageType) {
+                MessageType item = (MessageType) itemType;
+                // From can be null if you have a draft email that isn't filled out
+                String from = item.getFrom() != null ? item.getFrom().getMailbox().getName() : "";
+                boolean answered = false; //sensible default
+                if (item.getExtendedProperties().size() > 0) {
+                    ExtendedPropertyType prLastVerbExecuted = item.getExtendedProperties().iterator().next();
+                    String propValue = prLastVerbExecuted.getValue();
+                    // From MS-OXOMG protocol document: 102 = ReplyToSender, 103 = ReplyToAll, 104 = Forward
+                    answered = "102".equals(propValue) || "103".equals(propValue);
+                }
+                message = new ExchangeEmailMessage(messageNumber, item.getItemId().getId(),
+                        item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
+                        messageUtils.cleanHTML(item.getSubject()), dateSent,
+                        !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null);
+                // EMAILPLT-162 Can add importance someday to model using
+                // boolean highImportance = item.getImportance() != null ? item.getImportance().value().equals(ImportanceChoicesType.HIGH.value()) : false;
+            } else {
+                log.debug("Found message of type {} in exchange folder", itemType.getClass());
+                boolean isRead = false; // have to pick a default
+                String from = ""; // have to pick a default
+                String subject = messageUtils.cleanHTML(itemType.getSubject());
+
+                if (itemType instanceof PostItemType) {
+                    PostItemType item = (PostItemType) itemType;
+                    isRead = item.isIsRead();
+                    from = item.getFrom() != null && item.getFrom().getMailbox() != null ?
+                            messageUtils.cleanHTML(item.getFrom().getMailbox().getName()) : from;
+                } else if (itemType instanceof CalendarItemType) {
+                    CalendarItemType item = (CalendarItemType) itemType;
+                    from = item.getOrganizer() != null && item.getOrganizer().getMailbox() != null ?
+                            messageUtils.cleanHTML(item.getOrganizer().getMailbox().getName()) : from;
+                } else if (itemType instanceof DistributionListType) {
+                    // Do nothing
+                } else if (itemType instanceof TaskType) {
+                    // Do nothing
+                } else if (itemType instanceof ContactItemType) {
+                    // Do nothing
+                }
+                // Create a place holder to represent this message.
+                message = new ExchangeEmailMessage(messageNumber, itemType.getItemId().getId(),
+                        itemType.getItemId().getChangeKey(), from,
+                        subject, dateSent, !isRead, false, deleted,
+                        itemType.isHasAttachments(), contentType, null, null, null, null);
             }
-            ExchangeEmailMessage message = new ExchangeEmailMessage(messageNumber, item.getItemId().getId(),
-                    item.getItemId().getChangeKey(), messageUtils.cleanHTML(from),
-                    messageUtils.cleanHTML(item.getSubject()), dateSent,
-                    !item.isIsRead(), answered, deleted, item.isHasAttachments(), contentType, null, null, null, null);
-            // EMAILPLT-162 Can add importance someday to model using
-            // boolean highImportance = item.getImportance() != null ? item.getImportance().value().equals(ImportanceChoicesType.HIGH.value()) : false;
             messages.add(message);
             messageNumber++;
         }
@@ -379,25 +409,63 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                 sendMessageAndExtractSingleResponse(
                         createGetItemSoapMessage(uuid, DefaultShapeNamesType.ALL_PROPERTIES), GET_ITEM_SOAP_ACTION, storeConfig);
 
-        MessageType message = (MessageType) response.getItems().getItemsAndMessagesAndCalendarItems().get(0);
-        String sender = getOriginatorEmailAddress(message);
+        ExchangeEmailMessage msg;
+        ItemType itemType = response.getItems().getItemsAndMessagesAndCalendarItems().get(0);
         boolean answered = false;  // Sensible default
         boolean deleted = false; // Sensible default
-        String contentType = message.getBody().getBodyType().value();
-        EmailMessageContent content = new EmailMessageContent(messageUtils.cleanHTML(message.getBody().getValue()),
-                BodyTypeType.HTML.equals(message.getBody().getBodyType()));
-        String toRecipients = getToRecipients(message);
-        String ccRecipients = getCcRecipients(message);
-        String bccRecipients = getBccRecipients(message);
+        Date dateSent = itemType.getDateTimeSent() != null ?
+                new Date(itemType.getDateTimeSent().toGregorianCalendar().getTimeInMillis()) : new Date();
+        if (itemType instanceof MessageType) {
+            MessageType message = (MessageType) itemType;
+            String sender = getOriginatorEmailAddress(message);
+            String contentType = message.getBody().getBodyType().value();
+            EmailMessageContent content = new EmailMessageContent(messageUtils.cleanHTML(message.getBody().getValue()),
+                    BodyTypeType.HTML.equals(message.getBody().getBodyType()));
+            String toRecipients = getToRecipients(message);
+            String ccRecipients = getCcRecipients(message);
+            String bccRecipients = getBccRecipients(message);
 
+            msg = new ExchangeEmailMessage(0, message.getItemId().getId(), message.getItemId().getChangeKey(),
+                    sender, messageUtils.cleanHTML(message.getSubject()), dateSent,
+                    !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType,
+                    content, toRecipients, ccRecipients, bccRecipients);
+        } else {
+            // For message detail, default to 'isRead' for non-MessageType messages so the auto-mark message as read
+            // feature won't attempt to set read=true status on a message type that doesn't support it and cause
+            // an error.
+            boolean isRead = true;
+            String sender = ""; // have to pick a default
+            String subject = messageUtils.cleanHTML(itemType.getSubject());
+            String toRecipients = "";
+            String ccRecipients = "";
+            String bccRecipients = "";
+            String contentString = itemType.getBody() != null ? messageUtils.cleanHTML(itemType.getBody().getValue())
+                    : "Exchange message of type " + itemType.getClass().getSimpleName()
+                    + " cannot be displayed.  Please view using email client or web viewer.";
+            String contentType = itemType.getBody() != null && itemType.getBody().getBodyType() != null ?
+                    itemType.getBody().getBodyType().value() : "text/plain";
+            EmailMessageContent content = new EmailMessageContent(contentString, BodyTypeType.HTML.equals(contentType));
+            if (itemType instanceof PostItemType) {
+                PostItemType item = (PostItemType) itemType;
+                isRead = item.isIsRead();
+                sender = item.getFrom() != null  && item.getFrom().getMailbox() != null ?
+                        messageUtils.cleanHTML(item.getFrom().getMailbox().getName()) : sender;
+            } else if (itemType instanceof CalendarItemType) {
+                CalendarItemType item = (CalendarItemType) itemType;
+                sender = item.getOrganizer() != null && item.getOrganizer().getMailbox() != null ?
+                        messageUtils.cleanHTML(item.getOrganizer().getMailbox().getName()) : sender;
+            } else if (itemType instanceof DistributionListType) {
+                // Do nothing
+            } else if (itemType instanceof TaskType) {
+                // Do nothing
+            } else if (itemType instanceof ContactItemType) {
+                // Do nothing
+            }
 
-        ExchangeEmailMessage msg =  new ExchangeEmailMessage(0, message.getItemId().getId(), message.getItemId().getChangeKey(),
-                sender, messageUtils.cleanHTML(message.getSubject()),
-                new Date(message.getDateTimeSent().toGregorianCalendar().getTimeInMillis()),
-                !message.isIsRead(), answered, deleted, message.isHasAttachments(), contentType, 
-                content, toRecipients, ccRecipients, bccRecipients);
-
-
+            msg = new ExchangeEmailMessage(0, itemType.getItemId().getId(), itemType.getItemId().getChangeKey(),
+                    sender, subject, dateSent, !isRead, answered, deleted, itemType.isHasAttachments(), contentType,
+                    content, toRecipients, ccRecipients, bccRecipients);
+        }
         // Insert the changeKey into cache in case the message read status is changed again.
         insertChangeKeyIntoCache(msg.getMessageId(), msg.getExchangeChangeKey());
 

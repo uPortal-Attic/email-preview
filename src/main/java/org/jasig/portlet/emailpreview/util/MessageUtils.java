@@ -88,6 +88,11 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
 
 
     public String cleanHTML(String message) {
+        // As a convenience for the caller and to avoid an error, if the message is null, return an empty string
+        // to avoid an exception.
+        if (message == null) {
+            return "";
+        }
         try {
             AntiSamy as = new AntiSamy();
             CleanResults cr = as.scan(message, policy);
