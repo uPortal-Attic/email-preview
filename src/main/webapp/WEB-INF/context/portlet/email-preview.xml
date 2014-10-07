@@ -115,6 +115,24 @@
 
     <bean id="httpClientConnectionManager" class="org.apache.http.impl.conn.PoolingClientConnectionManager"
             p:maxTotal="200"/>
+            
+    <!-- required to set Authentication Preference order (httpAuthPreferences) once http client has been -->
+    <!-- fully initialized.  By default, order is Negotiate; this setting does NTLM authentication       -->
+    <!-- first.  Remove this bean to handle normal negotiate authentication behavior.                    -->
+    <!-- requested as part of EMAILPLT-149                                                               -->
+    <bean class="org.jasig.portlet.emailpreview.util.HttpParamSetter">
+	    <property name="httpClient" ref="httpClient" />
+	    <property name="parameters">
+	        <map>
+	       		<entry key="http.auth.target-scheme-pref" value-ref="httpAuthPreferences" />
+	        </map>
+	    </property>
+	</bean>
+
+    <util:list id="httpAuthPreferences">
+    	<value>NTLM</value>
+    </util:list>
+    
     <bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient"
           c:conman-ref="httpClientConnectionManager"
           p:credentialsProvider-ref="mailCredentialsProvider"
