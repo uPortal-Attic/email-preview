@@ -732,7 +732,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                 StringResult message = new StringResult();
                 try {
                     marshaller.marshal(soapRequest, message);
-                    log.trace("Attempting to send SOAP request to {}\nSoap Action: {}\nSoap message body"
+                    log.debug("Attempting to send SOAP request to {}\nSoap Action: {}\nSoap message body"
                             +" (not exact, log org.apache.http.wire to see actual message):\n{}",
                             uri, soapAction, message);
                 } catch (IOException ex) {
@@ -748,7 +748,7 @@ public class ExchangeAccountDaoImpl implements IMailAccountDao<ExchangeFolderDto
                 StringResult messageResponse = new StringResult();
                 try {
                     marshaller.marshal(response, messageResponse);
-                    log.trace("Soap response body (not exact, log org.apache.http.wire to see actual message):\n{}", messageResponse);
+                    log.debug("Soap response body (not exact, log org.apache.http.wire to see actual message):\n{}", messageResponse);
                 } catch (IOException ex) {
                     log.debug("IOException attempting to display soap response", ex);
                 }
