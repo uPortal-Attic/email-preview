@@ -114,7 +114,7 @@
     </bean>
 
     <bean id="httpClientConnectionManager" class="org.apache.http.impl.conn.PoolingClientConnectionManager"
-            p:maxTotal="200"/>
+            p:maxTotal="200" p:defaultMaxPerRoute="30"/>
     <bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient"
           c:conman-ref="httpClientConnectionManager"
           p:credentialsProvider-ref="mailCredentialsProvider"

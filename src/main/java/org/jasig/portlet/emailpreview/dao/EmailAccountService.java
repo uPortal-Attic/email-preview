@@ -19,6 +19,11 @@
 
 package org.jasig.portlet.emailpreview.dao;
 
+import java.util.List;
+
+import javax.mail.Folder;
+import javax.portlet.PortletRequest;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import org.jasig.portlet.emailpreview.AccountSummary;
@@ -38,10 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.mail.Folder;
-import javax.portlet.PortletRequest;
-import java.util.List;
 
 /**
  * Implements the email account service, handling caching of data for efficiency.
@@ -128,9 +129,8 @@ public class EmailAccountService implements IEmailAccountService {
                             username, mailAccount, folder, start, max);
                     return summary;
                 }
-                log.debug("Different min or max so setting refresh = true for username={}, mailAccount={}",
+                log.debug("Different min or max than cached data so fetching data for username={}, mailAccount={}",
                         username, mailAccount);
-                refresh = true;
             }
         }
 
