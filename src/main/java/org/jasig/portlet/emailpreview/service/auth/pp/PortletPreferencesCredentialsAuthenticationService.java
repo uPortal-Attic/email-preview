@@ -18,6 +18,15 @@
  */
 package org.jasig.portlet.emailpreview.service.auth.pp;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.mail.Authenticator;
+import javax.portlet.PortletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,10 +35,6 @@ import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
 import org.jasig.portlet.emailpreview.service.auth.BaseCredentialsAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.SimplePasswordAuthenticator;
-
-import javax.mail.Authenticator;
-import javax.portlet.PortletRequest;
-import java.util.*;
 
 public class PortletPreferencesCredentialsAuthenticationService extends BaseCredentialsAuthenticationService {
 
@@ -74,7 +79,7 @@ public class PortletPreferencesCredentialsAuthenticationService extends BaseCred
     public boolean isConfigured(PortletRequest req, MailStoreConfiguration config) {
         String mailAccount = getMailAccountName(req, config);
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
-        return (mailAccount != null && password != null);
+        return (StringUtils.isNotBlank(mailAccount) && StringUtils.isNotBlank(password));
     }
 
     public Authenticator getAuthenticator(PortletRequest request, MailStoreConfiguration config) {
@@ -83,7 +88,7 @@ public class PortletPreferencesCredentialsAuthenticationService extends BaseCred
     }
 
     public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
-        String ntlmDomain = config.getExchangeDomain();
+        String ntlmDomain = config.getAdditionalProperties().get(MailPreferences.EXCHANGE_DOMAIN.getKey());
         String password = config.getAdditionalProperties().get(MailPreferences.PASSWORD.getKey());
 
         // If the domain is specified, we are authenticating to a domain so we need to return NT credentials
@@ -112,7 +117,7 @@ public class PortletPreferencesCredentialsAuthenticationService extends BaseCred
             // User input
             accountName = config.getAdditionalProperties().get(MailPreferences.MAIL_ACCOUNT.getKey());
         }
-        return createMailAccountName(accountName, config);
+        return createMailAccountName(accountName, req, config);
     }
 
     public String getKey() {

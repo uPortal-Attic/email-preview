@@ -34,13 +34,11 @@ import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService;
@@ -339,7 +337,7 @@ public final class EditPreferencesController extends BaseEmailController {
 
     // Exchange Web Services does not need host configuration
     private boolean hostConfigRequired(String protocol) {
-        return !IEmailAccountService.EXCHANGE_WEB_SERVICES.equals(protocol);
+        return !IServiceBroker.EXCHANGE_WEB_SERVICES.equals(protocol);
     }
 
     @Autowired(required = true)

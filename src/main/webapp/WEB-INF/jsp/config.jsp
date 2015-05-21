@@ -19,26 +19,6 @@
 
 --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%--
-
-    Licensed to Jasig under one or more contributor license
-    agreements. See the NOTICE file distributed with this work
-    for additional information regarding copyright ownership.
-    Jasig licenses this file to you under the Apache License,
-    Version 2.0 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a
-    copy of the License at:
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on
-    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied. See the License for the
-    specific language governing permissions and limitations
-    under the License.
-
---%>
 <%@ include file="/WEB-INF/jsp/include.jsp"%>
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
@@ -67,7 +47,7 @@
     
                 <div class="portlet-section-body">
 
-                    <table>
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th><spring:message code="config.preferences.prefName"/></th>
@@ -90,18 +70,12 @@
                                 <td class="plt-email-description"><spring:message code="config.preferences.protocol.tooltip"/></td>
                             </tr>
                             <tr class="plt-email-exchange">
+                                <c:set var="path" value="additionalProperties['exchangeDomain'].value"/>
                                 <td class="preference-name">
-                                    <form:label path="exchangeDomain"><spring:message code="config.preferences.exchange.domain"/></form:label>
+                                    <form:label path="${path}"><spring:message code="config.preferences.exchange.domain"/></form:label>
                                 </td>
-                                <td class="value"><form:input path="exchangeDomain"/></td>
+                                <td class="value"><form:input path="${path}"/></td>
                                 <td class="plt-email-description"><spring:message code="config.preferences.exchange.domain.tooltip"/></td>
-                            </tr>
-                            <tr class="plt-email-exchange">
-                                <td class="preference-name">
-                                    <form:label path="exchangeAutodiscover"><spring:message code="config.preferences.exchange.autodiscover"/></form:label>
-                                </td>
-                                <td class="value"><form:checkbox path="exchangeAutodiscover"/></td>
-                                <td class="plt-email-description"><spring:message code="config.preferences.exchange.autodiscover.tooltip"/></td>
                             </tr>
                             <tr class="plt-email-exchange plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
@@ -110,6 +84,13 @@
                                 <td class="value"><form:input path="host"/></td>
                                 <td class="plt-email-description"><spring:message code="config.preferences.host.tooltip"/></td>
                             </tr>
+                            <tr class="plt-email-exchange">
+                                <td class="preference-name">
+                                    <form:label path="exchangeAutodiscover"><spring:message code="config.preferences.exchange.autodiscover"/></form:label>
+                                </td>
+                                <td class="value"><form:checkbox path="exchangeAutodiscover"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.exchange.autodiscover.tooltip"/></td>
+                            </tr>
                             <tr class="plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="port"><spring:message code="config.preferences.port"/></form:label>
@@ -117,7 +98,14 @@
                                 <td class="value"><form:input path="port"/></td>
                                 <td class="plt-email-description"><spring:message code="config.preferences.port.tooltip"/></td>
                             </tr>
-                            <tr>
+                            <tr class="plt-email-exchange">
+                                <td class="preference-name">
+                                    <form:label path="ewsUseMailAttribute"><spring:message code="config.preferences.exchange.ews.use.mail.attribute"/></form:label>
+                                </td>
+                                <td class="value"><form:checkbox path="ewsUseMailAttribute"  cssClass="ewsUseMailAttribute"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.exchange.ews.use.mail.attribute.tooltip"/></td>
+                            </tr>
+                            <tr class="plt-username-suffix plt-email-imap plt-email-pop3">
                                 <td class="preference-name">
                                     <form:label path="usernameSuffix"><spring:message code="config.preferences.username.suffix"/></form:label>
                                 </td>
@@ -137,6 +125,13 @@
                                 </td>
                                 <td class="value"><form:input path="connectionTimeout"/></td>
                                 <td class="plt-email-description"><spring:message code="config.preferences.connTimeout.tooltip"/></td>
+                            </tr>
+                            <tr>
+                                <td class="preference-name">
+                                    <form:label path="displayMailAttribute"><spring:message code="config.preferences.displayMailAttribute"/></form:label>
+                                </td>
+                                <td class="value"><form:checkbox path="displayMailAttribute"/></td>
+                                <td class="plt-email-description"><spring:message code="config.preferences.displayMailAttribute.tooltip"/></td>
                             </tr>
                             <tr>
                                 <td class="preference-name">
@@ -168,7 +163,7 @@
                         </c:forEach>
                     </form:select>
                     
-                    <table class="link-service-parameters">
+                    <table class="link-service-parameters table">
                         <thead>
                             <tr>
                                 <th><spring:message code="config.preferences.prefName"/></th>
@@ -208,7 +203,7 @@
                             <spring:message code="editPreferences.warning.message.default.password.set"/>
                           </div>
                         </c:if>
-                        <table class="auth-service-parameters">
+                        <table class="auth-service-parameters table">
                             <thead>
                                 <tr>
                                     <th><c:out value="${auth.key}"/> <spring:message code="config.preferences.parameter"/></th>

@@ -39,12 +39,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
-import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
 import org.jasig.portlet.emailpreview.mvc.MailStoreConfigurationForm;
 import org.jasig.portlet.emailpreview.security.IStringEncryptionService;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationServiceRegistry;
 import org.jasig.portlet.emailpreview.service.link.IEmailLinkService;
@@ -107,7 +107,7 @@ public class MailStoreConfigurationController extends BaseEmailController {
 
             // For Exchange, the inbox is called 'Inbox' not 'INBOX'. Change it so the folder drop-down on the
             // preview and summary pages shows the correct inbox folder.
-            if (IEmailAccountService.EXCHANGE_WEB_SERVICES.equals(config.getProtocol())
+            if (IServiceBroker.EXCHANGE_WEB_SERVICES.equals(config.getProtocol())
                     && "INBOX".equals(config.getInboxFolderName())) {
                 config.setInboxFolderName("Inbox");
             }
@@ -125,9 +125,10 @@ public class MailStoreConfigurationController extends BaseEmailController {
             config.setLinkServiceKey(form.getLinkServiceKey());
             config.setConnectionTimeout(form.getConnectionTimeout());
             config.setTimeout(form.getTimeout());
-            config.setExchangeDomain(form.getExchangeDomain());
             config.setExchangeAutodiscover(form.getExchangeAutodiscover());
-            
+            config.setEwsUseMailAttribute(form.getEwsUseMailAttribute());
+            config.setDisplayMailAttribute(form.getDisplayMailAttribute());
+
             String allowContent = request.getParameter(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey());
             if (StringUtils.isNotEmpty(allowContent)) {
                 config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));

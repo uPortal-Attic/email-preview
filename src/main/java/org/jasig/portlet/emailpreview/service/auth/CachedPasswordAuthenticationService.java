@@ -18,17 +18,19 @@
  */
 package org.jasig.portlet.emailpreview.service.auth;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.mail.Authenticator;
+import javax.portlet.PortletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
+import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-
-import javax.mail.Authenticator;
-import javax.portlet.PortletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 
@@ -56,7 +58,7 @@ public class CachedPasswordAuthenticationService extends BaseCredentialsAuthenti
     public boolean isConfigured(PortletRequest req, MailStoreConfiguration config) {
         String mailAccount = getMailAccountName(req, config);
         String password = getPassword(req);
-        return (mailAccount != null && password != null);
+        return (StringUtils.isNotBlank(mailAccount) && StringUtils.isNotBlank(password));
     }
 
     public Authenticator getAuthenticator(PortletRequest req, MailStoreConfiguration config) {
@@ -64,7 +66,7 @@ public class CachedPasswordAuthenticationService extends BaseCredentialsAuthenti
     }
 
     public Credentials getCredentials(PortletRequest req, MailStoreConfiguration config) {
-        String ntlmDomain = config.getExchangeDomain();
+        String ntlmDomain = config.getAdditionalProperties().get(MailPreferences.EXCHANGE_DOMAIN.getKey());
 
         // If the domain is specified, we are authenticating to a domain so we need to return NT credentials
         if (StringUtils.isNotBlank(ntlmDomain)) {
@@ -79,7 +81,7 @@ public class CachedPasswordAuthenticationService extends BaseCredentialsAuthenti
         @SuppressWarnings("unchecked")
         Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
         String accountName = userInfo.get(USERNAME_ATTRIBUTE);
-        return createMailAccountName(accountName, config);
+        return createMailAccountName(accountName, request, config);
     }
 
     /*

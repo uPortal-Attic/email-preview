@@ -24,20 +24,23 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:p="http://www.springframework.org/schema/p"
-    xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-            http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:component-scan base-package="org.jasig.portlet.emailpreview.controller"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.dao.demo"/>
     <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
+    <util:constant id="imaps" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.IMAPS"/>
+    <util:constant id="ExchangeWebServices" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.EXCHANGE_WEB_SERVICES"/>
+
     <bean class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
         <property name="services">
             <util:map>
+                <entry key-ref="imaps" value-ref="demoAccountService"/>
+                <!-- Should delete IMAPS. Added 5/20/15 for backwards compatibility with pre-uPortal 4.3 demo email preview portlet definitions -->
                 <entry key="IMAPS" value-ref="demoAccountService"/>
             </util:map>
         </property>
@@ -45,7 +48,7 @@
 
     <!-- List of the protocols that we do not display to users in the Edit Preferences page -->
     <util:set id="nonUserProtocols">
-        <value>ExchangeWebServices</value>
+        <ref bean="ExchangeWebServices"/>
     </util:set>
 
 </beans>

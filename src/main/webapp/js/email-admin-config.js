@@ -20,9 +20,12 @@ var emailPortlet = {
     init : function (context, portletDiv) {
         var $ = context.jQuery;
         $(document).ready(function(){
-            hideProtocolIrrelevant();
+            hideProtocolAndOptionIrrelevant();
             portletDiv.find('.plt-email-input-protocol').change(function() {
-                hideProtocolIrrelevant();
+                hideProtocolAndOptionIrrelevant();
+            });
+            portletDiv.find('.ewsUseMailAttribute').change(function() {
+                hideProtocolAndOptionIrrelevant();
             });
         });
         var hideAll = function hideAll() {
@@ -30,11 +33,14 @@ var emailPortlet = {
             portletDiv.find('.plt-email-imap').addClass('hidden');
             portletDiv.find('.plt-email-smtp').addClass('hidden');
         };
-        var hideProtocolIrrelevant = function() {
+        var hideProtocolAndOptionIrrelevant = function() {
             hideAll();
             var protocol = portletDiv.find('.plt-email-input-protocol').get(0).value;
-            if (protocol == 'ExchangeWebServices') {
+            if (protocol === 'ExchangeWebServices') {
                 portletDiv.find('.plt-email-exchange').removeClass('hidden');
+                if (!portletDiv.find('.ewsUseMailAttribute:checked').is(":checked")) {
+                    portletDiv.find('.plt-username-suffix').removeClass('hidden');
+                }
             } else if (protocol == 'imap' || protocol == 'imaps') {
                 portletDiv.find('.plt-email-imap').removeClass('hidden');
             } else if (protocol == 'pop3' || protocol == 'pop3s') {

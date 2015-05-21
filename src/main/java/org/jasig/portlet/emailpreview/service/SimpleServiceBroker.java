@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Jen Bourey, jbourey@unicon.net
  * @author Drew Wills, drew@unicon.net
- * @version $Revision: 24053 $
  */
 public class SimpleServiceBroker implements IServiceBroker {
     
@@ -55,37 +54,42 @@ public class SimpleServiceBroker implements IServiceBroker {
     private Set<String> protocols;
     private final Log log = LogFactory.getLog(this.getClass());
 
+    // Add items to this list if they are enumerated specifically in the code for getConfiguration and saveConfiguration
     protected static final List<String> RESERVED_PROPERTIES = Arrays.asList(
-                new String[] { 
-                    MailPreferences.HOST.getKey(), MailPreferences.PORT.getKey(), 
+                    MailPreferences.HOST.getKey(), MailPreferences.PORT.getKey(),
                     MailPreferences.INBOX_NAME.getKey(), MailPreferences.PROTOCOL.getKey(), 
                     MailPreferences.TIMEOUT.getKey(), MailPreferences.CONNECTION_TIMEOUT.getKey(), 
                     MailPreferences.LINK_SERVICE_KEY.getKey(), MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), 
                     MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), MailPreferences.USERNAME_SUFFIX.getKey(),
-                    MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), MailPreferences.EXCHANGE_AUTODISCOVER.getKey(),
-                    MailPreferences.MARK_MESSAGES_AS_READ.getKey()
-                });    
+                    MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(),
+                    MailPreferences.EWS_USE_MAIL_ATTRIBUTE.getKey(), MailPreferences.EXCHANGE_AUTODISCOVER.getKey(),
+                    MailPreferences.MARK_MESSAGES_AS_READ.getKey(), MailPreferences.DISPLAY_MAIL_ATTRIBUTE.getKey()
+                );
     
     public MailStoreConfiguration getConfiguration(PortletRequest request) {
         PortletPreferences prefs = request.getPreferences();
-        
         MailStoreConfiguration config = new MailStoreConfiguration();
+
+        // Preferences specifically handled here must be added to the RESERVED_PROPERTIES list.  Items might
+        // be listed here to set specific default values, if the values are not Strings, or you just want to
+        // explicitely enumerate it for easier source tracking.
         config.setHost(prefs.getValue(MailPreferences.HOST.getKey(), null));
         config.setInboxFolderName(prefs.getValue(MailPreferences.INBOX_NAME.getKey(), null));
-        config.setProtocol(prefs.getValue(MailPreferences.PROTOCOL.getKey(), "imaps"));
+        config.setProtocol(prefs.getValue(MailPreferences.PROTOCOL.getKey(), IServiceBroker.IMAPS));
         config.setLinkServiceKey(prefs.getValue(MailPreferences.LINK_SERVICE_KEY.getKey(), "default"));
         config.setAuthenticationServiceKey(prefs.getValue(MailPreferences.AUTHENTICATION_SERVICE_KEY.getKey(), null));
         String[] authServiceKeys = prefs.getValues(MailPreferences.ALLOWABLE_AUTHENTICATION_SERVICE_KEYS.getKey(), new String[0]);
         config.setAllowableAuthenticationServiceKeys(Arrays.asList(authServiceKeys));
         config.setUsernameSuffix(prefs.getValue(MailPreferences.USERNAME_SUFFIX.getKey(), null));
         config.setMarkMessagesAsRead(Boolean.valueOf(prefs.getValue(MailPreferences.MARK_MESSAGES_AS_READ.getKey(), "true")));
-        
-        String allowContent = prefs.getValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), "true");
-        config.setAllowRenderingEmailContent(Boolean.valueOf(allowContent));
 
-        config.setExchangeDomain(prefs.getValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), null));
+        config.setAllowRenderingEmailContent(Boolean.valueOf(
+                prefs.getValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), "true")));
+
         config.setExchangeAutodiscover(Boolean.valueOf(prefs.getValue(MailPreferences.EXCHANGE_AUTODISCOVER.getKey(), "false")));
-        
+        config.setEwsUseMailAttribute(Boolean.valueOf(prefs.getValue(MailPreferences.EWS_USE_MAIL_ATTRIBUTE.getKey(), "false")));
+        config.setDisplayMailAttribute(Boolean.valueOf(prefs.getValue(MailPreferences.DISPLAY_MAIL_ATTRIBUTE.getKey(), "false")));
+
         // set the port number
         try {
             int port = Integer.parseInt(prefs.getValue(MailPreferences.PORT.getKey(), "-1"));
@@ -217,16 +221,19 @@ public class SimpleServiceBroker implements IServiceBroker {
             if (!prefs.isReadOnly(MailPreferences.USERNAME_SUFFIX.getKey())) {
                 prefs.setValue(MailPreferences.USERNAME_SUFFIX.getKey(), config.getUsernameSuffix());
             }
-            
+
             if (!prefs.isReadOnly(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey())) {
-                prefs.setValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(), 
-                                String.valueOf(config.getAllowRenderingEmailContent()));
-            }
-            if (!prefs.isReadOnly(MailPreferences.EXCHANGE_USER_DOMAIN.getKey())) {
-                prefs.setValue(MailPreferences.EXCHANGE_USER_DOMAIN.getKey(), config.getExchangeDomain());
+                prefs.setValue(MailPreferences.ALLOW_RENDERING_EMAIL_CONTENT.getKey(),
+                        String.valueOf(config.getAllowRenderingEmailContent()));
             }
             if (!prefs.isReadOnly(MailPreferences.EXCHANGE_AUTODISCOVER.getKey())) {
                 prefs.setValue(MailPreferences.EXCHANGE_AUTODISCOVER.getKey(), String.valueOf(config.isExchangeAutodiscover()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.EWS_USE_MAIL_ATTRIBUTE.getKey())) {
+                prefs.setValue(MailPreferences.EWS_USE_MAIL_ATTRIBUTE.getKey(), String.valueOf(config.isEwsUseMailAttribute()));
+            }
+            if (!prefs.isReadOnly(MailPreferences.DISPLAY_MAIL_ATTRIBUTE.getKey())) {
+                prefs.setValue(MailPreferences.DISPLAY_MAIL_ATTRIBUTE.getKey(), String.valueOf(config.isDisplayMailAttribute()));
             }
 
 

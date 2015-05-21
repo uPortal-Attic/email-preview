@@ -39,12 +39,14 @@ public enum MailPreferences {
     USERNAME_SUFFIX("usernameSuffix"),
     MARK_MESSAGES_AS_READ("markMessagesAsRead"),
     ALLOW_RENDERING_EMAIL_CONTENT("allowRenderingEmailContent"),
+    DISPLAY_MAIL_ATTRIBUTE("displayMailAttribute"),
 
     /*
      * Settings used by the Exchange DAO
      */
-    EXCHANGE_USER_DOMAIN("exchangeUserDomain"),
+    EXCHANGE_DOMAIN("exchangeDomain"),
     EXCHANGE_AUTODISCOVER("exchangeAutodiscover"),
+    EWS_USE_MAIL_ATTRIBUTE("ewsUseMailAttribute"),
 
     /*
      * Optional settings used by some auth services 

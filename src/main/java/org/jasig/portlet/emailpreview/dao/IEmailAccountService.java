@@ -18,14 +18,14 @@
  */
 package org.jasig.portlet.emailpreview.dao;
 
+import java.util.List;
+
 import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
-
-import java.util.List;
 
 /**
  * IEmailAccountDao is repsonsible for retrieving email messages from an
@@ -36,9 +36,6 @@ import java.util.List;
  * @author James Wennmacher, jwennmacher@unicon.net
  */
 public interface IEmailAccountService {
-
-    public static final String EXCHANGE_WEB_SERVICES = "ExchangeWebServices";
-    public static final String IMAP = "imap";
 
     /**
      * Obtains the {@link AccountSummary} object from the data store itself, or possibly from cache.

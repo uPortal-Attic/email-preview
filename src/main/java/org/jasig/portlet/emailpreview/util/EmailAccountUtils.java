@@ -18,40 +18,52 @@
  */
 package org.jasig.portlet.emailpreview.util;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
 
 public final class EmailAccountUtils {
 
-  private final static Pattern DOMAIN_PATTERN = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
-  private final static Pattern IP_ADDRESS_PATTERN = Pattern.compile("\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
-  
-  public static String determineUserEmailAddress(final PortletRequest req, final MailStoreConfiguration config, 
-                                             final IAuthenticationService authService) {
+    private final static Pattern DOMAIN_PATTERN = Pattern.compile("\\.([a-zA-Z0-9]+\\.[a-zA-Z0-9]+)\\z");
+    private final static Pattern IP_ADDRESS_PATTERN = Pattern.compile("\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
+    private final static String MAIL = "mail";
 
-    String emailAddress = null;
-    final String mailAccount = authService.getMailAccountName(req, config);
-    final String nameSuffix = config.getUsernameSuffix();
-    final String serverName = config.getHost();
-    if (mailAccount.contains("@")) {
-      emailAddress = mailAccount;
-    } else if (nameSuffix != null && nameSuffix.length() != 0)  {
-      emailAddress = mailAccount + nameSuffix;
-    } else if (IP_ADDRESS_PATTERN.matcher(serverName).find()) { 
-        emailAddress = mailAccount;
-    } else {
-      emailAddress = mailAccount;
-      final Matcher m = DOMAIN_PATTERN.matcher(serverName);
-      if (m.find()) {
-        emailAddress = emailAddress + "@" + m.group(1);
-      }
+    public static String determineUserEmailAddress(final PortletRequest req, final MailStoreConfiguration config,
+                                                   final IAuthenticationService authService) {
+
+        String emailAddress = null;
+        final PortletPreferences prefs = req.getPreferences();
+        if (config.isDisplayMailAttribute()) {
+            final Map<String,String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);
+            emailAddress = userInfo.get(MAIL);
+            if (StringUtils.isNotBlank(emailAddress)) {
+                return emailAddress;
+            }
+        }
+        final String mailAccount = authService.getMailAccountName(req, config);
+        final String nameSuffix = config.getUsernameSuffix();
+        final String serverName = config.getHost();
+        if (mailAccount.contains("@")) {
+            emailAddress = mailAccount;
+        } else if (StringUtils.isNotBlank(nameSuffix))  {
+            emailAddress = mailAccount + nameSuffix;
+        } else if (IP_ADDRESS_PATTERN.matcher(serverName).find()) {
+            emailAddress = mailAccount;
+        } else {
+            emailAddress = mailAccount;
+            final Matcher m = DOMAIN_PATTERN.matcher(serverName);
+            if (m.find()) {
+                emailAddress = emailAddress + "@" + m.group(1);
+            }
+        }
+        return emailAddress;
     }
-    return emailAddress;
-  }
 
 }

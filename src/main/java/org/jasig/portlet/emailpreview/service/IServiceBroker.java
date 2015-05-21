@@ -37,6 +37,12 @@ import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
  */
 public interface IServiceBroker {
 
+    String EXCHANGE_WEB_SERVICES = "ExchangeWebServices";
+    String IMAP = "imap";
+    String IMAPS = "imaps";
+    String POP3 = "pop3";
+    String POP3S = "pop3s";
+
     /**
      * 
      * 

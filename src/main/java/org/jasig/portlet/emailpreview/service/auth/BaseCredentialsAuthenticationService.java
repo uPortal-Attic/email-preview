@@ -18,16 +18,20 @@
  */
 package org.jasig.portlet.emailpreview.service.auth;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.portlet.PortletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.service.ConfigurationParameter;
-import org.jasig.portlet.emailpreview.service.auth.pp.PortletPreferencesCredentialsAuthenticationService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.jasig.portlet.emailpreview.service.IServiceBroker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Description
@@ -36,9 +40,12 @@ import java.util.Map;
  */
 
 public abstract class BaseCredentialsAuthenticationService implements IAuthenticationService {
+    private static final String MAIL_ATTRIBUTE = "mail";
+
     protected List<ConfigurationParameter> userParameters = Collections.<ConfigurationParameter>emptyList();
     protected List<ConfigurationParameter> adminParameters = Collections.<ConfigurationParameter>emptyList();
-    protected Map<String,ConfigurationParameter> configParams = Collections.<String, ConfigurationParameter>emptyMap();;
+    protected Map<String,ConfigurationParameter> configParams = Collections.<String, ConfigurationParameter>emptyMap();
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public Map<String, ConfigurationParameter> getConfigurationParametersMap() {
@@ -67,7 +74,19 @@ public abstract class BaseCredentialsAuthenticationService implements IAuthentic
         configParams = params;
     }
 
-    protected String createMailAccountName(String accountName, MailStoreConfiguration config) {
+    protected String createMailAccountName(String accountName, PortletRequest req, MailStoreConfiguration config) {
+        // If using Exchange Web Services and configured for using the email attribute instead of
+        // the username (optionally plus suffix), return the username.
+        String emailAddress;
+        if (IServiceBroker.EXCHANGE_WEB_SERVICES.equals(config.getProtocol()) && config.isEwsUseMailAttribute()) {
+            final Map<String,String> userInfo = (Map<String, String>) req.getAttribute(PortletRequest.USER_INFO);
+            emailAddress = userInfo.get(MAIL_ATTRIBUTE);
+            if (StringUtils.isNotBlank(emailAddress)) {
+                return emailAddress;
+            }
+            log.warn("Using EWS, configured to use mail attribute, and no email address in user attribute {}" +
+                " for user {}. Falling back to constructing one from username", MAIL_ATTRIBUTE, accountName);
+        }
         // Use a suffix?
         final String suffix = config.getUsernameSuffix();
         if (accountName != null && StringUtils.isNotBlank(suffix)) {

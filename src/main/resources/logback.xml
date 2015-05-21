@@ -99,10 +99,10 @@
       <appender-ref ref="LOG" />
   </logger-->
 
-  <!-- To view and debug exchange messages set TRACE level. To see wire-line data for protocol messages and greater
+  <!-- To view and debug exchange messages set DEBUG level. To see wire-line data for protocol messages and greater
        detail, set debug on org.apache.http.wire -->
   <!--
-  <logger name="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountDaoImpl" additivity="false" level="TRACE">
+  <logger name="org.jasig.portlet.emailpreview.dao.exchange.ExchangeAccountDaoImpl" additivity="false" level="DEBUG">
       <appender-ref ref="LOG" />
   </logger>
   -->

@@ -40,8 +40,9 @@ public class MailStoreConfigurationForm implements Serializable {
     private Boolean markMessagesAsRead;
     private Boolean allowRenderingEmailContent = true;
 
-    private String exchangeDomain;
     private Boolean exchangeAutodiscover;
+    private Boolean ewsUseMailAttribute;
+    private Boolean displayMailAttribute;
 
     private int timeout;
     private int connectionTimeout;
@@ -74,9 +75,10 @@ public class MailStoreConfigurationForm implements Serializable {
         form.setConnectionTimeout(config.getConnectionTimeout());
         form.setTimeout(config.getTimeout());
         form.setAllowRenderingEmailContent(config.getAllowRenderingEmailContent());
-        form.setExchangeDomain(config.getExchangeDomain());
         form.setExchangeAutodiscover(config.isExchangeAutodiscover());
-        
+        form.setEwsUseMailAttribute(config.isEwsUseMailAttribute());
+        form.setDisplayMailAttribute(config.isDisplayMailAttribute());
+
         for (Map.Entry<String, String> entry : config.getJavaMailProperties().entrySet()) {
             form.getJavaMailProperties().put(entry.getKey(), new Attribute(entry.getValue()));
         }
@@ -206,19 +208,27 @@ public class MailStoreConfigurationForm implements Serializable {
         return allowRenderingEmailContent;
     }
 
-    public String getExchangeDomain() {
-        return exchangeDomain;
-    }
-
-    public void setExchangeDomain(String exchangeDomain) {
-        this.exchangeDomain = exchangeDomain;
-    }
-
     public Boolean getExchangeAutodiscover() {
         return exchangeAutodiscover;
     }
 
     public void setExchangeAutodiscover(Boolean exchangeAutodiscover) {
         this.exchangeAutodiscover = exchangeAutodiscover;
+    }
+
+    public Boolean getEwsUseMailAttribute() {
+        return ewsUseMailAttribute;
+    }
+
+    public void setEwsUseMailAttribute(Boolean ewsUseMailAttribute) {
+        this.ewsUseMailAttribute = ewsUseMailAttribute;
+    }
+
+    public Boolean getDisplayMailAttribute() {
+        return displayMailAttribute;
+    }
+
+    public void setDisplayMailAttribute(Boolean displayMailAttribute) {
+        this.displayMailAttribute = displayMailAttribute;
     }
 }

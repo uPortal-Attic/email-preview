@@ -74,21 +74,27 @@
         </property>
     </bean>
 
+    <util:constant id="pop3" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.POP3"/>
+    <util:constant id="pop3s" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.POP3S"/>
+    <util:constant id="imap" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.IMAP"/>
+    <util:constant id="imaps" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.IMAPS"/>
+    <util:constant id="ExchangeWebServices" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.EXCHANGE_WEB_SERVICES"/>
+
     <bean id="simpleServiceBroker" class="org.jasig.portlet.emailpreview.service.SimpleServiceBroker">
         <property name="services">
             <util:map>
-                <entry key="pop3" value-ref="javamailAccountService"/>
-                <entry key="pop3s" value-ref="javamailAccountService"/>
-                <entry key="imap" value-ref="javamailAccountService"/>
-                <entry key="imaps" value-ref="javamailAccountService"/>
-                <entry key="ExchangeWebServices" value-ref="exchangeAccountService"/>
+                <entry key-ref="pop3" value-ref="javamailAccountService"/>
+                <entry key-ref="pop3s" value-ref="javamailAccountService"/>
+                <entry key-ref="imap" value-ref="javamailAccountService"/>
+                <entry key-ref="imaps" value-ref="javamailAccountService"/>
+                <entry key-ref="ExchangeWebServices" value-ref="exchangeAccountService"/>
             </util:map>
         </property>
     </bean>
 
     <!-- List of the protocols that we do not display to users in the Edit Preferences page -->
     <util:set id="nonUserProtocols">
-        <value>ExchangeWebServices</value>
+        <ref bean="ExchangeWebServices"/>
     </util:set>
 
     <bean id="javamailAccountService"
