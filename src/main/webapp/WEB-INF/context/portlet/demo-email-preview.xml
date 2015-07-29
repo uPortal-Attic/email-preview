@@ -33,6 +33,10 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
+    <bean class="org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors"><bean class="org.jasig.portlet.emailpreview.mvc.MinimizedStateHandlerInterceptor"/></property>
+    </bean>
+
     <util:constant id="imaps" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.IMAPS"/>
     <util:constant id="ExchangeWebServices" static-field="org.jasig.portlet.emailpreview.service.IServiceBroker.EXCHANGE_WEB_SERVICES"/>
 
