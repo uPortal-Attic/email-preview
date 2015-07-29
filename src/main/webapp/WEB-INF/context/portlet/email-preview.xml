@@ -35,6 +35,10 @@
     <context:component-scan base-package="org.jasig.portlet.emailpreview.util"/>
     <context:annotation-config />
 
+    <bean class="org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+      <property name="interceptors"><bean class="org.jasig.portlet.emailpreview.mvc.MinimizedStateHandlerInterceptor"/></property>
+    </bean>
+
     <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
 
     <bean id="inboxCache" factory-bean="cacheManager" factory-method="getCache">
