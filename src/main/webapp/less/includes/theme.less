@@ -1,0 +1,49 @@
+/* Theme overrides */
+
+.no-col-padding {
+    padding: 0;
+}
+
+.email-preview-portlet-toolbar {
+    border-bottom: 1px solid @grayD;
+    height: 100%;
+
+    .alert-quota {
+        padding: 6px 12px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+}
+
+.fl-pager {
+    margin-top: 10px;
+
+    #allFolders {
+        margin-top: 0 !important;
+        width: auto !important;
+    }
+
+    .pager {
+        margin: 0;
+        li {
+            float: left;
+            margin-left: 6px;
+            ul {
+                float: left;
+            }
+        }
+    }
+}
+
+.email-message {
+    .email-message-toolbar {
+        padding-bottom: 6px;
+        border-bottom: 1px solid @grayD;
+    }
+}
+
+// Removing jQueryUI Styles
+.ui-corner-all {
+    .rounded(0);
+}
+
