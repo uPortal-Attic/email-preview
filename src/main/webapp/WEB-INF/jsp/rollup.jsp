@@ -43,13 +43,13 @@
         <div class="jumbotron">
             <h1><c:out value="${emailAddress}"/></h1>
             <div class="row">
-                <div class="col-sm-1">
+                <div class="col-xs-2">
                     <div class="email-animation">
                         <i class="fa fa-envelope-o fa-5x"></i>
                         <span class="unreadContainer unreadCountCircle label label-success" style="display: none;"></span>
                     </div>
                 </div>
-                <div class="col-sm-11">
+                <div class="col-xs-10">
 
                     <div class="text">
                         <p class="unreadContainer" style="display: none;">
@@ -65,7 +65,7 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-offset-1 col-sm-11">
+                <div class="col-xs-offset-2 col-xs-10">
                     <c:if test="${not empty inboxUrl}">
                         <a href="${inboxUrl}" class="btn btn-success" target="_blank" title="<spring:message code="rollup.inbox.linkText.tooltip"/>">
                                 <i class="fa fa-link"></i>&nbsp;<spring:message code="rollup.inbox.linkText"/>
