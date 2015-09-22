@@ -25,8 +25,10 @@
     <script src="<rs:resourceURL value="/rs/jquery/1.8.3/jquery-1.8.3.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
 </c:if>
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/email-preview.css"/>"/>
 
-<c:set var="n"><portlet:namespace/></c:set>
+
+    <c:set var="n"><portlet:namespace/></c:set>
 <portlet:resourceURL id="accountSummary" var="accountSummaryUrl" />
 <portlet:actionURL var="showPreviewUrl">
     <portlet:param name="action" value="showPreview"/>
@@ -36,120 +38,59 @@
 </portlet:actionURL>
 <c:set var="focusOnPreview" value="${renderRequest.preferences.map['focusOnPreview'][0]}"/>
 
-<!-- email splash styles -->
-<style type="text/css">
-    .emailSplash {
-        height: 120px;
-        margin: 0 auto auto 20px;
-        color: #847d76;
-        position: relative;
-    }
-    .emailSplash .graphic,
-    .emailSplash .text {
-        /* position: absolute; */
-        float: left;
-    }
-    .emailSplash .graphic {
-        background: url(<c:url value="/images/icon_email.png"/>) no-repeat top left;
-        height: 60px;
-        width: 58px;
-        margin: 0 20px 20px 0;
-        position: relative;
-    }
-    .emailSplash .graphic span {
-        background: url(<c:url value="/images/circle.png"/>) no-repeat top left;
-        line-height: 28px; /* vertical centering */
-        padding-left: 9px;
-        height: 28px;
-        width: 19px;
-        right: 0;
-        bottom: 0;
-        color: #eae8e6;
-        display: block;
-        position: absolute;
-    }
-    .emailSplash .text {
-        width: 70%;
-        line-height: 20px;
-    }
-    .emailSplash .text h2 {
-        font-size: 16px;
-        font-family: Georgia, serif;
-        font-weight: normal;
-        font-style: italic;
-        margin: 0;
-    }
-    .emailSplash .text p {
-        font-size: 10px;
-        font-family: Verdana, sans-serif;
-    }
-    .emailSplash .text a {
-        color: #00694e;
-        font-weight: bold;
-    }
-    .emailSplash .text a:hover {
-        color: #0b4133;
-    }
-    .emailSplash .inbox {
-        float: left;
-        clear: both;
-        margin: 0;
-    }
+<div class="container-fluid email-container">
+    <div id="${n}splash" class="emailSplash email-preview-rollup">
+        <div class="jumbotron">
+            <h1><c:out value="${emailAddress}"/></h1>
+            <div class="row">
+                <div class="col-sm-1">
+                    <div class="email-animation">
+                        <i class="fa fa-envelope-o fa-5x"></i>
+                        <span class="unreadContainer unreadCountCircle label label-success" style="display: none;"></span>
+                    </div>
+                </div>
+                <div class="col-sm-11">
 
-    .emailSplash .inbox li {
-        list-style: none;
-        float: left;
-        margin-right: 1em;
-    }
+                    <div class="text">
+                        <p class="unreadContainer" style="display: none;">
+                            <spring:message code="rollup.summary.preLink"/> <strong><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></strong> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
+                            <span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="email-quota-usage"></span> / <span class="email-quota-limit"></span><br /></span>
+                                <c:if test="${not empty inboxUrl}">
+                                    &bull; <strong><a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.summary.inboxLink.tooltip"/>"><spring:message code="rollup.summary.inboxLink"/></a></strong> <spring:message code="rollup.summary.inboxPostLink"/><br />
+                                </c:if>
+                            &bull; <strong><a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>" title="<spring:message code="rollup.summary.previewLink.tooltip"/>"><spring:message code="rollup.summary.previewLink"/></a></strong> <spring:message code="rollup.summary.previewPostLink"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    .emailSplash .inbox li a {
-        display: block;
-        text-decoration: none;
-    }
-    .emailSplash .inbox li img {
-        position: relative;
-        top: 3px;
-    }
-</style>
+            <div class="row">
+                <div class="col-sm-offset-1 col-sm-11">
+                    <c:if test="${not empty inboxUrl}">
+                        <a href="${inboxUrl}" class="btn btn-success" target="_blank" title="<spring:message code="rollup.inbox.linkText.tooltip"/>">
+                                <i class="fa fa-link"></i>&nbsp;<spring:message code="rollup.inbox.linkText"/>
+                        </a>
+                    </c:if>
+                    <c:if test="${supportsEdit}">
+                        <a href="<portlet:renderURL portletMode="EDIT"/>" class="btn btn-info" title="<spring:message code="rollup.inbox.preferences.tooltip"/>">
+                        <i class="fa fa-gears"></i>&nbsp;<spring:message code="rollup.inbox.preferences"/></a>
+                    </c:if>
+                    <c:if test="${supportsHelp}">
+                        <a href="<portlet:renderURL portletMode="HELP"/>" class="btn btn-warning" title="<spring:message code="rollup.inbox.help.tooltip"/>">
+                        <i class="fa fa-question-circle"></i>&nbsp;<spring:message code="rollup.inbox.help"/></a>
+                    </c:if>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end .email-preview-rollup div -->
 
-<div id="${n}splash" class="emailSplash">
-    <div class="graphic">
-        <span class="unreadContainer unreadCountCircle" style="display: none;"></span>
-    </div>
-    <div class="text">
-        <h2 style="color: #847d76;"><c:out value="${emailAddress}"/></h2>
-        <p class="unreadContainer" style="display: none;"><spring:message code="rollup.summary.preLink"/> <b><span class="unreadCount"></span> <spring:message code="rollup.summary.linkText"/></b> <spring:message code="rollup.summary.postLinkPreTotal"/> <span class="totalCount"></span> <spring:message code="rollup.summary.postTotal"/><br />
-        <span class="stats"><strong><spring:message code="common.quota"/>: </strong><span class="email-quota-usage"></span> / <span class="email-quota-limit"></span><br /></span>
-        <c:if test="${not empty inboxUrl}">
-            &bull; <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.summary.inboxLink.tooltip"/>"><spring:message code="rollup.summary.inboxLink"/></a> <spring:message code="rollup.summary.inboxPostLink"/><br />
-        </c:if>
-        &bull; <a href="<c:out value="${focusOnPreview == 'true' ?  showPreviewUrlMaximized : showPreviewUrl}"/>" title="<spring:message code="rollup.summary.previewLink.tooltip"/>"><spring:message code="rollup.summary.previewLink"/></a> <spring:message code="rollup.summary.previewPostLink"/></p>
-    </div>
-    <ul class="inbox">
-        <c:if test="${not empty inboxUrl}">
-            <li>
-                <a href="${inboxUrl}" target="_blank" title="<spring:message code="rollup.inbox.linkText.tooltip"/>"><img alt="<spring:message code="rollup.inbox.linkText"/>" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/email.png"/>"/> <spring:message code="rollup.inbox.linkText"/></a>
-            </li>
-        </c:if>
+    <div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
+        <p class="error-text"></p>
         <c:if test="${supportsEdit}">
-            <li>
-                <a href="<portlet:renderURL portletMode="EDIT"/>" title="<spring:message code="rollup.inbox.preferences.tooltip"/>"><img alt="Preferences" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/cog_edit.png"/>"/> <spring:message code="rollup.inbox.preferences"/></a>
-            </li>
+            <p><spring:message code="rollup.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="rollup.errorMessage.changePreferences.linkText"/></a> <spring:message code="rollup.errorMessage.changePreferences.postLink"/></p>
         </c:if>
-        <c:if test="${supportsHelp}">
-            <li>
-                <a href="<portlet:renderURL portletMode="HELP"/>" title="<spring:message code="rollup.inbox.help.tooltip"/>"><img alt="Help" src="<rs:resourceURL value="/rs/famfamfam/silk/1.3/help.png"/>"/> <spring:message code="rollup.inbox.help"/></a>
-            </li>
-        </c:if>
-    </ul>
-</div>
-
-<div id="${n}error-message" class="error-message portlet-msg-error portlet-msg error" role="alert" style="display:none">
-    <p class="error-text"></p>
-    <c:if test="${supportsEdit}">
-        <p><spring:message code="rollup.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="rollup.errorMessage.changePreferences.linkText"/></a> <spring:message code="rollup.errorMessage.changePreferences.postLink"/></p>
-    </c:if>
-</div>
+    </div>
+</div> <!-- end .container-fluid div -->
 
 <script type="text/javascript">
 
