@@ -311,7 +311,7 @@
         };
 
         var options = {
-        	inboxFolderUrl: "${inboxFolderUrl}",
+            inboxFolderUrl: "${inboxFolderUrl}",
             accountSummaryUrl: "${accountSummaryUrl}",
             messageUrl: "${messageUrl}",
             messagesInfoContainer: "${messagesInfoContainer}",

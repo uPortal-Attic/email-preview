@@ -490,7 +490,7 @@ var jasig = jasig || {};
             }
             that.locate("returnLink").click(function(){ showEmailList(that); });
             that.locate("previousMsg").click(function(){ displayMessage(that, this); });
-            that.locate("nextMsg").click(function(){ displayMessage(that, this); });              
+            that.locate("nextMsg").click(function(){ displayMessage(that, this); });
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("allFolders").ready(function(){ getFoldersList();});
