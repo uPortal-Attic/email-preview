@@ -151,7 +151,11 @@ public class EmailMessage {
 	 * @return The email message subject.
 	 */
 	public String getSubject() {
-		return this.subject;
+		if (this.subject == null) {
+            return "(No Subject)";
+		} else {
+            return this.subject.replace("<", "&lt;").replace(">", "&gt;");
+		}
 	}
 
     public boolean isUnread() {
