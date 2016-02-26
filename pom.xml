@@ -211,9 +211,9 @@
                 <version>1.8.0</version>
             </dependency>
             <dependency>
-                <groupId>org.owasp</groupId>
+                <groupId>org.owasp.antisamy</groupId>
                 <artifactId>antisamy</artifactId>
-                <version>1.4</version>
+                <version>1.4.5</version>
             </dependency>
             <dependency>
             <!-- nekohtml is a transitive dependency of antisamy;  
@@ -221,7 +221,7 @@
                  fixes issues with malformed HTML emails -->
             <groupId>net.sourceforge.nekohtml</groupId>
                 <artifactId>nekohtml</artifactId>
-                <version>1.9.17</version>
+                <version>1.9.22</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -398,7 +398,7 @@
             <artifactId>jasypt</artifactId>  
         </dependency> 
         <dependency>
-            <groupId>org.owasp</groupId>
+            <groupId>org.owasp.antisamy</groupId>
             <artifactId>antisamy</artifactId>
         </dependency>
         <dependency>
