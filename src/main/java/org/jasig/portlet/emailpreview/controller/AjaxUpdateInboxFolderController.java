@@ -76,7 +76,7 @@ public class AjaxUpdateInboxFolderController extends BaseEmailController {
             	if ((folderName.getType() & javax.mail.Folder.HOLDS_MESSAGES) != 0) {
             		String unreadMsgCount = "";
             		if(folderName.getUnreadMessageCount()!=0 && (!selectedFolder.equals(folderName.toString()))){
-            			unreadMsgCount = "(".concat(String.valueOf(folderName.getUnreadMessageCount())).concat(")").concat(UNREAD_MSG_FLAG);
+            			unreadMsgCount = " (".concat(String.valueOf(folderName.getUnreadMessageCount())).concat(")").concat(UNREAD_MSG_FLAG);
             		}
             		jsonData.put(folderName.toString().concat(unreadMsgCount), folderName.toString());
                 	if(selectedFolder.equals(folderName.toString())){
