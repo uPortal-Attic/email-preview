@@ -132,7 +132,7 @@ public class EmailMessage {
 	 * @return The sender of the email message.
 	 */
 	public String getSender() {
-	    return sender;
+	    return sender != null ? sender : "(No Sender)";
 	}
 
     public String getSenderName() {
