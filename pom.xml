@@ -26,7 +26,7 @@
         <jaxb2basicsVersion>0.6.0</jaxb2basicsVersion>
         <logbackVersion>1.0.12</logbackVersion>
         <sl4jVersion>1.7.5</sl4jVersion>
-        <spring.version>3.1.2.RELEASE</spring.version>
+        <spring.version>3.2.16.RELEASE</spring.version>
         <resource-server.version>1.0.28</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
@@ -235,6 +235,11 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
             </dependency>
@@ -409,6 +414,10 @@
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
