@@ -15,12 +15,12 @@ This project includes:
   == GreenMail == under Apache 2.0
   ant-launcher under Apache License, Version 2.0
   AOP alliance under Public Domain
+  Apache Commons Collections under Apache License, Version 2.0
   Apache HttpClient under Apache License
   Apache HttpCore under Apache License
   Batik CSS engine under The Apache Software License, Version 2.0
   Batik external code under The Apache Software License, Version 2.0
   Batik utility library under The Apache Software License, Version 2.0
-  Collections under The Apache Software License, Version 2.0
   Commons Codec under The Apache Software License, Version 2.0
   Commons IO under The Apache Software License, Version 2.0
   Commons Lang under The Apache Software License, Version 2.0
