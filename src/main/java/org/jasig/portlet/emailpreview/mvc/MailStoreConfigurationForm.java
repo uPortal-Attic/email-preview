@@ -26,7 +26,7 @@ import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
-import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections4.map.LazyMap;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 
 public class MailStoreConfigurationForm implements Serializable {
@@ -52,12 +52,10 @@ public class MailStoreConfigurationForm implements Serializable {
     private List<String> allowableAuthenticationServiceKeys = Collections.emptyList();
     private String usernameSuffix;
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Attribute> additionalProperties = LazyMap.decorate(
+    private Map<String, Attribute> additionalProperties = LazyMap.lazyMap(
             new HashMap<String, Attribute>(), new AttributeFactory());
     
-    @SuppressWarnings("unchecked")
-    private Map<String, Attribute> javaMailProperties = LazyMap.decorate(
+    private Map<String, Attribute> javaMailProperties = LazyMap.lazyMap(
             new HashMap<String, Attribute>(), new AttributeFactory());
 
     public static MailStoreConfigurationForm create(final MailStoreConfiguration config, final PortletRequest req) {
