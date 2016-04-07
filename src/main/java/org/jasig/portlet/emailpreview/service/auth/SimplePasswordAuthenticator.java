@@ -21,8 +21,8 @@ package org.jasig.portlet.emailpreview.service.auth;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * 

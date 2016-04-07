@@ -21,7 +21,7 @@ package org.jasig.portlet.emailpreview.dao.javamail;
 import com.sun.mail.imap.IMAPFolder;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;

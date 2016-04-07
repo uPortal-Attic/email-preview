@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;

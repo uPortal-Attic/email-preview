@@ -28,11 +28,11 @@ import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
@@ -216,15 +216,15 @@ public final class DemoAccountService implements IEmailAccountService {
             // Creates a Mime Message because Email Message depends on a "message" variable.
             for (JsonNode msg : json) {
 
-                String uid = msg.path("uid").getValueAsText();
-                String sender = msg.path("from").getTextValue();
-                String subject = msg.path("subject").getTextValue();
-                Date sentDate = new Date(msg.path("sentDate").getLongValue());
-                boolean unread = msg.path("unread").getBooleanValue();
-                boolean answered = msg.path("answered").getBooleanValue();
-                boolean multipart = msg.path("multipart").getBooleanValue();
+                String uid = msg.path("uid").asText();
+                String sender = msg.path("from").textValue();
+                String subject = msg.path("subject").textValue();
+                Date sentDate = new Date(msg.path("sentDate").longValue());
+                boolean unread = msg.path("unread").booleanValue();
+                boolean answered = msg.path("answered").booleanValue();
+                boolean multipart = msg.path("multipart").booleanValue();
                 boolean deleted = false; // more testing is available here
-                EmailMessageContent content = new EmailMessageContent(msg.path("body").getTextValue(), true);
+                EmailMessageContent content = new EmailMessageContent(msg.path("body").textValue(), true);
                 String toRecipients = "toTest@test.univ.eu; toTest1@test1.univ.eu";
                 String ccRecipients = "ccTest@test.univ.eu; ccTest1@test1.univ.eu";
                 String bccRecipients = "bccTest@test.univ.eu; bccTest1@test1.univ.eu";

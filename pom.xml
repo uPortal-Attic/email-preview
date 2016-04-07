@@ -43,14 +43,15 @@
   </scm>
    
     <properties>
-        <jaxb2basicsVersion>0.6.0</jaxb2basicsVersion>
-        <logbackVersion>1.0.12</logbackVersion>
-        <sl4jVersion>1.7.5</sl4jVersion>
-        <spring.version>3.2.16.RELEASE</spring.version>
-        <resource-server.version>1.0.28</resource-server.version>
+        <jackson.version>2.7.3</jackson.version>
+        <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
+        <logbackVersion>1.1.6</logbackVersion>
+        <sl4jVersion>1.7.19</sl4jVersion>
+        <spring.version>4.2.5.RELEASE</spring.version>
+        <resource-server.version>1.0.43</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
-        <cas.version>3.2.1</cas.version>
+        <cas.version>3.4.1</cas.version>
     </properties>
 
     <licenses>
@@ -75,7 +76,7 @@
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.1.2</version>
+                <version>1.2</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -115,22 +116,22 @@
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail</artifactId>
-                <version>1.3.1b</version>
+                <version>1.5.0</version>
             </dependency>
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>1.4</version>
+                <version>2.4</version>
             </dependency>
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.5</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
@@ -140,7 +141,7 @@
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
-                <version>1.4.1</version>
+                <version>1.5.0-b01</version>
             </dependency>
             <dependency>
                 <groupId>javax.portlet</groupId>
@@ -154,8 +155,8 @@
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.4</version>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.0.1</version>
             </dependency>
             <dependency>
                 <groupId>jcifs</groupId>
@@ -165,23 +166,23 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.10</version>
+                <version>4.12</version>
             </dependency>
             <!-- Used w/ Exchange Web Services -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.2.6</version>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache-core</artifactId>
-                <version>2.6.5</version>
+                <version>2.6.11</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.pluto</groupId>
                 <artifactId>pluto-taglib</artifactId>
-                <version>1.1.5</version>
+                <version>1.1.7</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>
@@ -195,14 +196,14 @@
                 <version>1.0-rc-3</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>1.6.2</version>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>1.6.2</version>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jasig.resourceserver</groupId>
@@ -218,7 +219,7 @@
 	        <dependency> 
 	            <groupId>org.jasypt</groupId> 
 	            <artifactId>jasypt</artifactId>  
-                <version>1.6</version>
+                <version>1.9.2</version>
 	        </dependency>
             <dependency>
                 <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -228,12 +229,12 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.8.0</version>
+                <version>2.0.44-beta</version>
             </dependency>
             <dependency>
                 <groupId>org.owasp.antisamy</groupId>
                 <artifactId>antisamy</artifactId>
-                <version>1.4.5</version>
+                <version>1.5.3</version>
             </dependency>
             <dependency>
             <!-- nekohtml is a transitive dependency of antisamy;  
@@ -286,12 +287,12 @@
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core</artifactId>
-                <version>2.1.0.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-security</artifactId>
-                <version>2.1.0.RELEASE</version>
+                <version>2.2.4.RELEASE</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.sun.xml.wss</groupId>
@@ -353,16 +354,16 @@
             <artifactId>greenmail</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -389,12 +390,12 @@
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency> 
             <groupId>org.jasypt</groupId> 
@@ -469,7 +470,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 

@@ -18,7 +18,7 @@
  */
 package org.jasig.portlet.emailpreview.service;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ConfigurationParameter {
 
