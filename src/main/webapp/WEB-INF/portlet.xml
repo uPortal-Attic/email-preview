@@ -19,9 +19,9 @@
     under the License.
 
 -->
-<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
-    version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd">
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" version="2.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
     <portlet>
         <portlet-name>email-preview</portlet-name>
@@ -224,7 +224,43 @@
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
             </preference>
+            <!-- Portal context path for URL generation -->
+            <preference>
+                <name>portal.context.path</name>
+                <value>uPortal</value>
+            </preference>
+            <!-- Portlet fname for URL generation -->
+            <preference>
+                <name>portlet.fname</name>
+                <value>email-preview</value>
+            </preference>
+            <!-- Category to use in Notifications -->
+            <preference>
+                <name>notification.category.title</name>
+                <value>Email</value>
+            </preference>
+            <!-- Title for Notification -->
+            <preference>
+                <name>notification.entry.title</name>
+                <value>Unread Email</value>
+            </preference>
+            <!-- Body of message for unread count -->
+            <preference>
+                <name>notification.entry.body.unread</name>
+                <value>You have {} unread email in your inbox.</value>
+            </preference>
+            <!-- Source text to display in Notification -->
+            <preference>
+                <name>notification.entry.source</name>
+                <value>Email Preview</value>
+            </preference>
         </portlet-preferences>
+        <supported-processing-event>
+            <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationQuery</qname>
+        </supported-processing-event>
+        <supported-publishing-event>
+            <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationResult</qname>
+        </supported-publishing-event>
     </portlet>
     
     <portlet>
@@ -319,7 +355,43 @@
                 <name>allowRenderingEmailContent</name>
                 <value>true</value>
             </preference>
+            <!-- Portal context path for URL generation -->
+            <preference>
+                <name>portal.context.path</name>
+                <value>uPortal</value>
+            </preference>
+            <!-- Portlet fname for URL generation -->
+            <preference>
+                <name>portlet.fname</name>
+                <value>email-preview-demo</value>
+            </preference>
+            <!-- Category to use in Notifications -->
+            <preference>
+                <name>notification.category.title</name>
+                <value>Email</value>
+            </preference>
+            <!-- Title for Notification -->
+            <preference>
+                <name>notification.entry.title</name>
+                <value>Unread Demo Email</value>
+            </preference>
+            <!-- Body of message for unread count -->
+            <preference>
+                <name>notification.entry.body.unread</name>
+                <value>You have {} unread email in your inbox.</value>
+            </preference>
+            <!-- Source text to display in Notification -->
+            <preference>
+                <name>notification.entry.source</name>
+                <value>Demo Email Preview</value>
+            </preference>
         </portlet-preferences>
+        <supported-processing-event>
+            <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationQuery</qname>
+        </supported-processing-event>
+        <supported-publishing-event>
+            <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationResult</qname>
+        </supported-publishing-event>
     </portlet>
 
     <user-attribute>
@@ -346,5 +418,14 @@
         <description>Campus email address (e.g. for use with ACCOUNT_NAME_ATTRIBUTE setting)</description>
         <name>mail</name>
     </user-attribute>
+
+    <event-definition>
+        <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationQuery</qname>
+        <value-type>org.jasig.portlet.notice.NotificationQuery</value-type>
+    </event-definition>
+    <event-definition>
+        <qname xmlns:x="https://source.jasig.org/schemas/portlet/notification">x:NotificationResult</qname>
+        <value-type>org.jasig.portlet.notice.NotificationResult</value-type>
+    </event-definition>
 
 </portlet-app>

@@ -19,23 +19,35 @@
 package org.jasig.portlet.emailpreview.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.portlet.EventRequest;
+import javax.portlet.EventResponse;
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.exception.MailAuthenticationException;
 import org.jasig.portlet.emailpreview.exception.MailTimeoutException;
+import org.jasig.portlet.notice.NotificationCategory;
+import org.jasig.portlet.notice.NotificationEntry;
+import org.jasig.portlet.notice.NotificationQuery;
+import org.jasig.portlet.notice.NotificationResponse;
+import org.jasig.portlet.notice.NotificationResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.EventMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 /**
@@ -58,7 +70,19 @@ public class EmailAccountSummaryController extends BaseEmailController {
     public static final String KEY_EMAIL_QUOTA_USAGE = "emailQuotaUsage";
     public static final String INBOX_NAME_PREFERENCE = "inboxName";
     public static final String INBOX_NAME_DEFAULT = "INBOX";
-    public static final String INBOX_NAME_UNDEFINED = "undefined";    
+    public static final String INBOX_NAME_UNDEFINED = "undefined";
+
+    private static final String NOTIFICATION_NAMESPACE = "https://source.jasig.org/schemas/portlet/notification";
+    private static final String NOTIFICATION_QUERY_LOCAL_NAME = "NotificationQuery";
+    private static final String NOTIFICATION_QUERY_QNAME_STRING = "{" + NOTIFICATION_NAMESPACE + "}" + NOTIFICATION_QUERY_LOCAL_NAME;
+    private static final String NOTIFICATION_RESULT_LOCAL_NAME = "NotificationResult";
+    private static final QName NOTIFICATION_RESULT_QNAME = new QName(NOTIFICATION_NAMESPACE, NOTIFICATION_RESULT_LOCAL_NAME);
+    private static final String CONTEXT_PATH_PREFERENCE = "portal.context.path";
+    private static final String NOTIFICATION_REDIRECT_FNAME = "portlet.fname";
+    private static final String NOTIFICATION_CATEGORY_NAME = "notification.category.title";
+    private static final String NOTIFICATION_ENTRY_NAME = "notification.entry.title";
+    private static final String NOTIFICATION_UNREAD_BODY = "notification.entry.body.unread";
+    private static final String NOTIFICATION_ENTRY_SOURCE = "notification.entry.source";
 
     @ResourceMapping(value = "accountSummary")
     public ModelAndView getAccountSummary(ResourceRequest req, ResourceResponse res,
@@ -139,4 +163,70 @@ public class EmailAccountSummaryController extends BaseEmailController {
 
     }
 
+    @EventMapping(NOTIFICATION_QUERY_QNAME_STRING)
+    public void syndicateNotifications(final EventRequest req, final EventResponse res) {
+
+        final NotificationQuery query = (NotificationQuery) req.getEvent().getValue();
+        log.info("***** Syndicating announcements for Notification portlet with windowId=" + query.getQueryWindowId());
+
+        long count = getUnreadEmail(req);
+
+        if (count == 0) {
+            log.info("No unread messages for " + req.getRemoteUser());
+            return;
+        }
+
+        PortletPreferences prefs = req.getPreferences();
+
+        // Single category for unread email
+        final List<NotificationCategory> categories = new ArrayList<>();
+        final NotificationCategory category = new NotificationCategory();
+        category.setTitle(prefs.getValue(NOTIFICATION_CATEGORY_NAME, "Email"));
+        categories.add(category);
+        final List<NotificationEntry> entries = new ArrayList<>();
+
+        // unread email entries
+        final NotificationEntry entry = new NotificationEntry();
+        entry.setTitle(prefs.getValue(NOTIFICATION_ENTRY_NAME, "Unread Email"));
+        String body = prefs.getValue(NOTIFICATION_UNREAD_BODY, "You have {} unread email in your preview inbox.");
+        entry.setBody(body.replace("{}", Long.toString(count)));
+        entry.setSource(prefs.getValue(NOTIFICATION_ENTRY_SOURCE, "Email Preview"));
+        entry.setUrl(generateUrl(req));
+        entries.add(entry);
+        category.setEntries(entries);
+
+        // build response/result
+        final NotificationResponse response = new NotificationResponse();
+        response.setCategories(categories);
+        final NotificationResult result = new NotificationResult();
+        result.setQueryWindowId(query.getQueryWindowId());
+        result.setResultWindowId(req.getWindowID());
+        result.setNotificationResponse(response);
+
+        res.setEvent(NOTIFICATION_RESULT_QNAME, result);
+    }
+
+    private String generateUrl(PortletRequest req) {
+        PortletPreferences prefs = req.getPreferences();
+        String contextPath = prefs.getValue(CONTEXT_PATH_PREFERENCE, "uportal");
+        String fname = prefs.getValue(NOTIFICATION_REDIRECT_FNAME, "email-preview");
+        String subscribeId = "";
+        if (req.getWindowID() != null) {
+            String[] parts = req.getWindowID().split("_");
+            if (parts != null && parts.length >2) {
+                subscribeId = "." + parts[1];
+            }
+        }
+        return "/" + contextPath + "/p/" + fname + subscribeId + "/max/render.uP";
+    }
+
+    private long getUnreadEmail(PortletRequest req) {
+        // get Inbox folder name from preferences
+        PortletPreferences prefs = req.getPreferences();
+        String folder = prefs.getValue(INBOX_NAME_PREFERENCE, INBOX_NAME_DEFAULT);
+
+        // Get current user's account information
+        AccountSummary accountSummary = getEmailAccountService(req).getAccountSummary(req, 0, 1, false, folder);
+        return accountSummary.isValid() ? accountSummary.getUnreadMessageCount() : 0;
+    }
 }
