@@ -63,6 +63,7 @@ This project includes:
   Logback Core Module under Eclipse Public License - v 1.0 or GNU Lesser General Public License
   Mockito under The MIT License
   Neko HTML under The Apache Software License, Version 2.0
+  NotificationPortlet - API under JA-SIG Collaborative Licence
   Objenesis under Apache 2
   org.apache.tools.ant under Apache License, Version 2.0
   OWASP AntiSamy under BSD License
