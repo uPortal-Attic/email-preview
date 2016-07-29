@@ -16,32 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// Basic Color Variables
-@white: #fff;
-@black: #000;
 
-// 14 Shades of gray
-@grayE: #eee; // lightest gray
-@grayD: #ddd; //       Λ
-@grayC: #ccc; //      /|\
-@grayB: #bbb; //       |
-@grayA: #aaa; //       |
-@gray9: #999; //       |
-@gray8: #888; //       |
-@gray7: #777; //       |
-@gray6: #666; //       |
-@gray5: #555; //       |
-@gray4: #444; //       |
-@gray3: #333; //      \|/
-@gray2: #222; //       V
-@gray1: #111; // darkest gray
+/* ==========================================================================
+   Variables
+   ========================================================================== */
+@white: #FFFFFF;
+@black: #000000;
 
-// Primary color with 3 lightened shades and 3 darkened shades.
-@color1:            #4065b0; // uPortal blue
-@color1-light:      lighten(@color1, 10%);
-@color1-lighter:    lighten(@color1, 25%);
-@color1-lightest:   lighten(@color1, 50%);
+/*
+ * Grayscale colors. 1 is lightest, 10 is darkest.
+ */
 
-@color1-dark:       darken(@color1, 10%);
-@color1-darker:     darken(@color1, 25%);
-@color1-darkest:    darken(@color1, 50%);
+@grayscale1:  #F5F5F5;
+@grayscale2:  #E5E5E5;
+@grayscale3:  #D8D8D8;
+@grayscale4:  #CCCCCC;
+@grayscale5:  #ADADAD;
+@grayscale6:  #999999;
+@grayscale7:  #8C8C8C;
+@grayscale8:  #696969;
+@grayscale9:  #404040;
+@grayscale10: #333333;
+
+/*
+ * Primary color with 3 lightened shades and 3 darkened shades. - GREEN
+ *
+ * Used for spinner, active folder, active message, active pagination, active link
+ * Should be the same color as uPortal link in your defaultSkin or customSkin in Respondr
+ *
+ */
+
+@color1: #4065B0; // medium blue
+@color1-light: lighten(@color1, 10%);
+@color1-lighter: lighten(@color1, 25%);
+@color1-lightest: lighten(@color1, 50%);
+@color1-dark: darken(@color1, 10%);
+@color1-darker: darken(@color1, 25%);
+@color1-darkest: darken(@color1, 50%);
+
+
+/*
+ * Width variables - RED : do not change
+ */
+
+@width100: 100%; 
+@width50: 50%; 
+@width33: 33.3%;
+

@@ -25,12 +25,12 @@
 <div class="fl-widget portlet" role="section">
 
     <div class="fl-widget-titlebar portlet-title" role="sectionhead">
-        <h2 role="heading"><c:out value="${welcomeTitle}"/></h2>
+        <h3 role="heading"><c:out value="${welcomeTitle}"/></h3>
     </div>
 
     <p>
       <spring:message code="welcome.summary" />
-      <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="welcome.summary.linkText"/></a>
+      <a href="<portlet:renderURL portletMode="EDIT"/>" role="button" class="btn btn-default"><spring:message code="welcome.summary.linkText"/></a>
     </p>
 
     <div>${welcomeInstructions}</div>

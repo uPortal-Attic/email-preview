@@ -22,13 +22,16 @@
 
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${includeJQuery}">
-    <script src="<rs:resourceURL value="/rs/jquery/1.8.3/jquery-1.8.3.js"/>" type="text/javascript"></script>
-    <script src="<rs:resourceURL value="/rs/jqueryui/1.7.2/jquery-ui-1.7.2-v2.min.js"/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value="/rs/jquery/1.11.0/jquery-1.11.0.min.js"/>" type="text/javascript"></script>
+    <script src="/ResourceServingWebapp/rs/jquery-migrate/1.2.1/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+    <script src="<rs:resourceURL value="/rs/jqueryui/1.8.24/jquery-ui-1.8.24.min.js"/>" type="text/javascript"></script>
+    <script src="<rs:resourceURL value="/rs/fluid/1.4.0-upmc/js/fluid-all-1.4.0.min.js"/>" type="text/javascript"></script>
 </c:if>
-<script src="<rs:resourceURL value="/rs/fluid/1.1.3/js/fluid-all-1.1.3.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/jquery.quickselect.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email-preview.css"/>"/>
+<link type="text/css" rel="stylesheet" href="<c:url value="/css/quickselect.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
 <portlet:resourceURL id="accountSummary" var="accountSummaryUrl" />
@@ -42,12 +45,16 @@
 <portlet:resourceURL id="inboxFolder" var="inboxFolderUrl" />
 
 
-    <div id="${n}container" class="email-container container-fluid" xmlns:rsf="http://ponder.org.uk">
+    <div id="${n}container" class="email-container" xmlns:rsf="http://ponder.org.uk">
         <div class="row">
             <!-- Loading and error messages -->
-            <div class="col-sm-10">
-                <div class="loading-message" role="alert"></div>
-                <div class="alert alert-danger error-message" role="alert">
+            <div class="col-sm-12">
+                <!-- spinner background on load and on reflow - aka showLoadingMessage() in email-browser.js -->
+                <div class="loading-message"><!-- this box is the background div of the initial loading spinner... -->
+                   <span class="invisible">&nbsp;</span><!-- invisible span in box... shouldn't be empty because of Chrome and Edge -->
+                </div>
+                <!-- error message -->
+                <div class="alert alert-danger error-message" role="alert" style="display:none">
                     <p id="error-text"></p>
                     <c:if test="${supportsEdit}">
                         <p><spring:message code="preview.errorMessage.changePreferences.preLink"/> <a href="<portlet:renderURL portletMode="EDIT"/>"><spring:message code="preview.errorMessage.changePreferences.linkText"/></a> <spring:message code="preview.errorMessage.changePreferences.postLink"/></p>
@@ -56,191 +63,224 @@
             </div>
 
             <!-- Configure portlet button -->
-            <div class="col-sm-2">
+            <div class="col-sm-12">
                 <c:if test="${showConfigLink}">
                     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
-                    <a class="btn btn-primary pull-right" href="${ configUrl }"><i class="fa fa-gear"></i> Configure portlet</a>
+                    <a class="btn btn-primary pull-right" role="button" href="${ configUrl }"><i class="fa fa-gear" aria-hidden="true"></i> <spring:message code="preview.configure"/></a>
                 </c:if>
             </div>
         </div> <!-- end .row div -->
 
+        
         <!-- Email list div -->
-        <div class="row email-list" style="display:none;">
-            <form name="inboxForm" class="form-inline">
-                <!-- Email preview portlet toobar -->
-                <div class="row email-preview-portlet-toolbar">
-                    <div class="col-sm-9">
-                        <div class="btn-toolbar" role="toolbar">
-                            <div class="btn-group" role="group">
-                                <!-- Inbox button -->
-                                <c:if test="${not empty inboxUrl}">
-                                    <a class="inbox-link btn btn-primary" href="javascript:;" target="_blank">
-                                        <i class="fa fa-envelope"></i>&nbsp;
-                                            <spring:message code="preview.toolbar.inbox"/>&nbsp;
-                                            <span class="badge unread-message-count">10</span>
-                                    </a>
-                                </c:if>
-                                <!-- Refresh button -->
-                                <a class="refresh-link btn btn-success" href="javascript:;">
-                                    <i class="fa fa-refresh"></i>&nbsp;
-                                    <spring:message code="preview.toolbar.refresh"/>
-                                </a>
-                                <!-- Delete button -->
-                                <c:if test="${allowDelete}">
-                                    <a class="delete-link btn btn-danger" href="javascript:;">
-                                        <i class="fa fa-trash-o"></i>&nbsp;
-                                        <spring:message code="preview.toolbar.deleteSelected"/>
-                                    </a>
-                                </c:if>
-                            </div> <!-- End .btn-group div -->
-                            <div class="btn-group" role="group">
-                                <!-- Close preview button -->
-                                <a class="btn btn-default" href="${showRollupUrl}">
-                                    <i class="fa fa-sign-out"></i>&nbsp;
-                                    <spring:message code="preview.toolbar.closePreview"/>
-                                </a>
-                                <!-- Preferences button -->
-                                <c:if test="${supportsEdit}">
-                                    <a class="btn btn-info" href="<portlet:renderURL portletMode="EDIT"/>">
-                                        <i class="fa fa-gears"></i>&nbsp;
-                                        <spring:message code="preview.toolbar.preferences"/>
-                                    </a>
-                                </c:if>
-                                <!-- Help button -->
-                                <c:if test="${supportsHelp}">
-                                    <a class="btn btn-warning" href="<portlet:renderURL portletMode="HELP"/>">
-                                        <i class="fa fa-question-circle"></i>&nbsp;
-                                        <spring:message code="preview.toolbar.help"/>
-                                    </a>
-                                </c:if>
-                            </div> <!-- end .btn-group div -->
-                        </div> <!-- end .btn-toolbar div -->
-                    </div> <!-- end .col-sm-9 div -->
-                    <div class="col-sm-3">
-                        <div class="alert-quota alert alert-success" role="alert">
-                            <span class="stats">
-                                <i class="fa fa-bar-chart-o"></i>&nbsp;
-                                <strong><spring:message code="common.quota"/>: </strong>
-                                <span class="email-quota-usage"></span> /
-                                <span class="email-quota-limit"></span>
-                            </span>
-                        </div>
-                    </div> <!-- end .col-sm-3 div -->
-                </div> <!-- end .row .email-preview-portlet-toolbar div -->
+        <div id="outer-wrapper" style="width:100%;display:none;">
+           <div id="inner-wrapper" style="width:100%">
 
-                <!-- Pagination, items per page, current folder -->
-                <div class="fl-pager">
+        <div class="row email-list">
+            <form name="inboxForm" class="form-inline">
+              <span id="envelope" class="glyphicon glyphicon-inbox" aria-hidden="true"></span>
+              <nav id="left-menu" class="off-canvas-menu">
+                <div class="navbar navbar-inverse text-align-right">
+                   <!-- Inbox button -->
+                   <c:if test="${not empty inboxUrl}">
+                   <a target="_blank" href="javascript:void(0);" role="button" class="inbox-link btn btn-inverse btn-xs pull-left">
+                      <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.inbox"/>&nbsp;&nbsp;
+                      <span class="badge unread-message-count">10</span>
+                   </a>
+                   </c:if>
+
+                   <!-- Close preview button -->
+                   <a href="${showRollupUrl}" role="button" class="btn btn-inverse btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.closePreview'/>" title="<spring:message code='preview.toolbar.closePreview'/>">
+                      <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                   </a>
+
+                   <!-- Params toggle (NEW)-->
+                   <a target="javascript:void(0);" class="btn btn-inverse btn-xs dropdown" role="button" data-toggle="collapse" data-target="#collapse-preferences" aria-expanded="false" aria-controls="collapse-preferences" aria-label="<spring:message code='preview.toolbar.parameters'/>" title="<spring:message code='preview.toolbar.parameters'/>" tabindex="0">
+                      <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                   </a>
+
+                   <div class="collapse text-align-left" id="collapse-preferences">
+                       <div role="alert" class="alert-quota">
+                            <div class="container-fluid stats">
+                                <div>
+
+                                  <!-- Quota alert and info -->
+                                   <div class="row bd-top bd-bottom"><strong class="col-xs-8 space-used-label"><spring:message code="preview.toolbar.usedStorage"/></strong><span class="col-xs-4 email-quota-usage space-used-value"></span></div>
+                                   <div class="row bd-bottom"><strong class="col-xs-8 quota-label"><spring:message code="common.quota"/></strong><span class="col-xs-4 email-quota-limit"></span></div>
+
+                                   <!-- Items per page dropdown -->
+                                   <div class="row bd-bottom">
+                                       <label class="sr-only" for="${n}pager-page-size"><spring:message code="preview.pager.perPage"/></label>
+                                       <div class="input-group email-select">
+                                          <select id="${n}pager-page-size" class="form-control pager-page-size flc-pager-page-size">
+                                             <option value="5">5</option>
+                                             <option value="10">10</option>
+                                             <option value="20">20</option>
+                                             <%-- James W - Removed option for 50 because it has some issues with behavior needing
+                                             addressing.  See EMAILPLT-119
+                                             <option value="50">50</option> --%>
+                                          </select>
+                                          <span class="input-group-addon"><spring:message code="preview.pager.perPage"/></span>
+                                       </div>
+                                    </div>
+
+                                    <!-- Preferences button -->
+                                    <c:if test="${supportsEdit}">
+                                    <div class="row">
+                                        <a class="btn btn-default preference-button" role="button" href="<portlet:renderURL portletMode="EDIT"/>"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.preferences"/></a>
+                                    </div>
+                                    </c:if>
+                                  </div>
+                              </div>
+                          </div>
+                     </div>
+                 </div>
+                 <div style="margin-top:15px;">
+                    <div class="form-group" style="width:100%">
+                       <label for="allFolders" class="sr-only"><spring:message code="preview.inboxFolder.choose"/></label>
+                       <div clas="container-fluid btn-group-vertical">
+                          <select id="allFolders" name="allFolders" class="form-control input-sm">
+                             <option></option>
+                          </select>
+                       </div>
+                    </div>
+                 </div>
+              </nav>
+              
+              <!-- Email list main content (middle) -->
+              <div id="content-middle-area" class="navbar navbar-default navbar-middle" role="main" tabindex="0">
+                 <div class="container-fluid">
+
+                    <h3 id="selected-folder-title" class="navbar-brand"><span></span></h3>
+
+                    <!-- left-menu Toggle -->
+                    <a href="javascript:void(0);" role="button" id="left-menu-toggle" class="left-menu-toggle btn btn-default btn-xs pull-left off-canvas-menu-toggle" aria-label="Menu" title ="Menu">
+                        <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+                    </a>
+
+                    <!-- Refresh button -->
+                    <a href="javascript:void(0);" role="button" class="refresh-link btn btn-success btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.refresh'/>" title="<spring:message code='preview.toolbar.refresh'/>">
+                       <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    </a>
+
+                    <!-- Help button -->
+                    <c:if test="${supportsHelp}">
+                    <a class="btn btn-primary btn-xs pull-left" role="button" aria-label="<spring:message code='preview.toolbar.help'/>" title="<spring:message code='preview.toolbar.help'/>" href="<portlet:renderURL portletMode="HELP"/>">
+                       <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                    </a>
+                    </c:if>
+                    
+                 </div>
+              </div> <!-- end navbar-middle -->
+              <!-- begin toolbar-middle -->
+              <div class="navbar navbar-default toolbar-middle">
+                 <div class="container-fluid">
+                    
+                    <div class="pull-left">
+                       <a href="javascript:void(0);" role="button" class="hide-toolbar-middle btn btn-default btn-xs" aria-label="<spring:message code='preview.toolbar.cancel'/>" title="<spring:message code='preview.toolbar.cancel'/>"><spring:message code='preview.toolbar.cancel'/></a>
+                       <input type="checkbox" class="select-all">
+                    </div>
+                    <!-- Delete button -->          
+                    <c:if test="${allowDelete}">
+                    <div class="pull-right">
+                       <a href="javascript:void(0);" role="button" class="delete-link btn btn-danger btn-xs" aria-label="<spring:message code='preview.toolbar.deleteSelected'/>" title="<spring:message code='preview.toolbar.deleteSelected'/>"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                    </div>
+                    </c:if>
+                 </div>
+              </div><!-- end toolbar-middle -->
+
+              <!-- Pagination, items per page, current folder -->
+              <div class="container-list" aria-labelledby="selected-folder-title" aria-describedby="container-middle-description" tabindex="-1">
+                <p id="container-middle-description" class="sr-only"><spring:message code='preview.aria.emaillist'/></p>
+                <div class="fl-pager email-pager">
                     <!-- Pagination -->
-                    <div class="row flc-pager-top">
-                        <div class="col-md-6">
-                            <ul id="pager-top" class="pager">
+                    <div class="flc-pager-top">
+                        
+                            <ul id="pager-top" class="pager pagination pagination-sm" style="position:relative;margin:0px;margin-right:-5px;">
                                 <li class="flc-pager-previous">
-                                    <a href="javascript:;">&lt; <spring:message code="preview.pager.previous"/></a>
+                                    <a href="javascript:void(0);" role="button" aria-label="<spring:message code='preview.pager.previous'/>" title="<spring:message code='preview.pager.previous'/>"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a>
                                 </li>
-                                <li>
-                                    <ul class="fl-pager-links flc-pager-links pager">
+                            </ul>
+                                    <ul class="fl-pager-links flc-pager-links pager pagination pagination-sm" style="position:relative;margin:0px;">
                                         <li class="flc-pager-pageLink">
-                                            <a href="javascript:;">1</a>
+                                            <a href="javascript:void(0);" role="button">1</a>
                                         </li>
-                                        <li class="flc-pager-pageLink-disabled">2</li>
-                                        <li class="flc-pager-pageLink-skip">...</li>
+                                        <!--<li class="flc-pager-pageLink-disabled">2</li>-->
+                                        <li class="flc-pager-pageLink-skip"><a href="javascript:void(0);">...</a></li>
                                         <li class="flc-pager-pageLink">
-                                            <a href="javascript:;">3</a>
+                                            <a href="javascript:void(0);" role="button">3</a>
                                         </li>
                                     </ul>
-                                </li>
+                            <ul class="pager pagination pagination-sm" style="position:relative;margin:0px;margin-left:-5px;">
                                 <li class="flc-pager-next">
-                                    <a href="javascript:;"><spring:message code="preview.pager.next"/> &gt;</a>
+                                    <a href="javascript:void(0);" role="button" aria-label="<spring:message code='preview.pager.next'/>" title="<spring:message code='preview.pager.next'/>"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>
                                 </li>
-                            </ul> <!-- end #pager-top ul -->
-                        </div> <!-- end .col-md-6 div -->
-
-                        <!-- Items per page dropdown -->
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <span class="flc-pager-summary">page</span>
-                                <span>
-                                    <select class="form-control input-sm pager-page-size flc-pager-page-size">
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="20">20</option>
-                                        <%-- James W - Removed option for 50 because it has some issues with behavior needing
-                                             addressing.  See EMAILPLT-119
-                                        <option value="50">50</option> --%>
-                                    </select>
-                                </span> <spring:message code="preview.pager.perPage"/>
+                            </ul>
+                        
+                            <!-- Fluid Pager Summary -->
+                            <div>
+                               <div class="form-group">
+                                <span class="flc-pager-summary" tabindex="0">page</span>
+                               </div>
                             </div>
-                        </div> <!-- end .col-md-3 div -->
-
-                        <!-- Current folder dropdown -->
-                        <div class="col-md-3">
-                            <div class="form-group pull-right">
-                                <label for="allFolders"><spring:message code="preview.inboxFolder.choose"/></label>
-                                <select id="allFolders" name="allFolders" class="form-control input-sm">
-                                    <option></option>
-                                </select>
-                            </div>
-                        </div> <!-- end .col-md-3 div -->
+                        
                     </div> <!-- end .flc-pager-top div -->
 
                     <!-- Email preview table -->
-                    <table class="table table-hover table-striped">
-                        <tr>
-                            <th class="select"><input type="checkbox" class="select-all"></th>
-                            <th class="flags-header"><span class="flags-span"></span></th>
-                            <th class="flags-header"><span class="attached-span"></span></th>
-                            <th><spring:message code="preview.column.subject"/></th>
-                            <th><spring:message code="preview.column.sender"/></th>
-                            <th><spring:message code="preview.column.dateSent"/></th>
-                        </tr>
-                        <tr rsf:id="row:" class="email-row">
-                            <td rsf:id="select" class="select"></td>
-                            <td rsf:id="flags"><span class="answered-span"></span></td>
-                            <td rsf:id="attachments"><span class="attached-span"></span></td>
-                            <td rsf:id="subject" class="subject"></td>
-                            <td rsf:id="sender" class="sender"></td>
-                            <td rsf:id="sentDate" class="sentDate"></td>
+                    <table id="email-list-table" class="list-group" role="list">
+                        <tr rsf:id="row:" class="email-row list-group-item" role="listitem">
+                           <td class="right-content-email-toggle">
+                            <label rsf:id="selectlabel" aria-label="Select this message" class="sr-only checkbox pull-left">Select this message</label>
+                            <div rsf:id="select" class="select"></div>
+                            <span rsf:id="sender" class="sender"></span>
+                            <span rsf:id="subject-link" class="subject"></span>
+                            <div rsf:id="attachments"><span class="attached-span glyphicon glyphicon-paperclip" aria-hidden="true"></span></div>
+                            <span rsf:id="sentDate" class="sentDate"></span>
+                            <div rsf:id="flags"><span class="answered-span"></span></div>
+                           </td>
                         </tr>
                     </table>
                 </div>
-
+              </div>
             </form>
         </div> <!-- end .row .email-list div -->
 
         <c:if test="${allowRenderingEmailContent}">
-            <div class="email-message">
+            <div id="right-content-email" class="container-fluid off-canvas-menu email-message" role="contentinfo" aria-label="<spring:message code='preview.aria.selectedmessage'/>" tabindex="-1">
+              <div class="navbar navbar-default">
+                <div class="container-fluid">
                 <!-- Email message toolbar -->
-                <div class="row email-message-toolbar">
-                    <div class="col-md-6">
-                        <span class="previous-msg">
-                            <a href="javascript:;" class="btn btn-primary btn-small">
-                                <i class="fa fa-arrow-left"></i> <spring:message code="preview.pager.previous"/>
+                  <div class="row un-row">
+                    <div class="pull-left col-xs-5" style="padding:0">
+                        <span class="previous-msg" style="display: inline;">
+                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.previous'/>" title="<spring:message code='preview.pager.previous'/>">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                             </a>
                         </span>
                         <span class="next-msg">
-                            <a href="javascript:;" class="btn btn-primary btn-small">
-                                <spring:message code="preview.pager.next"/> <i class="fa fa-arrow-right"></i>
+                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.next'/>" title="<spring:message code='preview.pager.next'/>">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                             </a>
                         </span>
                     </div>
-                    <div class="col-md-6">
+                    <div class="pull-right col-xs-7" style="padding:0">
                         <form name="messageForm" class="pull-right">
                             <input class="message-uid" type="hidden" name="selectMessage" value=""/>
-                            <a href="javascript:;" class="btn btn-default return-link"><i class="fa fa-undo"></i> <spring:message code="preview.message.returnToMessages"/></a>
+                            
                             <c:if test="${allowDelete}">
-                                <button class="delete-message-button btn btn-danger" type="button"><i class="fa fa-trash-o"></i> <spring:message code="preview.message.delete"/></button>
+                                <button class="delete-message-button btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash" title="<spring:message code='preview.message.delete'/>"></span></button>
                             </c:if>
                             <c:if test="${supportsToggleSeen}">
-                                <button class="mark-read-button btn btn-success" type="button" style="display: none;"><i class="fa fa-eye"></i> <spring:message code="preview.message.markRead"/></button>
-                                <button class="mark-unread-button btn btn-warning" type="button" style="display: none;"><i class="fa fa-eye-slash"></i> <spring:message code="preview.message.markUnread"/></button>
+                                <button class="mark-read-button btn btn-success btn-xs" type="button" aria-label="<spring:message code='preview.message.markRead'/>" title="<spring:message code='preview.message.markRead'/>" style="display: none;"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+                                <button class="mark-unread-button btn btn-warning btn-xs" type="button" aria-label="<spring:message code='preview.message.markUnread'/>" title="<spring:message code='preview.message.markUnread'/>" style="display: none;"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> </button>
                             </c:if>
+                            <a href="javascript:void(0);" role="button" id="right-content-email-close" class="btn btn-default return-link btn-xs" aria-label="<spring:message code='preview.message.returnToMessages'/>" title="<spring:message code='preview.message.returnToMessages'/>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
                         </form>
-                    </div>
-                </div> <!-- end .row .email-message-toolbar div -->
+                     </div>
+                  </div><!-- End Email message toolbar -->
 
                 <!-- Email message header -->
-                <div class="row">
-                    <div class="col-md-12">
+                
                         <table class="table table-condensed message-headers">
                             <tr>
                                 <td class="message-header-name"><spring:message code="preview.message.from"/></td>
@@ -267,36 +307,40 @@
                                 <td class="bccRecipients"></td>
                             </tr>
                         </table>
-                    </div> <!-- end .email-message .col-md-12 div -->
-                </div> <!-- end .row div -->
-
+                    </div>
+                  </div>
                 <!-- Email message content -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="message-content"></div>
+                <div>
+                    <div>
+                        <div class="message-content" tabindex="0"></div>
                     </div>
                 </div>
-            </div> <!-- end .email-content-container div -->
+            </div> <!-- end #right-content-email div -->
         </c:if>
+        </div>
+      </div>
+
+      <!-- Spinner - it must be at the end of the code -->
+       <div class="outer-spinner" role="progressbar" aria-valuetext="<spring:message code='preview.spinner'/>">
+          <div class="spinner-container">
+             <div class="spinner swoosh"></div>
+          </div>
+       </div><!-- end Spinner -->
+
     </div> <!-- End .email-container div -->
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript"><rs:compressJs>
 
     var ${n} = {};
     ${n}.jQuery = jQuery<c:if test="${ includeJQuery }">.noConflict(true)</c:if>;
     ${n}.fluid = fluid;
     fluid = null;
-    fluid_1_1 = null;
+    fluid_1_4 = null;
 
     ${n}.jQuery(function() {
         var $ = ${n}.jQuery;
         var fluid = ${n}.fluid;
-
-        // Notify the server of changes to pageSize so they can be remembered
-        var updatePageSize = function(newPageSize) {
-            $.post("${updatePageSizeUrl}", {newPageSize: newPageSize});
-        };
 
         var jsErrorMessages = {
             <c:forEach items="${jsErrorMessages}" var="entry" varStatus="status">
@@ -318,13 +362,12 @@
             deleteUrl: "${deleteUrl}",
             toggleSeenUrl: "${toggleSeenUrl}",
             pageSize: <c:out value="${pageSize}"/>,
-            listeners: {
-                initiatePageSizeChange: updatePageSize
-            },
+            updatePageSizeUrl: "${updatePageSizeUrl}",
             jsErrorMessages: jsErrorMessages,
             jsMessages: jsMessages,
             allowRenderingEmailContent: <c:out value="${allowRenderingEmailContent ? 'true' : 'false'}"/>,
-            markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>
+            markMessagesAsRead: <c:out value="${markMessagesAsRead ? 'true' : 'false'}"/>,
+            fluidPagerSummaryOverride:"<spring:message code='preview.fluid.pager.summary.override'/>",
         };
         // Initialize the display asynchronously
         setTimeout(function() {
@@ -333,4 +376,39 @@
 
     });
 
-</script>
+            /*jslint browser: true*/
+            /*global $, jQuery, alert*/
+
+             ${n}.jQuery(document).ready(function () {
+                "use strict";
+                var $ = ${n}.jQuery;
+
+               $('.toolbar-middle').hide();
+ 
+               $('#right-content-email-close').click(function (event) {
+                   $('.hide-toolbar-middle').click();
+                   $('.email-container').toggleClass('show-right-menu');
+                   $('#content-middle-area').focus();
+                });
+
+                function showLeftPanel() {
+                    if ($('.email-container').hasClass('show-right-menu')) {
+                            $('.email-container').removeClass('show-right-menu');
+                        }
+
+                        $('.email-container').toggleClass('show-left-menu');
+                }
+
+                function openAndClosePanel() {
+                    var buttonPanel = $('.left-menu-toggle');
+                        for (var i=0;i<buttonPanel.length;i++){
+                            buttonPanel[i].addEventListener("click", showLeftPanel);
+                        }
+                }
+
+                openAndClosePanel();
+                
+            });
+
+            
+</rs:compressJs></script>
