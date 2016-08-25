@@ -24,7 +24,7 @@
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${ includeJQuery }">
     <script src="<rs:resourceURL value="/rs/jquery/1.11.0/jquery-1.11.0.min.js"/>" type="text/javascript"></script>
-    <script src="/ResourceServingWebapp/rs/jquery-migrate/1.2.1/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+    <!-- <script src="/ResourceServingWebapp/rs/jquery-migrate/1.2.1/jquery-migrate-1.2.1.min.js" type="text/javascript"></script> -->
 </c:if>
 <script src="${pageContext.request.contextPath}/js/email-admin-config.min.js" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email.min.css"/>"/>
