@@ -730,7 +730,7 @@ var jasig = jasig || {};
 	            	location.reload();
             	});    
             that.locate("inboxLink").attr("href", account.inboxUrl);
-            
+            $("#right-content-email").addClass( "emailpreview-container-min-height-"+ that.options.pageSize );
             //Mobile view fixes
             $("#mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
             console.log(that.pager);

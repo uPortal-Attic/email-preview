@@ -341,6 +341,11 @@
             }
         }
     }
+    /*
+      The contents of the preview consists of three blocks aligned horizontally (left, middle, right) in a Container.
+      The minimum height of the wrapper Container is determined by the min-height of the last block (right).
+      These three classes set the min height for the wrapper container depending on pageSize : 5 messages, 10 messages, 20 messages.
+    */
     #right-content-email.emailpreview-container-min-height-5 {
         min-height:660px !important;
     }
