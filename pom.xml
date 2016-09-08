@@ -710,6 +710,7 @@
                             <includes>
                                 <include>rs/fluid/1.4.0/</include>
                                 <include>rs/jquery/1.11.0/</include>
+                                <include>rs/jquery-migrate/</include>
                                 <include>rs/jqueryui/1.8.24/</include>
                                 <include>rs/famfamfam/silk/1.3/arrow_refresh_small.png</include>
                                 <include>rs/famfamfam/silk/1.3/attach.png</include>
