@@ -26,7 +26,7 @@
     <script src="<rs:resourceURL value="/rs/jquery-migrate/jquery-migrate-1.2.1.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.8.24/jquery-ui-1.8.24.min.js"/>" type="text/javascript"></script>
 </c:if>
-<script src="<rs:resourceURL value="/rs/fluid/1.4.0-upmc/js/fluid-all-1.4.0.min.js"/>" type="text/javascript"></script>
+<script src="<rs:resourceURL value="/rs/fluid/1.4.0/js/fluid-all-1.4.0.min.js"/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email-preview.css"/>"/>
 
 <c:set var="n"><portlet:namespace/></c:set>
