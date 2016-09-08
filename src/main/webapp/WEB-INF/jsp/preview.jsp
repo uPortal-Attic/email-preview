@@ -23,7 +23,7 @@
 <c:set var="includeJQuery" value="${renderRequest.preferences.map['includeJQuery'][0]}"/>
 <c:if test="${includeJQuery}">
     <script src="<rs:resourceURL value="/rs/jquery/1.11.0/jquery-1.11.0.min.js"/>" type="text/javascript"></script>
-    <!-- <script src="/ResourceServingWebapp/rs/jquery-migrate/1.2.1/jquery-migrate-1.2.1.min.js" type="text/javascript"></script> -->
+    <script src="<rs:resourceURL value="/rs/jquery-migrate/jquery-migrate-1.2.1.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/jqueryui/1.8.24/jquery-ui-1.8.24.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/fluid/1.4.0-upmc/js/fluid-all-1.4.0.min.js"/>" type="text/javascript"></script>
 </c:if>
