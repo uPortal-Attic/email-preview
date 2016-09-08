@@ -708,7 +708,7 @@
                             <groupId>org.jasig.resourceserver</groupId>
                             <artifactId>resource-server-content</artifactId>
                             <includes>
-                                <include>rs/fluid/1.4.0-upmc</include>
+                                <include>rs/fluid/1.4.0/</include>
                                 <include>rs/jquery/1.11.0/</include>
                                 <include>rs/jqueryui/1.8.24/</include>
                                 <include>rs/famfamfam/silk/1.3/arrow_refresh_small.png</include>
