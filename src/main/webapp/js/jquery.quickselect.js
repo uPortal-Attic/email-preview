@@ -69,7 +69,7 @@
 			});
 
 
-			if(breakOutAll) {
+			if (breakOutAll) {
 				// Hide select overflow as all elements have been broken out. Can't use display none as
 				// the value will not be submitted.
 				$(el).addClass(namespace + '__hidden');

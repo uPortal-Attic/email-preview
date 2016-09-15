@@ -105,7 +105,7 @@ var jasig = jasig || {};
         var messageId = $(element).attr("messageId");
         var message = getMessage(that, messageId);
 
-      if(message) {
+      if (message) {
         // update the individual message display with our just-retrieved message
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
         that.container.find(".message-content").html(html);
@@ -607,7 +607,7 @@ var jasig = jasig || {};
                         success: function(response){  	                	
 		                var select = that.locate("allFolders");	
 		                $("option", select).remove();
-		                if(select.prop) {
+		                if (select.prop) {
 		                	var options = select.prop('options');
 		                }
 		                else {
@@ -615,7 +615,7 @@ var jasig = jasig || {};
 		                }
 		                var selected;
 		                $.each(response, function(index,response) {
-		                	if(index=="selected"){
+		                	if (index=="selected"){
 		                		selected = response;
 		                	}
 		                	else{
@@ -744,7 +744,7 @@ var jasig = jasig || {};
             $(document).on("click", ".hide-toolbar-middle", that.toggleSelectAndHideToolbar);
 
             that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
-            if(account.spaceUsed=="-1"){
+            if (account.spaceUsed=="-1"){
             	that.locate("stats").remove();
             }
             if (account.emailQuotaUsage <= 0 || account.emailQuotaLimit <= 0) {
