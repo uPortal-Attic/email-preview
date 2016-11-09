@@ -401,7 +401,7 @@
 
                 function openAndClosePanel() {
                     var buttonPanel = $('.left-menu-toggle');
-                        for (var i=0;i<buttonPanel.length;i++){
+                        for (var i = 0; i < buttonPanel.length ; i++){
                             buttonPanel[i].addEventListener("click", showLeftPanel);
                         }
                 }
