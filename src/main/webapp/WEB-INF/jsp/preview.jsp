@@ -154,7 +154,7 @@
                     <h3 id="selected-folder-title" class="navbar-brand" tabindex="0"><span></span></h3>
 
                     <!-- left-menu Toggle -->
-                    <a href="javascript:void(0);" tabindex="0" role="button" id="left-menu-toggle" class="left-menu-toggle btn btn-default btn-xs pull-left off-canvas-menu-toggle" aria-label="Menu" title ="Menu" aria-flowto="left-menu">
+                    <a href="javascript:void(0);" tabindex="0" role="button" id="left-menu-toggle" class="left-menu-toggle btn btn-default btn-xs pull-left off-canvas-menu-toggle" aria-label="<spring:message code='preview.toolbar.toggle.menu'/>" title ="<spring:message code='preview.toolbar.toggle.menu'/>" aria-flowto="left-menu">
                         <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
                     </a>
 
@@ -230,7 +230,7 @@
                     <table id="email-list-table" class="list-group" role="list">
                         <tr rsf:id="row:" class="email-row list-group-item" role="listitem">
                            <td class="right-content-email-toggle">
-                            <label rsf:id="selectlabel" aria-label="Select this message" class="sr-only checkbox pull-left">Select this message</label>
+                            <label rsf:id="selectlabel" aria-label="<spring:message code='preview.row.checkbox'/>" class="sr-only checkbox pull-left"><spring:message code='preview.row.checkbox'/></label>
                             <div rsf:id="select" class="select"></div>
                             <span rsf:id="sender" class="sender"></span>
                             <span rsf:id="subject-link" class="subject"></span>
@@ -253,12 +253,12 @@
                   <div class="row un-row">
                     <div class="pull-left col-xs-5" style="padding:0">
                         <span class="previous-msg" style="display: inline;">
-                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.previous'/>" title="<spring:message code='preview.pager.previous'/>">
+                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.message.previous'/>" title="<spring:message code='preview.pager.message.previous'/>">
                                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                             </a>
                         </span>
                         <span class="next-msg">
-                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.next'/>" title="<spring:message code='preview.pager.next'/>">
+                            <a href="javascript:void(0);" role="button" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.message.next'/>" title="<spring:message code='preview.pager.message.next'/>">
                                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                             </a>
                         </span>
@@ -268,7 +268,7 @@
                             <input class="message-uid" type="hidden" name="selectMessage" value=""/>
                             
                             <c:if test="${allowDelete}">
-                                <button class="delete-message-button btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash" aria-label="<spring:message code='preview.message.delete'/>" title="<spring:message code='preview.message.delete'/>"></span></button>
+                                <button tabindex="0" class="delete-message-button btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash" aria-label="<spring:message code='preview.message.delete'/>" title="<spring:message code='preview.message.delete'/>"></span></button>
                             </c:if>
                             <c:if test="${supportsToggleSeen}">
                                 <button class="mark-read-button btn btn-success btn-xs" type="button" aria-label="<spring:message code='preview.message.markRead'/>" title="<spring:message code='preview.message.markRead'/>" style="display: none;" tabindex="0"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
