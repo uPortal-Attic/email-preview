@@ -55,6 +55,23 @@ var jasig = jasig || {};
                 checkboxCounter = 0;
                 return checkboxCounter;
 	}
+        /**
+         * Helper function to change a role value to another
+         * @param {string} elem The ID or Class of the element which have the role you need to change
+         * @param {string} actualRole The value of role you need to change
+         * @param {string} newRole The value of role you need elem to have
+         * Used to patch fluid pager which add role="application" to allow user to use the standard keyboard commands on fluid pager.
+         *    Issue ref: FLUID-6064 https://issues.fluidproject.org/browse/FLUID-6064
+         *    Additional notes: https://www.marcozehe.de/2012/02/06/if-you-use-the-wai-aria-role-application-please-do-so-wisely/
+         *    Additional notes: http://tink.uk/using-the-aria-application-role/
+         * @supported So far tested in Chrome, FF, Safari, IE9, edge. IOS, Android.
+         */
+        function overrideA11nRole (elem, actualRole, newRole) {
+                var target = document.querySelector( elem );
+                if (target.getAttribute( "role" ) === actualRole ) {
+                	target.setAttribute( "role", newRole );
+        	}
+	}
 
 	function removeActiveClassOnEmailList() {
         	$( ".email-row.active" ).each(function() {
@@ -324,6 +341,11 @@ var jasig = jasig || {};
         var p = $( "#right-content-email" );
         var position = p.position();
         console.log( "right-content-email left: " + position.left + ", right-content-email top: " + position.top );
+        /**
+         * Patch fluid pager which add role="application" to allow user to use the standard keyboard commands.
+         * @supported So far tested in Chrome, FF, Safari, IE9, edge. PC, Linux, Mac IOS, Android. VoiceOver
+         */
+        overrideA11nRole( ".email-list", "application", "section" );
     };
 
     var showLoadingMessage = function(that) {
