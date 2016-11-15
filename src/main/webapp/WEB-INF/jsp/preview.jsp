@@ -268,7 +268,7 @@
                             <input class="message-uid" type="hidden" name="selectMessage" value=""/>
                             
                             <c:if test="${allowDelete}">
-                                <button tabindex="0" class="delete-message-button btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash" aria-label="<spring:message code='preview.message.delete'/>" title="<spring:message code='preview.message.delete'/>"></span></button>
+                                <button tabindex="0" class="delete-message-button btn btn-danger btn-xs" type="button" title="<spring:message code='preview.message.delete'/>"><span class="glyphicon glyphicon-trash" aria-label="<spring:message code='preview.message.delete'/>"></span></button>
                             </c:if>
                             <c:if test="${supportsToggleSeen}">
                                 <button class="mark-read-button btn btn-success btn-xs" type="button" aria-label="<spring:message code='preview.message.markRead'/>" title="<spring:message code='preview.message.markRead'/>" style="display: none;" tabindex="0"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>

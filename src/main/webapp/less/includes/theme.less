@@ -49,6 +49,7 @@
     }
     #envelope {
         color: @grayscale7;
+        box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
         display: inline-block;
         font-size: 50px;
         opacity: 50;
@@ -84,6 +85,7 @@
                 border-left: .8em solid @color1;
                 border-radius: 50%;
                 border-top: .8em solid transparent;
+                box-shadow: 0px 16px 10px 0 rgba(0, 0, 0, 0.04);
                 height: 4em;
                 margin: 0 auto 0 auto;
                 position: absolute;
@@ -212,14 +214,15 @@
         }
     }
     .navbar-middle {
+        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        position: absolute;
         -moz-transform: translate3d(15px,0,0);
         -ms-transform: translate3d(15px,0,0);
         -o-transform: translate3d(15px,0,0);
         -webkit-transform: translate3d(15px,0,0);
-        position: absolute;
         transform: translate3d(15px,0,0);
         width:@width100;
-        z-index: 1;
+        z-index: 2;
         a.btn-default {
             margin-left: 2px;
             margin-right: 3px;
@@ -383,14 +386,16 @@
         }
     }
     .container-list {
+        background: white;
+        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+        min-height: 100%;
+        padding-right: .2em;
+        position: absolute;
+        top: 50px;
         -moz-transform: translate3d(15px,0,0);
         -ms-transform: translate3d(15px,0,0);
         -o-transform: translate3d(15px,0,0);
         -webkit-transform: translate3d(15px,0,0);
-        background: white;
-        min-height: 100%;
-        position: absolute;
-        top: 50px;
         transform: translate3d(15px,0,0);
         width:@width100;
         z-index: 1;
@@ -477,6 +482,14 @@
             min-width: @width100;
             overflow: hidden;
             padding: 7px 10px !important;
+            &:hover {
+                box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+                -moz-transition:all .3s ease-in-out;
+                -o-transition:all .3s ease-in-out;
+                -webkit-transition:all .3s ease-in-out;
+                transition:all .5s ease-in-out;
+                z-index:5;
+            }
         }
         table {
             display: block;
