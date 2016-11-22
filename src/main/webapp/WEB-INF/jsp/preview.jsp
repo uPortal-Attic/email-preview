@@ -66,7 +66,7 @@
             <div class="col-sm-12">
                 <c:if test="${showConfigLink}">
                     <portlet:renderURL var="configUrl" portletMode="CONFIG"/>
-                    <a class="btn btn-primary pull-right" role="link" href="${ configUrl }"><i class="fa fa-gear" aria-hidden="true"></i> <spring:message code="preview.configure"/></a>
+                    <a class="btn btn-primary pull-right" tabindex="0" role="link" href="${ configUrl }"><i class="fa fa-gear" aria-hidden="true"></i> <spring:message code="preview.configure"/></a>
                 </c:if>
             </div>
         </div> <!-- end .row div -->
@@ -83,20 +83,21 @@
                 <div class="navbar navbar-inverse text-align-right">
                    <!-- Inbox button -->
                    <c:if test="${not empty inboxUrl}">
-                   <a target="_blank" href="javascript:void(0);" role="link" class="inbox-link btn btn-inverse btn-xs pull-left">
-                      <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.inbox"/>&nbsp;&nbsp;
-                      <span class="badge unread-message-count">10</span>
+                   <a target="_blank" href="javascript:void(0);" tabindex="0" role="button" class="inbox-link btn btn-inverse btn-xs pull-left">
+                      <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.inbox"/>&nbsp;
+                      <span class="badge unread-message-count" aria-label="<spring:message code='preview.toolbar.unreadMessages'/>">10</span>
                    </a>
                    </c:if>
 
                    <!-- Close preview button -->
-                   <a href="${showRollupUrl}" role="link" class="btn btn-inverse btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.closePreview'/>" title="<spring:message code='preview.toolbar.closePreview'/>">
+                   <a href="${showRollupUrl}" role="button" tabindex="0" class="btn btn-inverse btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.closePreview'/>" title="<spring:message code='preview.toolbar.closePreview'/>">
                       <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
                    </a>
 
                    <!-- Params toggle (NEW)-->
                    <a target="javascript:void(0);" tabindex="0" class="btn btn-inverse btn-xs dropdown" role="link" data-toggle="collapse" data-target="#collapse-preferences" aria-expanded="false" aria-controls="collapse-preferences" aria-label="<spring:message code='preview.toolbar.parameters'/>" title="<spring:message code='preview.toolbar.parameters'/>" tabindex="0">
                       <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                      <span class="sr-only"><spring:message code="preview.toolbar.parameters"/></span>
                    </a>
 
                    <div class="collapse text-align-left" id="collapse-preferences">
@@ -127,7 +128,8 @@
                                     <!-- Preferences button -->
                                     <c:if test="${supportsEdit}">
                                     <div class="row">
-                                        <a tabindex="0" class="btn btn-default preference-button" role="link" href="<portlet:renderURL portletMode="EDIT"/>"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.preferences"/></a>
+                                        <a tabindex="0" class="btn btn-default preference-button" role="link" href="<portlet:renderURL portletMode="EDIT"/>">
+                                           <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.preferences"/></a>
                                     </div>
                                     </c:if>
                                   </div>
@@ -156,17 +158,20 @@
                     <!-- left-menu Toggle -->
                     <a href="javascript:void(0);" tabindex="0" role="link" id="left-menu-toggle" class="left-menu-toggle btn btn-default btn-xs pull-left off-canvas-menu-toggle" aria-label="<spring:message code='preview.toolbar.toggle.menu'/>" title ="<spring:message code='preview.toolbar.toggle.menu'/>" aria-flowto="left-menu">
                         <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+                        <span class="sr-only"><spring:message code="preview.toolbar.toggle.menu"/></span>
                     </a>
 
                     <!-- Refresh button -->
                     <a href="javascript:void(0);" tabindex="0" role="link" class="refresh-link btn btn-success btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.refresh'/>" title="<spring:message code='preview.toolbar.refresh'/>">
                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                       <span class="sr-only"><spring:message code="preview.toolbar.refresh"/></span>
                     </a>
 
                     <!-- Help button -->
                     <c:if test="${supportsHelp}">
                     <a  tabindex="0" class="btn btn-primary btn-xs pull-left" role="link" aria-label="<spring:message code='preview.toolbar.help'/>" title="<spring:message code='preview.toolbar.help'/>" href="<portlet:renderURL portletMode="HELP"/>">
                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                       <span class="sr-only"><spring:message code="preview.toolbar.help"/></span>
                     </a>
                     </c:if>
                     
@@ -177,13 +182,18 @@
                  <div class="container-fluid">
                     
                     <div class="pull-left">
-                       <a href="javascript:void(0);" tabindex="0" role="link" class="hide-toolbar-middle btn btn-default btn-xs" aria-label="<spring:message code='preview.toolbar.cancel'/>" title="<spring:message code='preview.toolbar.cancel'/>"><spring:message code='preview.toolbar.cancel'/></a>
+                       <a href="javascript:void(0);" tabindex="0" role="link" class="hide-toolbar-middle btn btn-default btn-xs" aria-label="<spring:message code='preview.toolbar.cancel'/>" title="<spring:message code='preview.toolbar.cancel'/>">
+                          <spring:message code="preview.toolbar.cancel"/>
+                       </a>
                        <input type="checkbox" class="select-all" aria-label="<spring:message code='preview.toolbar.select.all'/>" title="<spring:message code='preview.toolbar.select.all'/>">
                     </div>
                     <!-- Delete button -->          
                     <c:if test="${allowDelete}">
                     <div class="pull-right">
-                       <a href="javascript:void(0);" tabindex="0" role="link" class="delete-link btn btn-danger btn-xs" aria-label="<spring:message code='preview.toolbar.deleteSelected'/>" title="<spring:message code='preview.toolbar.deleteSelected'/>"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                       <a href="javascript:void(0);" tabindex="0" role="link" class="delete-link btn btn-danger btn-xs" aria-label="<spring:message code='preview.toolbar.deleteSelected'/>" title="<spring:message code='preview.toolbar.deleteSelected'/>">
+                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                          <span class="sr-only"><spring:message code="preview.toolbar.deleteSelected"/></span>
+                       </a>
                     </div>
                     </c:if>
                  </div>
@@ -198,22 +208,28 @@
                         
                             <ul id="pager-top" class="pager pagination pagination-sm" style="position:relative;margin:0px;margin-right:-5px;">
                                 <li class="flc-pager-previous">
-                                    <a href="javascript:void(0);" tabindex="0" role="link" aria-label="<spring:message code='preview.pager.previous'/>" title="<spring:message code='preview.pager.previous'/>"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a>
+                                    <a href="javascript:void(0);" tabindex="0" role="link" aria-label="<spring:message code='preview.pager.previous'/>" title="<spring:message code='preview.pager.previous'/>">
+                                       <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                       <span class="sr-only"><spring:message code="preview.pager.previous"/></span>
+                                    </a>
                                 </li>
                             </ul>
                                     <ul class="fl-pager-links flc-pager-links pager pagination pagination-sm" style="position:relative;margin:0px;">
                                         <li class="flc-pager-pageLink">
-                                            <a href="javascript:void(0);" role="link">1</a>
+                                            <a href="javascript:void(0);" role="link" tabindex="0">1</a>
                                         </li>
-                                        <!--<li class="flc-pager-pageLink-disabled" role="link">2</li>-->
+                                        <!--<li class="flc-pager-pageLink-disabled" role="link" tabindex="0">2</li>-->
                                         <li class="flc-pager-pageLink-skip"><a href="javascript:void(0);">...</a></li>
                                         <li class="flc-pager-pageLink">
-                                            <a href="javascript:void(0);" role="link">3</a>
+                                            <a href="javascript:void(0);"  role="link" tabindex="0">3</a>
                                         </li>
                                     </ul>
                             <ul class="pager pagination pagination-sm" style="position:relative;margin:0px;margin-left:-5px;">
                                 <li class="flc-pager-next">
-                                    <a href="javascript:void(0);" tabindex="0" role="link" aria-label="<spring:message code='preview.pager.next'/>" title="<spring:message code='preview.pager.next'/>"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>
+                                    <a href="javascript:void(0);" tabindex="0" role="link" aria-label="<spring:message code='preview.pager.next'/>" title="<spring:message code='preview.pager.next'/>">
+                                       <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                       <span class="sr-only"><spring:message code="preview.pager.next"/></span>
+                                    </a>
                                 </li>
                             </ul>
                         
@@ -255,11 +271,13 @@
                         <span class="previous-msg" style="display: inline;">
                             <a href="javascript:void(0);" tabindex="0" role="link" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.message.previous'/>" title="<spring:message code='preview.pager.message.previous'/>">
                                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                <span class="sr-only"><spring:message code="preview.pager.message.previous"/></span>
                             </a>
                         </span>
                         <span class="next-msg">
                             <a href="javascript:void(0);" tabindex="0" role="link" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.pager.message.next'/>" title="<spring:message code='preview.pager.message.next'/>">
                                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                <span class="sr-only"><spring:message code="preview.pager.message.next"/></span>
                             </a>
                         </span>
                     </div>
@@ -274,7 +292,10 @@
                                 <button class="mark-read-button btn btn-success btn-xs" type="button" aria-label="<spring:message code='preview.message.markRead'/>" title="<spring:message code='preview.message.markRead'/>" style="display: none;" tabindex="0"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
                                 <button class="mark-unread-button btn btn-warning btn-xs" type="button" aria-label="<spring:message code='preview.message.markUnread'/>" title="<spring:message code='preview.message.markUnread'/>" style="display: none;" tabindex="0"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> </button>
                             </c:if>
-                            <a href="javascript:void(0);" tabindex="0" role="link" id="right-content-email-close" class="btn btn-default return-link btn-xs" aria-label="<spring:message code='preview.message.returnToMessages'/>" title="<spring:message code='preview.message.returnToMessages'/>" aria-flowto="content-middle-area" tabindex="0"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                            <a href="javascript:void(0);" tabindex="0" role="link" id="right-content-email-close" class="btn btn-default return-link btn-xs" aria-label="<spring:message code='preview.message.returnToMessages'/>" title="<spring:message code='preview.message.returnToMessages'/>" aria-flowto="content-middle-area" tabindex="0">
+                               <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                               <span class="sr-only"><spring:message code="preview.message.returnToMessages"/></span>
+                            </a>
                         </form>
                      </div>
                   </div><!-- End Email message toolbar -->
