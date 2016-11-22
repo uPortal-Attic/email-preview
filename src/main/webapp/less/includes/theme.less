@@ -857,13 +857,24 @@
     }
 }
 
+/*
+    When a user clicks to see a message, #right-content-email (the Selected Message)
+    moves from the right to the left over email-list on small devices.
+    due to inconstitancy with assistives technologies (embedded Screen Readers like Voiceover on IOS or talkback on android)
+    it is just assumptions: those stuffs seems to use CSS graphical layer to show the focused current element chrome by adding
+    extra layers in the z-index layers.
+    in short: they put the mess in the stacking context with the GPU accelerated CSS transformations properties.
+    Do-it-yourself: So I give a try to artificially increase the regular z-index spaces and translateZ axis layers (without assistive technologies)
+    to give more space to these Assistive Technologies...
+*/
 .email-container.show-right-menu {
     #right-content-email {
-        -moz-transform: translate3d(-100%, 0, 0);
-        -ms-transform: translate3d(-100%, 0, 0);
-        -o-transform: translate3d(-100%, 0, 0);
-        -webkit-transform: translate3d(-100%, 0, 0);
-        transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 10px);
+        -ms-transform: translate3d(-100%, 0, 10px);
+        -o-transform: translate3d(-100%, 0, 10px);
+        -webkit-transform: translate3d(-100%, 0, 10px);
+        transform: translate3d(-100%, 0, 10px);
+        z-index: 200;
     }
 }
 
@@ -919,6 +930,8 @@
 
         .toolbar-middle {
             width: @width50;
+            // Should be over .navbar-middle z-index (350) at any time
+            z-index: 360;
         }
 
         .navbar-fixed-bottom {
@@ -990,15 +1003,21 @@
             width: @width50;
         }
     }
+    /*
+     When a user clicks to see a message on tablet / desktop,
+     this time the Selected Message moves from left to right under the middle blocks
+     (the middle blocks = .navbar-middle && .toolbar-middle && .container-list)
+     giving space vertically to Assistive Technologies. see comment above...
+    */
     .email-container.show-right-menu {
         .navbar-middle {
             width: @width50;
-            z-index: 150;
+            z-index: 350;
         }
 
         .container-list {
             width: @width50;
-            z-index: 150;
+            z-index: 350;
         }
 
         #right-content-email {
@@ -1009,6 +1028,7 @@
             opacity: 100;
             transform: translate3d(50%, 0, 0);
             width: @width50;
+            z-index: 0;
         }
     }
 }
