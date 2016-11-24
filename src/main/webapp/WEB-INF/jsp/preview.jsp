@@ -83,15 +83,16 @@
                 <div class="navbar navbar-inverse text-align-right">
                    <!-- Inbox button -->
                    <c:if test="${not empty inboxUrl}">
-                   <a target="_blank" href="javascript:void(0);" tabindex="0" role="button" class="inbox-link btn btn-inverse btn-xs pull-left">
+                   <a target="_blank" href="javascript:void(0);" tabindex="0" role="link" class="inbox-link btn btn-inverse btn-xs pull-left">
                       <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>&nbsp;<spring:message code="preview.toolbar.inbox"/>&nbsp;
-                      <span class="badge unread-message-count" aria-label="<spring:message code='preview.toolbar.unreadMessages'/>">10</span>
+                      <span class="badge unread-message-count" aria-label="<spring:message code='preview.toolbar.unreadMessages'/>" title="<spring:message code='preview.toolbar.unreadMessages'/>">10</span>
                    </a>
                    </c:if>
 
                    <!-- Close preview button -->
-                   <a href="${showRollupUrl}" role="button" tabindex="0" class="btn btn-inverse btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.closePreview'/>" title="<spring:message code='preview.toolbar.closePreview'/>">
+                   <a href="${showRollupUrl}" role="link" tabindex="0" class="btn btn-inverse btn-xs pull-left" aria-label="<spring:message code='preview.toolbar.closePreview'/>" title="<spring:message code='preview.toolbar.closePreview'/>">
                       <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                      <span class="sr-only"><spring:message code="preview.toolbar.closePreview"/></span>
                    </a>
 
                    <!-- Params toggle (NEW)-->
