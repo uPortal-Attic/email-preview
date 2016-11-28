@@ -338,6 +338,13 @@
                 <div>
                     <div>
                         <div class="message-content" tabindex="0"></div>
+                        <br />
+                        <div class="right-content-email-scroll-up">
+                            <a href="#right-content-email" tabindex="0" role="link" class="btn btn-primary btn-xs" aria-label="<spring:message code='preview.message.scroll.top'/>" title="<spring:message code='preview.message.scroll.top'/>">
+                                <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                <span class="sr-only"><spring:message code="preview.message.scroll.top"/></span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div> <!-- end #right-content-email div -->
