@@ -246,7 +246,7 @@
                     <!-- Email preview table -->
                     <table id="email-list-table" class="list-group" role="list">
                         <tr rsf:id="row:" class="email-row list-group-item" role="listitem">
-                           <td class="right-content-email-toggle">
+                           <td class="right-content-email-toggle" role="presentation">
                             <label rsf:id="selectlabel" aria-label="<spring:message code='preview.row.checkbox'/>" class="sr-only checkbox pull-left"><spring:message code='preview.row.checkbox'/></label>
                             <div rsf:id="select" class="select"></div>
                             <span rsf:id="sender" class="sender"></span>
