@@ -27,7 +27,7 @@
     <script src="<rs:resourceURL value="/rs/jqueryui/1.8.24/jquery-ui-1.8.24.min.js"/>" type="text/javascript"></script>
     <script src="<rs:resourceURL value="/rs/fluid/1.4.0/js/fluid-all-1.4.0.min.js"/>" type="text/javascript"></script>
 </c:if>
-<script src="<c:url value="/js/jquery.quickselect.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/jquery.quickselect.min.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/batched-pager.js"/>" type="text/javascript"></script>
 <script src="<c:url value="/js/email-browser.js"/>" type="text/javascript"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value="/css/email-preview.css"/>"/>
