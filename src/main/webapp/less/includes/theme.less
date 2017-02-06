@@ -53,6 +53,8 @@
 
     #envelope {
         color: @grayscale7;
+        -webkit-box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
         box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
         display: inline-block;
         font-size: 50px;
@@ -63,7 +65,9 @@
     }
 
     .loading-message {
-        // do not change: background's height for initial spinner see comments around the invisible span in a block in preview.jsp
+        /**
+         * do not change: background's height for initial spinner see comments around the invisible span in a block in preview.jsp
+         */
         height: 500px;
         position: relative;
         width: 95%;
@@ -94,6 +98,8 @@
                 border-left: .8em solid @color1;
                 border-radius: 50%;
                 border-top: .8em solid transparent;
+                -webkit-box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
+                -moz-box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
                 box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
                 height: 4em;
                 margin: 0 auto 0 auto;
@@ -122,6 +128,192 @@
     .text-align-left {
         text-align: left;
     }
+
+    .inbox-link {
+       line-height: 2.5 !important;
+       margin-left: 2px;
+       margin-right: 2px;
+       margin-top: 4px;
+
+       .unread-message-count {
+           background-color: @color1;
+           border-radius: 5px;
+           padding: 5px;
+       }
+    }
+
+    .btn-xs-rounded {
+       /**
+        * Rounded button inspired by Material Design
+        * try to fit 3.2 Touch Target Size and Spacing so 40px height and 40px width
+        * (https://www.w3.org/TR/mobile-accessibility-mapping/#touch-target-size-and-spacing)
+        */
+       border-radius: 50%;
+       -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       cursor: pointer;
+       height: 40px;
+       margin: 0 !important;
+       padding: 0 !important;
+       position: relative;
+       text-align: center;
+       top: 4px;
+       -moz-transition: box-shadow 0.1s;
+       -o-transition: box-shadow 0.1s;
+       -webkit-transition: box-shadow 0.1s;
+       transition: box-shadow 0.1s;
+       width: 40px;
+       /**
+        * Important the link with .btn-xs-rounded needs to have a z-index > than the z-index
+        * of its inner hidden or visible content for IOS VoiceOver
+        */
+       z-index: 20;
+
+       &:hover {
+          -webkit-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          -moz-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+       }
+
+       &:focus {
+          -webkit-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          -moz-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          .touch-sr-only {
+              /**
+               * On focus .touch-sr-only box will be displayed and outlined but its text remained invisible because of its relative font-size very small 
+               *
+               * Fix visual rotor Touch areas on a elements (rounded buttons) for IOS ScreenReaders VoiceOver
+               * Tested on IOS voiceOver, Android Talkback
+               */
+              clip: auto;
+              outline: 1px solid @black;
+           }
+       }
+
+       &:active {
+          -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          
+          .touch-sr-only {
+              /**
+               * On active state .touch-sr-only box won't be displayed and outlined but its text remained invisible because of its relative font-size very small 
+               *
+               * Fix visual rotor Touch areas on a elements (rounded buttons) for IOS ScreenReaders VoiceOver
+               * Tested on IOS voiceOver, Android Talkback
+               */
+              clip: rect(0,0,0,0);
+              outline: 0 solid rgba(0, 0, 0, 0);
+           }
+       }
+       .glyphicon {
+          line-height: 40px;
+          font-size: 16px;
+          outline: 0 solid rgba(0, 0, 0, 0) !important;
+          top: 0;
+          z-index: 2;
+       }
+       .touch-sr-only {
+          /**
+           * touch-sr-only is a rewrite of Bootstrap 3.5 Class .sr-only
+           * because .sr-only was written to display a skip to nav menu
+           * here it is another use case, because the hidden label of a glyphicon link or button is hightlighted by IOS VoiceOver Rotor
+           *
+           * Fix focus (keyboard navigation) & touch areas on a elements for keyboard and ScreenReaders (VoiceOver, Talkback, etc.)
+           * Tested on IOS voiceOver, Android Talkback
+           */
+           // 
+           background-color: transparent;
+           /**
+            * display none with clip propertie
+            */
+           clip: rect(0,0,0,0);
+           color: transparent;
+           /**
+            * Important the font-size needs to be in relative units
+            * very very small transparent text
+            */
+           font-size: 0.1em !important;
+           height: 40px;
+           margin: -1px;
+           max-height: 40px;
+           max-width: 40px;
+           min-height: 40px;
+           min-width: 40px;
+           /**
+            * no overflow so always 40px width and height
+            */
+           overflow: hidden !important;
+           padding: 0;
+           /**
+            * Important absolute position to fit with link box and enable z-index propertie
+            */
+           position: absolute !important;
+           right: 0;
+           top: 0;
+           width: 40px;
+           /**
+            * Important the label with .touch-sr-only needs to have a z-index < than the z-index
+            * of its wrapper link for IOS VoiceOver
+            */
+           z-index: -10;
+       }
+    }
+
+    
+
+    .close-preview-link, .btn-message-previous, .btn-message-next, .right-content-email-scroll-up a {
+        font-size: 14.5px;
+        line-height: 1.5;
+        margin-top: 4px;
+        position: relative;
+        z-index: 20;
+
+        .glyphicon {
+            outline: 0 solid rgba(0, 0, 0, 0) !important;
+            z-index: 2;
+        }
+
+        &:focus {
+           
+            .touch-sr-only {
+                clip: auto;                
+                outline: 1px solid @black;
+           }
+        }
+
+        &:active {
+           
+            .touch-sr-only {
+                clip: rect(0,0,0,0);
+                outline: 0 solid rgba(0, 0, 0, 0);
+           }
+        }
+
+        .touch-sr-only {
+           background-color: transparent !important;
+           border: 0 !important;
+           clip: rect(0,0,0,0);
+           color: transparent !important;
+           font-size: .1em !important;
+           height: 40px;
+           margin-left: -27px;
+           margin-top: -7px;
+           max-height: 40px;
+           max-width: 40px;
+           min-height: 40px;
+           min-width: 40px;
+           overflow: hidden !important;
+           position: absolute !important;
+           padding: 0;
+           width: 40px;
+           z-index: -10;
+           
+       }
+    }
+    .btn-inverse {}
 
     #collapse-preferences {
         margin-top: 15px;
@@ -221,6 +413,7 @@
     #left-menu {
         .quickselect__wrapper {
             .btn {
+                border-radius: 0 !important;
                 text-align: left !important;
                 vertical-align: middle;
             }
@@ -235,24 +428,32 @@
 
             .btn-default.active {
                 background-color: @color1;
-                border-color: @grayscale5;
+                border-color: @color1;
                 color: @white;
             }
         }
     }
 
     .navbar {
-        a.btn-inverse {
+        &.navbar-inverse {
+            .vertical-gradient (@grayscale10, @grayscale8);
             border-color: @black;
-            color: @white;
-            margin-left: 3px;
-            margin-right: 3px;
-            margin-top: 12px;
+            padding-top:4px;
+            a.btn-inverse {
+                border-color: @grayscale8;
+                color: @white;
+                right: 2px;
+                top: 0;
+            }
         }
     }
 
     .navbar-middle {
-        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        .vertical-gradient (@color1-dark, @color1);
+        border-color: @color1;
+        -webkit-box-shadow:2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
+        -moz-box-shadow: 2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
+        box-shadow: 2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
         position: absolute;
         -moz-transform: translate3d(15px, 0, 0);
         -ms-transform: translate3d(15px, 0, 0);
@@ -265,34 +466,88 @@
         a.btn-default {
             margin-left: 2px;
             margin-right: 3px;
-            margin-top: 12px;
             z-index: 500;
         }
 
         a.btn-primary {
-            margin-left: 2px;
-            margin-right: 3px;
-            margin-top: 12px;
+            background-color: @color1;
+            border-color: @color1;
+            margin-left: 2px !important;
+            margin-right: 3px !important;
             z-index: 500;
+            &:hover {
+               border-color: @color1;
+            }
+            &:focus {
+               border-color: @color1;
+               outline: 1px solid @white;
+            }
+            &:active {
+               outline: 0 solid rgba(0, 0, 0, 0) !important;
+            }
         }
 
         .btn-success {
-            margin-left: 2px;
-            margin-right: 3px;
-            margin-top: 12px;
+            margin-left: 2px !important;
+            margin-right: 3px !important;
             z-index: 500;
+            
+            &:focus {
+               outline: 1px solid @white;
+            }
+            &:active {
+                outline: 0 solid rgba(0, 0, 0, 0) !important;
+            }
         }
 
         a.left-menu-toggle {
-            margin-left: -7px;
+            margin-left: -10px !important;
+
+            &:link,  {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:visited,  {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:hover,  {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:active {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:focus {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 1px solid @white;
+            }
+        }
+        
+        a.refresh-link {
+            right:-6px;
         }
     }
     .toolbar-middle {
+        -webkit-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
         -moz-transform: translate3d(15px, 0, 0);
         -ms-transform: translate3d(15px, 0, 0);
         -o-transform: translate3d(15px, 0, 0);
         -webkit-transform: translate3d(15px, 0, 0);
-        height: 50px;
+        min-height: 50.9px;
         position: absolute;
         top: 0;
         transform: translate3d(15px, 0, 0);
@@ -302,20 +557,23 @@
         .btn-danger {
             margin-left: 2px;
             margin-right: 3px;
-            margin-top: 12px;
+            margin-top: 4px;
+            padding: 0;
             z-index: 500;
         }
 
-        .btn-default {
-            margin-left: 2px;
-            margin-right: 3px;
-            margin-top: -4px !important;
+        .hide-toolbar-middle {
+            line-height: 1.8;
+            position: relative;
+            top: -4px;
             z-index: 500;
         }
 
         .select-all {
             margin-left: 7px !important;
             margin-top: 18px !important;
+            position: relative;
+            top: -2px;
         }
     }
 
@@ -340,22 +598,38 @@
 
         .navbar {
             a {
-                margin-left: 2px;
-                margin-right: 3px;
-                margin-top: 12px;
+                line-height: 1.8;
+                margin-top: 8px;
             }
 
             button {
                 margin-left: 2px;
-                margin-right: 3px;
-                margin-top: 12px;
+                margin-right: 2px;
+                margin-top: 4px;
+                padding:0;
+            }
+            
+            .return-link {
+                &:hover {
+                    background-color: @white;
+                }
+                
+                &:focus {
+                    background-color: @white;
+                }
+                
+                &:active {
+                    background-color: @white;
+                }
+                
             }
         }
 
         .un-row {
-            margin-left: 2px !important;
-            margin-right: 2px !important;
-            padding-bottom: 13px;
+           margin-bottom: 10px;
+           margin-left: -13px !important;
+           margin-right: -13px !important;
+           margin-top: 0;
         }
 
         .message-content>div {
@@ -404,7 +678,10 @@
         }
         .right-content-email-scroll-up {
             bottom: 0;
-            position: absolute; 
+            position: absolute;
+            a {
+               line-height: 1.8;
+            } 
         }
     }
     /*
@@ -458,16 +735,18 @@
         }
     }
     .container-list {
+        -moz-transform: translate3d(15px, 0, 0);
+        -ms-transform: translate3d(15px, 0, 0);
+        -o-transform: translate3d(15px, 0, 0);
+        -webkit-transform: translate3d(15px, 0, 0);
         background: @white;
+        -webkit-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
         box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
         min-height: 100%;
         padding-right: .2em;
         position: absolute;
         top: 50px;
-        -moz-transform: translate3d(15px, 0, 0);
-        -ms-transform: translate3d(15px, 0, 0);
-        -o-transform: translate3d(15px, 0, 0);
-        -webkit-transform: translate3d(15px, 0, 0);
         transform: translate3d(15px, 0, 0);
         width: @width100;
         z-index: 1;
@@ -567,8 +846,19 @@
             min-width: @width100;
             overflow: hidden;
             padding: 7px 10px !important;
+            
+            &.uni-list-group-square {
+                // Material Design for list-group-item
+                border-radius: 0;
+                border-top: 1px solid @grayscale3;
+                -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+                -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+            }
 
             &:hover {
+                -webkit-box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+                -moz-box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
                 box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
                 -moz-transition: all 0.5s ease-in-out;
                 -o-transition: all 0.5s ease-in-out;
@@ -616,56 +906,56 @@
         }
 
         .list-group-item.active {
-            background-color: @color1-lighter;
-            border-color: @color1-lighter;
-            color: @white;
+            background-color: lighten(@color1, 40%);
+            border-color: lighten(@color1, 40%);
+            color: @grayscale10;
 
             &:hover {
-                background-color: @color1-lighter;
-                border-color: @color1-lighter;
-                color: @white;
+                background-color: lighten(@color1, 40%);
+                border-color: lighten(@color1, 40%);
+                color: @grayscale10;
             }
 
             &:focus {
-                background-color: @color1-lighter;
-                border-color: @color1-lighter;
-                color: @white;
+                background-color: lighten(@color1, 40%);
+                border-color: lighten(@color1, 40%);
+                color: @grayscale10;
             }
 
             a {
-                color: @white !important;
+                color: @grayscale10 !important;
 
                 &:hover {
-                    color: @white !important;
+                    color: @grayscale10 !important;
                 }
 
                 &:focus {
-                    color: @white !important;
+                    color: @grayscale10 !important;
                 }
             }
 
             .sentDate {
-                background-color: @color1-lighter;
-                color: @white;
+                background-color: lighten(@color1, 40%);
+                color: @color1-dark;
             }
 
             span.attached-span {
-                background-color: @color1-lighter;
-                color: @white;
+                background-color: lighten(@color1, 40%);
+                color: @color1-dark;
 
                 &:before {
-                    background-color: @color1-lighter;
-                    color: @white;
+                    background-color: lighten(@color1, 40%);
+                    color: @color1-dark;
                 }
             }
 
             .sender {
-                color: @color1;
+                color: @color1-dark;
                 opacity: 1;
             }
 
             .sender.read {
-                color: @color1;
+                color: @color1-dark;
                 opacity: 1;
             }
         }
@@ -683,14 +973,14 @@
     .navbar-brand {
         margin: 0;
         padding: 0;
-        position: absolute;
-        width: @width100;
+        max-width: 114px;
+        position: relative;
         z-index: 0;
-
         span {
+            color: @white;
             float: left;
             font-size: 13px;
-            margin-left: 85px;
+            margin-left: 8px;
             margin-top: 13px;
         }
     }
@@ -899,12 +1189,15 @@
         }
 
         .navbar-brand {
-            span {
-                margin-left: 95px;
-            }
+            margin-left: 1px !important;
+            max-width: 180px;
         }
 
         .form-inline {
+            .form-group {
+                margin-bottom: 13px;
+             }
+
             .container-list {
                 .checkbox {
                     input[type=checkbox] {
@@ -934,8 +1227,8 @@
 
         .toolbar-middle {
             width: @width50;
-            // Should be over .navbar-middle z-index (350) at any time
-            z-index: 360;
+            // Should be over .navbar-middle z-index (600) at any time
+            z-index: 700;
         }
 
         .navbar-fixed-bottom {
@@ -1016,7 +1309,7 @@
     .email-container.show-right-menu {
         .navbar-middle {
             width: @width50;
-            z-index: 350;
+            z-index: 600;
         }
 
         .container-list {
@@ -1073,6 +1366,9 @@
             -webkit-transform: translate3d(98%, 0, 0);
             transform: translate3d(98%, 0, 0);
             width: @width33;
+            .navbar-brand {
+                max-width: 175px;
+            }
         }
 
         .toolbar-middle {
@@ -1187,7 +1483,13 @@
 
     .jumbotron {
         margin: 0 -5px 0 -25px;
-
+        /* Material Design - styles */
+        background-color: @white;
+        border-style: hidden;
+        border-radius: 0;
+        -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 
         .email-animation {
             position: relative;

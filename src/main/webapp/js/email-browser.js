@@ -122,10 +122,8 @@ var jasig = jasig || {};
                 	linkMessages[i].addEventListener("click", hideAndShowRightMessage);
         	}
 	}
-
-
 	
-	/**
+	    /**
          * Remember these items so we can access the cache quickly & accurately
          */
 	var lastRequestedStart;
@@ -191,7 +189,7 @@ var jasig = jasig || {};
         	if (msg.messageId === messageId) {
         		cacheIndex = parseInt(i);
         		if (msg.unread && that.options.markMessagesAsRead) {
-        	        /**
+        	            /**
                          * Update the display to reflect the new state of the SEEN flag
                          */
                            msg.unread = false;
@@ -218,7 +216,7 @@ var jasig = jasig || {};
         }
         
         if (cacheIndex != -1) {
-        	/**
+        	    /**
                  * Load the previous link...
                  */
         	if (cacheIndex > 0) {
@@ -329,7 +327,7 @@ var jasig = jasig || {};
     };
 
     var showEmailList = function(that) {
-        console.log("showEmailList"); 
+        //console.log("showEmailList"); 
         that.locate("loadingMessage").hide();
         that.locate("spinner").hide();
         that.locate("wrapper").show();
@@ -340,7 +338,7 @@ var jasig = jasig || {};
         hideSupressToolbar();
         var p = $( "#right-content-email" );
         var position = p.position();
-        console.log( "right-content-email left: " + position.left + ", right-content-email top: " + position.top );
+        //console.log( "right-content-email left: " + position.left + ", right-content-email top: " + position.top );
         /**
          * Patch fluid pager which add role="application" to allow user to use the standard keyboard commands.
          * @supported So far tested in Chrome, FF, Safari, IE9, edge. PC, Linux, Mac IOS, Android. VoiceOver
@@ -349,7 +347,7 @@ var jasig = jasig || {};
     };
 
     var showLoadingMessage = function(that) {
-        console.log("showLoadingMessage");
+        //console.log("showLoadingMessage");
         that.locate("spinner").hide();
         that.locate("wrapper").hide();
         that.locate("emailList").hide();
@@ -359,14 +357,14 @@ var jasig = jasig || {};
     };
 
     var showSpinner = function(that) {
-        console.log("showSpinner");
+        //console.log("showSpinner");
         /** 
          * Show the spinner - function show() is strangely buggy on safari, chrome and edge in this special case, not in FF
          * fadeToggle() is not.
          * @supported So far tested in Chrome, FF, Safari, Edge and IE9+, Windows 10 MacOSX, Linux Centos, IOS and Android
          */
         $(".outer-spinner").fadeToggle( "fast", "linear" );
-        console.log("showSpinner fired");
+        //console.log("showSpinner fired");
         that.locate("wrapper").show();
         that.locate("emailList").show();
         that.locate("emailMessage").show();
@@ -375,7 +373,7 @@ var jasig = jasig || {};
     };
 
     var showEmailMessage = function(that) {
-        console.log("showEmailMessage");
+        //console.log("showEmailMessage");
         that.locate("loadingMessage").hide();
         that.locate("errorMessage").hide();
         /** 
@@ -398,7 +396,7 @@ var jasig = jasig || {};
     };
 
     var showErrorMessage = function(that, httpStatus, customMessage) {
-        console.log("showErrorMessage");
+        //console.log("showErrorMessage");
         that.locate("spinner").hide();
         that.locate("loadingMessage").hide();
         that.locate("wrapper").hide();
@@ -436,7 +434,7 @@ var jasig = jasig || {};
     var removeMessages = function(messages, cache) {
         that.locate("emailRow").each(function(index, row) {
             if (row.find(options.selectors.selectMessage).attr("checked")) {
-                console.log("remove row");
+                //console.log("remove row");
                 row.remove();
             }
         });
@@ -592,7 +590,7 @@ var jasig = jasig || {};
                 bodyRenderer: {
                     type: "fluid.pager.selfRender",
                     options: {
-        		/**
+        		        /**
                          * Only change for mobile view :replace table by div.message_infos
                          */
                         selectors: { root: that.options.messagesInfoContainer },
@@ -709,7 +707,8 @@ var jasig = jasig || {};
 	                type: "POST",
 	                data: {} ,
 	                dataType: "json",
-                        success: function(response){  	                	
+                        success: function(response){  
+                        // console.table(response);	                	
 		                var select = that.locate("allFolders");	
 		                $("option", select).remove();
 		                if (select.prop) {
@@ -727,7 +726,7 @@ var jasig = jasig || {};
 		                    	options[options.length] = new Option(index,response);
 		                    }
 		                });
-		                /**
+		                        /**
                                  * Sort by name
                                  */
 		                select.html(select.children("option").sort(function (a, b) {
@@ -749,7 +748,7 @@ var jasig = jasig || {};
                                 $("#allFolders").quickselect({
                                     activeButtonClass: 'active',
                                     breakOutAll: true,
-		                  /**
+		                          /**
                                    * breakOutValues: ['INBOX', 'option1', 'option2'],
                                    */
 		                    buttonClass: 'btn btn-default',
@@ -762,14 +761,14 @@ var jasig = jasig || {};
                                  * and the value of the selected folder value to the select
                                  */
                                 $(".quickselect__btn").on("click", function(event) {
-                                   //event.preventDefault();
+                                   event.preventDefault();
                                    $(".quickselect__btn.active").removeClass("active");
                                    $(this).addClass("active");
                                    var selectedFolder = $(this).attr("data-quickselect-value");
                                    $("#allFolders").trigger( "selected:folder:change", selectedFolder);
                                    return false;
                                 });
-		                console.log("list completed");
+		                //console.log("list completed");
 	                }
 
 	            };
@@ -783,7 +782,7 @@ var jasig = jasig || {};
                     alert(that.options.jsMessages['noMessagesSelected']);
                     return;
                 }
-                console.log("delete message");
+                //console.log("delete message");
                 if (confirm(that.options.jsMessages['deleteSelectedMessages'])) {
                     doDelete(that.locate("inboxForm").serializeArray());
                 }
@@ -850,7 +849,7 @@ var jasig = jasig || {};
              * Mobile view fixes
              */
             $("#mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
-            console.log(that.pager);
+            //console.log(that.pager);
             $("#results").change(function(){
                 that.pager.pager.model.pageSize=$("#results option:selected").val();
                 $.post(that.options.updatePageSizeUrl, {"newPageSize": that.pager.pager.model.pageSize});
