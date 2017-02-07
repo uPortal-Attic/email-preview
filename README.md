@@ -57,4 +57,4 @@ These may be set by users if permitted by the administrator. If any field is def
 
 ## Contributing
 
-This project follows the [Apereo Contributing Guidelines](https://github.com/Jasig/uPortal/blob/master/CONTRIBUTING.md).
+This project follows the [uPortal Contributing Guidelines](https://github.com/Jasig/uPortal/blob/master/CONTRIBUTING.md).
