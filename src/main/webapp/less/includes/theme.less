@@ -180,6 +180,7 @@
           -webkit-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
           -moz-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
           box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          outline: 1px solid;
           .touch-sr-only {
               /**
                * On focus .touch-sr-only box will be displayed and outlined but its text remained invisible because of its relative font-size very small 
@@ -188,7 +189,13 @@
                * Tested on IOS voiceOver, Android Talkback
                */
               clip: auto;
-              outline: 1px solid @black;
+              /**
+               * Give the layout to touch-sr-only when the link is focused so IOS Voiceover Rotor apply width & height rules. "On having layout"
+               */
+              display: block;
+              outline: 0 solid @black;
+              opacity: 0;
+              overflow: hidden;
            }
        }
 
@@ -206,6 +213,7 @@
                */
               clip: rect(0,0,0,0);
               outline: 0 solid rgba(0, 0, 0, 0);
+              visibility: hidden;
            }
        }
        .glyphicon {
@@ -226,11 +234,13 @@
            */
            // 
            background-color: transparent;
+           border: 0 !important;
            /**
             * display none with clip propertie
             */
            clip: rect(0,0,0,0);
-           color: transparent;
+           color: transparent !important;
+           
            /**
             * Important the font-size needs to be in relative units
             * very very small transparent text
@@ -258,7 +268,7 @@
             * Important the label with .touch-sr-only needs to have a z-index < than the z-index
             * of its wrapper link for IOS VoiceOver
             */
-           z-index: -10;
+           z-index: -20;
        }
     }
 
@@ -277,10 +287,13 @@
         }
 
         &:focus {
-           
+            outline: 1px solid;
             .touch-sr-only {
-                clip: auto;                
-                outline: 1px solid @black;
+                clip: auto;
+                display: block;
+                outline: 0 solid @black;
+                opacity: 0;
+                overflow: hidden;              
            }
         }
 
@@ -297,7 +310,7 @@
            border: 0 !important;
            clip: rect(0,0,0,0);
            color: transparent !important;
-           font-size: .1em !important;
+           font-size: 0.1em !important;
            height: 40px;
            margin-left: -27px;
            margin-top: -7px;
@@ -444,6 +457,11 @@
                 color: @white;
                 right: 2px;
                 top: 0;
+                
+                &:focus {
+                    outline: 1px solid @white;
+                }
+                
             }
         }
     }
@@ -560,6 +578,11 @@
             margin-top: 4px;
             padding: 0;
             z-index: 500;
+
+            &:focus {
+               outline: 1px solid @black;
+            }
+
         }
 
         .hide-toolbar-middle {
@@ -567,6 +590,11 @@
             position: relative;
             top: -4px;
             z-index: 500;
+
+            &:focus {
+               outline: 1px solid @black;
+            }
+
         }
 
         .select-all {
@@ -607,6 +635,10 @@
                 margin-right: 2px;
                 margin-top: 4px;
                 padding:0;
+                
+                &:focus {
+                    outline: 1px solid @black;
+                }
             }
             
             .return-link {
