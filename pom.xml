@@ -41,7 +41,7 @@
         <url>scm:git:git@github.com:Jasig/email-preview.git</url>
       <tag>HEAD</tag>
   </scm>
-   
+
     <properties>
         <jackson.version>2.7.3</jackson.version>
         <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
@@ -221,9 +221,9 @@
                 <artifactId>resource-server-utils</artifactId>
                 <version>${resource-server.version}</version>
             </dependency>
-	        <dependency> 
-	            <groupId>org.jasypt</groupId> 
-	            <artifactId>jasypt</artifactId>  
+	        <dependency>
+	            <groupId>org.jasypt</groupId>
+	            <artifactId>jasypt</artifactId>
                 <version>1.9.2</version>
 	        </dependency>
             <dependency>
@@ -242,8 +242,8 @@
                 <version>1.5.3</version>
             </dependency>
             <dependency>
-            <!-- nekohtml is a transitive dependency of antisamy;  
-                 listing it explicitly to bump to v1.9.17, which 
+            <!-- nekohtml is a transitive dependency of antisamy;
+                 listing it explicitly to bump to v1.9.17, which
                  fixes issues with malformed HTML emails -->
             <groupId>net.sourceforge.nekohtml</groupId>
                 <artifactId>nekohtml</artifactId>
@@ -402,10 +402,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-        <dependency> 
-            <groupId>org.jasypt</groupId> 
-            <artifactId>jasypt</artifactId>  
-        </dependency> 
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.owasp.antisamy</groupId>
             <artifactId>antisamy</artifactId>
@@ -762,7 +762,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <reporting>
         <plugins>
             <plugin>
@@ -804,6 +804,14 @@
                         <link>http://java.sun.com/javaee/5/docs/api/</link>
                         <link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
                     </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
                 </configuration>
             </plugin>
         </plugins>
