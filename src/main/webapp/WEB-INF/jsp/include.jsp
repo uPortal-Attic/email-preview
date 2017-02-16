@@ -31,3 +31,5 @@
 <%@ taglib prefix="rs" uri="http://www.jasig.org/resource-server" %>
 
 <portlet:defineObjects/>
+<c:set var="usePortalJsLibs" value="${renderRequest.preferences.map['usePortalJsLibs'][0]}"/>
+<c:set var="portalJsNamespace" value="${renderRequest.preferences.map['portalJsNamespace'][0]}"/>

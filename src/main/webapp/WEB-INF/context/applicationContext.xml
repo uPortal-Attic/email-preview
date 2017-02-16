@@ -114,12 +114,12 @@
     </util:map>
 
     <util:list id="mobileDeviceRegexes">
-         <value>.*iPhone.*</value>
+         <!-- <value>.*iPhone.*</value>
          <value>.*iPad.*</value>
          <value>.*Android.*</value>
          <value>.*IEMobile.*</value>
          <value>.*Safari.*Pre.*</value>
-         <value>.*Nokia.*AppleWebKit.*</value>
+         <value>.*Nokia.*AppleWebKit.*</value> -->
     </util:list>
 
     <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->

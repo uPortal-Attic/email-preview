@@ -23,12 +23,9 @@
 <c:set var="n"><portlet:namespace/></c:set>
 
 <div class="fl-widget portlet" role="section">
-
-	<div class="fl-widget-titlebar portlet-title" role="sectionhead">
-        <h2 role="heading"><c:out value="${helpTitle}"/></h2>
+    <div class="fl-widget-titlebar portlet-title" role="sectionhead">
+        <h3 role="heading"><c:out value="${helpTitle}"/></h3>
     </div>
-    
     <div>${helpInstructions}</div><br/>
-    
-    <p><spring:message code="help.preview.prelink"/> <a href="<portlet:renderURL portletMode="VIEW"/>"><spring:message code="help.preview.link"/></a></p>
+    <p><spring:message code="help.preview.prelink"/> <a href="<portlet:renderURL portletMode="VIEW"/>" role="button" class="btn btn-default"><spring:message code="help.preview.link"/></a></p>
 </div>

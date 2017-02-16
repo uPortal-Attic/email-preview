@@ -19,8 +19,113 @@
 var jasig = jasig || {};
 
 (function($, fluid) {
+        /**
+         * checkboxCounter is the counting of the email List checkboxes Global Checkness State.
+         * it is used in:
+         *    function selectInputMessage()
+         *    function hideSupressToolbar()
+         * to display or not the Suppress toolbar (.toolbar-middle)
+         * @type {number}
+         */
+	var checkboxCounter = 0;
+        /**
+         * Slide down / up (.toolbar-middle) when a user selects a message checkbox to suppress or uncheck the
+         * selected message(s).
+         * increment or decrement checkboxCounter according to the Checkness State of every checkbox
+         */
+	function selectInputMessage(that, element) {
+		if (element.firstChild.checked) {
+		checkboxCounter++;
+		} else {
+		checkboxCounter--;
+        	}
+        	if (checkboxCounter === 0) {
+                	$('.toolbar-middle').slideUp( "fast" );
+        	} else {
+                	$('.toolbar-middle').slideDown( "fast" );
+        	}
+	}
+        /**
+         * Slide up (.toolbar-middle), when one message is selected at least and a user opens 
+         * any message. Because there is a suppress button on the displayed message,
+         * checkboxCounter is flushed to 0 to slide up .toolbar-middle.
+         */
+	function hideSupressToolbar() {
+                $('.toolbar-middle').slideUp( "fast" );
+                checkboxCounter = 0;
+                return checkboxCounter;
+	}
+        /**
+         * Helper function to change a role value to another
+         * @param {string} elem The ID or Class of the element which have the role you need to change
+         * @param {string} actualRole The value of role you need to change
+         * @param {string} newRole The value of role you need elem to have
+         * Used to patch fluid pager which add role="application" to allow user to use the standard keyboard commands on fluid pager.
+         *    Issue ref: FLUID-6064 https://issues.fluidproject.org/browse/FLUID-6064
+         *    Additional notes: https://www.marcozehe.de/2012/02/06/if-you-use-the-wai-aria-role-application-please-do-so-wisely/
+         *    Additional notes: http://tink.uk/using-the-aria-application-role/
+         * @supported So far tested in Chrome, FF, Safari, IE9, edge. IOS, Android.
+         */
+        function overrideA11nRole (elem, actualRole, newRole) {
+                var target = document.querySelector( elem );
+                if (target.getAttribute( "role" ) === actualRole ) {
+                	target.setAttribute( "role", newRole );
+        	}
+	}
+
+	function removeActiveClassOnEmailList() {
+        	$( ".email-row.active" ).each(function() {
+                	$( this ).removeClass("active");
+        	});
+        	$(".email-row .subject a").each(function() {
+                	$( this ).attr( "aria-expanded", "false" );
+        	});
+	}
+
+	function hideAndShowRightMessage() {
+        	if ($('.email-container').hasClass('show-left-menu')) {
+                	$('.email-container').removeClass('show-left-menu');
+        	}
+                       
+        	switch ($('.email-container').hasClass('show-right-menu')) {
+                	case true:
+                                /**
+                                 * There is already a message displayed
+                                 * hide it 
+                                 */
+                                $('.email-container').toggleClass('show-right-menu');
+                                if (window.matchMedia("(min-width: 768px)").matches) {
+                                /** 
+                                 * Wait a little then show the new one on tablet and desktop
+                                 */
+                                setTimeout(function(){ $('.email-container').addClass('show-right-menu'); }, 500);
+                                } else {
+                                /**
+                                 * Do not wait on mobile
+                                 */
+                                setTimeout(function(){ $('.email-container').addClass('show-right-menu'); }, 5);
+                                }
+                	break;
+                	case false:
+                                /**
+                                 * There is no message displayed yet,
+                                 * Show the selected message 
+                                 */
+                                setTimeout(function(){ $('.email-container').toggleClass('show-right-menu'); }, 5);
+                                break;
+        	}
+	}
+                
+	function hideAndShowMessage() {
+        	var linkMessages = $('#email-list-table .right-content-email-toggle .subject');
+        	for (var i = 0; i < linkMessages.length; i++) {
+                	linkMessages[i].addEventListener("click", hideAndShowRightMessage);
+        	}
+	}
 	
-	// Remember these items so we can access the cache quickly & accurately
+	    /**
+         * Remember these items so we can access the cache quickly & accurately
+         */
 	var lastRequestedStart;
 	var lastRequestedSize;
 
@@ -30,18 +135,25 @@ var jasig = jasig || {};
             return false;
         }
         
-        // display the loading message while we retrieve the desired message
-        showLoadingMessage(that);
+        /** 
+         * Display the loading message while we retrieve the desired message
+         */
+        showSpinner(that);
 
-        // get the message
+        /**
+         * get the message
+         */
         var messageId = $(element).attr("messageId");
         var message = getMessage(that, messageId);
 
-        // update the individual message display with our just-retrieved message
+      if (message) {
+        /**
+         * update the individual message display with our just-retrieved message
+         */
         var html = message.content.html ? message.content.contentString : "<pre>" + message.content.contentString + "</pre>";
         that.container.find(".message-content").html(html);
         that.container.find(".email-message .subject").html(message.subject);
-		that.container.find(".email-message .from").html(message.sender);
+	that.container.find(".email-message .from").html(message.sender);
         that.container.find(".email-message .sentDate").html(message.sentDateString);
     	that.container.find(".email-message .toRecipients").html(message.toRecipients);
     	that.container.find(".email-message .ccRecipients").html(message.ccRecipients);
@@ -56,7 +168,9 @@ var jasig = jasig || {};
         that.container.find(".email-message .message-uid").val(message.messageId);
 
         
-        // Mark messages read?
+        /** 
+         * Mark messages read?
+         */
         if (that.options.markMessagesAsRead || !message.unread) {
             that.locate("markMessageReadButton").hide();
             that.locate("markMessageUnreadButton").show();
@@ -65,7 +179,9 @@ var jasig = jasig || {};
             that.locate("markMessageUnreadButton").hide();
         }
 
-        // Access the messageObject in cache
+        /**
+         * Access the messageObject in cache
+         */
         var mostRecentCache = that.cache[lastRequestedStart][lastRequestedSize];
         var cacheIndex = -1;
         for (var i in mostRecentCache) {
@@ -73,20 +189,36 @@ var jasig = jasig || {};
         	if (msg.messageId === messageId) {
         		cacheIndex = parseInt(i);
         		if (msg.unread && that.options.markMessagesAsRead) {
-        	        // Update the display to reflect the new state of the SEEN flag
-                    msg.unread = false;
-                    var unreadCount = parseInt(that.locate("unreadMessageCount").html());
-                    if (unreadCount && unreadCount > 0) {
-                        that.locate("unreadMessageCount").html(unreadCount - 1);
-                    }                    
-                    that.pager.refreshView();
+        	            /**
+                         * Update the display to reflect the new state of the SEEN flag
+                         */
+                           msg.unread = false;
+                           var unreadCount = parseInt(that.locate("unreadMessageCount").html());
+                           if (unreadCount && unreadCount > 0) {
+                               that.locate("unreadMessageCount").html(unreadCount - 1);
+                           }                    
+                           that.pager.refreshView(); 
         		}
+                        /**
+                         * Update the display to show the actual selected message in email List
+                         */
+                           removeActiveClassOnEmailList();
+                           var selectedUnreadMessageDisplayed = $(".email-row").find("span.subject[messageId='" + msg.messageId + "']");
+                           selectedUnreadMessageDisplayed.closest("tr").addClass( "active" );
+                           selectedUnreadMessageDisplayed.children().attr({'aria-expanded': 'true'});
+                           /** 
+                            * keyboard navigation : wait a little for the display of the selected message then move the focus on selected message
+                            */
+                           setTimeout(function(){ $('#right-content-email').focus(); }, 1000);
+                           
                 break;
             }
         }
         
         if (cacheIndex != -1) {
-        	// Load the previous link...
+        	    /**
+                 * Load the previous link...
+                 */
         	if (cacheIndex > 0) {
         		var previousMsg = mostRecentCache[cacheIndex - 1];
     	        $(".email-message .previous-msg").attr("messageId", previousMsg.messageId);
@@ -94,7 +226,9 @@ var jasig = jasig || {};
         	} else {
             	$(".email-message .previous-msg").hide();
         	}
-        	// Load the next link...
+        	/**
+                 * Load the next link...
+                 */
         	if (cacheIndex < mostRecentCache.length - 1) {
         		var nextMsg = mostRecentCache[cacheIndex + 1];
     	        $(".email-message .next-msg").attr("messageId", nextMsg.messageId);
@@ -104,27 +238,30 @@ var jasig = jasig || {};
         	}
         }
 
-        // show the message display
+        /**
+         * show the message display
+         */
         showEmailMessage(that);
-
+      }
         return false;
     };
 
-    // Top-level abstraction of the user's email account;
-    // needs to be re-set whenever mail is fetched.
+    /**
+     * Top-level abstraction of the user's email account;
+     * needs to be re-set whenever mail is fetched.
+     */
     var account = {};
 
-    // If true, will drop the cache entry (if present)
-    // for this user on the next call to the server
+    /**
+     * If true, will drop the cache entry (if present)
+     * for this user on the next call to the server
+     */
     var clearCache = "false";
 
     /**
      * Retrieve batched email from the server
      */
     var getEmail = function(that, start, size, sortKey, sortDir, folderName) {
-        //if (that.cache[start] && that.cache[start][size]) {
-        //    return that.cache[start][size];
-        //}
 
         $.ajax({
             url: that.options.accountSummaryUrl,
@@ -146,11 +283,15 @@ var jasig = jasig || {};
 
         var messages = account.accountSummary ? account.accountSummary.messages : [];
         
-        // Cache the response
+        /**
+         * Cache the response
+         */
         that.cache[start] = that.cache[start] || [];
         that.cache[start][size] = messages;
         
-    	// Remember start/size for easy cache access
+    	/** 
+         * Remember start/size for easy cache access
+         */
     	lastRequestedStart = start;
     	lastRequestedSize = size;
 
@@ -186,32 +327,84 @@ var jasig = jasig || {};
     };
 
     var showEmailList = function(that) {
+        //console.log("showEmailList"); 
         that.locate("loadingMessage").hide();
-        that.locate("emailMessage").hide();
+        that.locate("spinner").hide();
+        that.locate("wrapper").show();
+        that.locate("emailMessage").show();
         that.locate("errorMessage").hide();
         that.locate("emailList").show();
+        that.container.find(".toolbar-middle").hide();
+        hideSupressToolbar();
+        var p = $( "#right-content-email" );
+        var position = p.position();
+        //console.log( "right-content-email left: " + position.left + ", right-content-email top: " + position.top );
+        /**
+         * Patch fluid pager which add role="application" to allow user to use the standard keyboard commands.
+         * @supported So far tested in Chrome, FF, Safari, IE9, edge. PC, Linux, Mac IOS, Android. VoiceOver
+         */
+        overrideA11nRole( ".email-list", "application", "section" );
     };
 
     var showLoadingMessage = function(that) {
+        //console.log("showLoadingMessage");
+        that.locate("spinner").hide();
+        that.locate("wrapper").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         that.locate("errorMessage").hide();
         that.locate("loadingMessage").show();
     };
 
-    var showEmailMessage = function(that) {
-        that.locate("loadingMessage").hide();
-        that.locate("emailList").hide();
-        that.locate("errorMessage").hide();
+    var showSpinner = function(that) {
+        //console.log("showSpinner");
+        /** 
+         * Show the spinner - function show() is strangely buggy on safari, chrome and edge in this special case, not in FF
+         * fadeToggle() is not.
+         * @supported So far tested in Chrome, FF, Safari, Edge and IE9+, Windows 10 MacOSX, Linux Centos, IOS and Android
+         */
+        $(".outer-spinner").fadeToggle( "fast", "linear" );
+        //console.log("showSpinner fired");
+        that.locate("wrapper").show();
+        that.locate("emailList").show();
         that.locate("emailMessage").show();
+        that.locate("errorMessage").hide();
+        that.locate("loadingMessage").hide();
+    };
+
+    var showEmailMessage = function(that) {
+        //console.log("showEmailMessage");
+        that.locate("loadingMessage").hide();
+        that.locate("errorMessage").hide();
+        /** 
+         * Hide the spinner - function hide() is strangely buggy on safari, chrome and edge in this special case, not in FF
+         * fadeToggle() is not.
+         * @supported So far tested in Chrome, FF, Safari, Edge and IE9+, Windows 10 MacOSX, Linux Centos, IOS and Android
+         */
+        that.locate("spinner").delay( 601 ).fadeToggle( "slow", "linear" );
+        that.locate("wrapper").show()
+        that.locate("emailList").show();
+        that.locate("emailMessage").show();
+        var cont = $( ".email-container" );
+        var position1 = cont.offset();
+        var positionAfterSticky = position1.top - 90;
+        var position2 = cont.scrollTop();
+        /**
+         * if the user is at the end of emaillist and select a message, scroll to selected message
+         */
+        $('html, body').animate({scrollTop: positionAfterSticky});
     };
 
     var showErrorMessage = function(that, httpStatus, customMessage) {
+        //console.log("showErrorMessage");
+        that.locate("spinner").hide();
         that.locate("loadingMessage").hide();
+        that.locate("wrapper").hide();
         that.locate("emailList").hide();
         that.locate("emailMessage").hide();
         if (httpStatus == 200) {
-            /* We assume 200 AS AN ERROR means the mapge timed out (on uPortal
+            /**
+             * We assume 200 AS AN ERROR means the mapge timed out (on uPortal
              * this event means the ACTION timed out and improperly went to
              * RENDER, where it should have resulted in a redirect).
              */
@@ -219,7 +412,9 @@ var jasig = jasig || {};
         }
         var errorText = that.options.jsErrorMessages[httpStatus] || that.options.jsErrorMessages['default'];
         if (customMessage) {
-            // Add a server-specified custom message to the end
+            /**
+             * Add a server-specified custom message to the end
+             */
             errorText += '<br/>' + customMessage;
         }
         that.locate("errorText").html(httpStatus + ": " + errorText);
@@ -239,6 +434,7 @@ var jasig = jasig || {};
     var removeMessages = function(messages, cache) {
         that.locate("emailRow").each(function(index, row) {
             if (row.find(options.selectors.selectMessage).attr("checked")) {
+                //console.log("remove row");
                 row.remove();
             }
         });
@@ -254,13 +450,36 @@ var jasig = jasig || {};
         var batchOptions = {
             batchSize: that.options.batchSize,
             pagerOptions: {
+                strings: { last: " "},
+                summary: {
+                    type: "fluid.pager.summary",
+                    options: {
+                        /**
+                         * Override of unlocalized dinamic string in fluid : see at the end of preview.jsp in fluid options
+                         * @override
+                         */
+                        message: that.options.fluidPagerSummaryOverride
+                    }
+                },
                 columnDefs: [
+                    { key: "selectlabel", valuebinding: "*.select",
+                        components: function(row, index) {
+                            return {
+                                decorators: [
+                                    { attrs: { 'for': "\${*.messageId}" } }
+                                ]
+                            }
+                        }
+                    },
                     { key: "select", valuebinding: "*.select",
                         components: function(row, index) {
                             return {
-                                markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.messageId}"/>',
+                                markup: '<input type="checkbox" class="select-message" name="selectMessage" value="\${*.messageId}" id="\${*.messageId}"/>',
                                 decorators: [
                                     { attrs: { messageId: '\${*.messageId}' } },
+                                    { type: "jQuery", func: "click",
+                                          args: function(){ selectInputMessage(that,this); }
+                                      },
                                     { type: "addClass", classes: getClasses(index, row) }
                                 ]
                             }
@@ -286,10 +505,56 @@ var jasig = jasig || {};
                     },
                     { key: "subject", valuebinding: "*.subject",
                         components: function(row, index) {
-                          
+                            return {
+                                  markup: "<span>\${*.subject}</span>",
+                                  decorators: [
+                                      { attrs: { messageId: '\${*.messageId}' } },
+                                      { type: "addClass", classes: getClasses(index, row) }
+                                  ]
+                            }
+                        }
+                    },
+                    { key: "subject-link", valuebinding: "*.subject",
+                        components: function(row, index) {                          
                             if (that.options.allowRenderingEmailContent) {
                               return {
-                                  markup: "<a href=\"javascript:;\">\${*.subject}</a>",
+                                  markup: "<a href=\"javascript:void(0);\" aria-controls=\"right-content-email\" aria-flowto=\"right-content-email\" aria-expanded=\"false\">\${*.subject}</a>",
+                                  decorators: [
+                                      { attrs: { messageId: '\${*.messageId}' } },
+                                      { type: "jQuery", func: "click",
+                                          args: function(){
+                                                   /**
+                                                    * remove previous active class
+                                                    */
+                                                   removeActiveClassOnEmailList();
+                                                   /**
+                                                    * set active class
+                                                    */
+                                                   $(this).closest("tr").addClass( "active" );
+                                                   /**
+                                                    * set accessibility attribute
+                                                    */
+                                                   $(this).children().attr({'aria-expanded': 'true'});
+                                                   /**
+                                                    * call for selected message
+                                                    */
+                                                   displayMessage(that, this);
+                                                   /**
+                                                    * close and open new message
+                                                    */
+                                                   hideAndShowRightMessage();
+                                                }
+                                      },
+                                      { type: "addClass", classes: getClasses(index, row) }
+                                  ]
+                              }
+                            }
+                        }
+                    },
+                    { key: "email-link", valuebinding: "*.messageId",
+                        components: function(row, index) {
+                            if (that.options.allowRenderingEmailContent) {
+                                return {
                                   decorators: [
                                       { attrs: { messageId: '\${*.messageId}' } },
                                       { type: "jQuery", func: "click",
@@ -298,13 +563,6 @@ var jasig = jasig || {};
                                       { type: "addClass", classes: getClasses(index, row) }
                                   ]
                               }
-                            } 
-                            return {
-                                  markup: "<span>\${*.subject}</span>",
-                                  decorators: [
-                                      { attrs: { messageId: '\${*.messageId}' } },
-                                      { type: "addClass", classes: getClasses(index, row) }
-                                  ]
                             }
                         }
                     },
@@ -332,7 +590,9 @@ var jasig = jasig || {};
                 bodyRenderer: {
                     type: "fluid.pager.selfRender",
                     options: {
-        				//Only change for mobile view :replace table by div.message_infos
+        		        /**
+                         * Only change for mobile view :replace table by div.message_infos
+                         */
                         selectors: { root: that.options.messagesInfoContainer },
                         row: "row:"
                     }
@@ -357,16 +617,43 @@ var jasig = jasig || {};
             dataFunction: getEmailFunction(that, that.options.folderName),
             dataLengthFunction: function() { return account.accountSummary ? account.accountSummary.totalMessageCount : 0; }
         };
-
         that.pager = unicon.batchedpager(that.locate("emailList"), batchOptions);
 
-        // The 'accountSummary' key indicates we obtained email info successfully
+        /**
+         * Notify the server of changes to pageSize so they can be remembered 
+         * and update the container min-height class
+         */
+        that.pager.pager.events.initiatePageSizeChange.addListener(function(newPageSize) {
+            /**
+             * if #right-content-email has already .min-height-XX class remove it
+             */
+            $("#right-content-email").removeClass (function (index, css) {
+                  return (css.match (/\bmin-height-\S+/g) || []).join(' ');
+            });
+            /**
+             * Set .emailpreview-container-min-height-[newPageSize] class on #right-content-email
+             */
+            $("#right-content-email").addClass( "min-height-"+newPageSize );
+
+            $.post(that.options.updatePageSizeUrl, {"newPageSize": newPageSize});
+        });
+
+
+        /**
+         * The 'accountSummary' key indicates we obtained email info successfully
+         */
         if (account.accountSummary) {
 
             that.refresh = function() {
                 showLoadingMessage(that);
-                clearCache = "true";  // Server-side cache
-                that.cache = [];      // Client-side cache
+                /**
+                 * Server-side cache
+                 */
+                clearCache = "true";
+                /**
+                 * Client-side cache
+                 */
+                that.cache = [];
                 that.pager.refreshView();
                 that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
                 showEmailList(that);
@@ -420,10 +707,11 @@ var jasig = jasig || {};
 	                type: "POST",
 	                data: {} ,
 	                dataType: "json",
-	                success: function(response){  	                	
+                        success: function(response){  
+                        // console.table(response);	                	
 		                var select = that.locate("allFolders");	
 		                $("option", select).remove();
-		                if(select.prop) {
+		                if (select.prop) {
 		                	var options = select.prop('options');
 		                }
 		                else {
@@ -431,36 +719,70 @@ var jasig = jasig || {};
 		                }
 		                var selected;
 		                $.each(response, function(index,response) {
-		                	if(index=="selected"){
+		                	if (index === "selected"){
 		                		selected = response;
 		                	}
 		                	else{
 		                    	options[options.length] = new Option(index,response);
 		                    }
-		                });  
-		                // Sort by name
+		                });
+		                        /**
+                                 * Sort by name
+                                 */
 		                select.html(select.children("option").sort(function (a, b) {
 		                  return a.text == b.text ? 0 : a.text < b.text ? -1 : 1;
 		                }));
-		                select.val(selected);            
+		                select.val(selected);
+                                          
 		                $(".styled-select .ui-btn-text").html(selected);
-		                select.find("option[value='INBOX']").css("color","red").css("font-weight","bold");
-		                select.find("option[value='inbox']").css("color","red").css("font-weight","bold");
-		                $("option:contains(':unread')").css("font-weight","bold");	
+                                /**
+                                 * Set folder name in h3
+                                 */
+                                $(".navbar-brand span").html(selected);	
 		                $("option:contains(':unread')").html(function(i, text) {
 		                    return text.replace(/:unread/g, '');
 		                });
-		                console.log("list completed");
+                                /**
+                                 * transform select into a list of button
+                                 */
+                                $("#allFolders").quickselect({
+                                    activeButtonClass: 'active',
+                                    breakOutAll: true,
+		                          /**
+                                   * breakOutValues: ['INBOX', 'option1', 'option2'],
+                                   */
+		                    buttonClass: 'btn btn-default',
+		                    selectDefaultText: 'Other',
+		                    wrapperClass: 'col-xs-12 btn-group-vertical'
+	                        });
+
+                                /**
+                                 * Attach event on click on folder button to trigger an event 
+                                 * and the value of the selected folder value to the select
+                                 */
+                                $(".quickselect__btn").on("click", function(event) {
+                                   event.preventDefault();
+                                   $(".quickselect__btn.active").removeClass("active");
+                                   $(this).addClass("active");
+                                   var selectedFolder = $(this).attr("data-quickselect-value");
+                                   $("#allFolders").trigger( "selected:folder:change", selectedFolder);
+                                   return false;
+                                });
+		                //console.log("list completed");
 	                }
+
 	            };
 	    		$.ajax(ajaxOptions);
-	        }; 
-	        
+	        };
+
+	    
+
             that.deleteSelectedMessages = function() {
                 if (that.locate('emailRow').find('input:checked').size() === 0) {
                     alert(that.options.jsMessages['noMessagesSelected']);
                     return;
                 }
+                //console.log("delete message");
                 if (confirm(that.options.jsMessages['deleteSelectedMessages'])) {
                     doDelete(that.locate("inboxForm").serializeArray());
                 }
@@ -468,13 +790,25 @@ var jasig = jasig || {};
 
             that.deleteShownMessage = function() {
                 if (confirm(that.options.jsMessages['deleteMessage'])) {
+                    $('.email-container').toggleClass('show-right-menu');
                     doDelete(that.locate("messageForm").serializeArray());
                 }
             };
 
             that.toggleSelectAll = function() {
-                var chk = $(this).attr("checked");
-                that.locate("selectMessage").attr("checked", chk);
+                var chk2 = $(this).prop('checked');
+                if (chk2) {
+                that.locate("selectMessage").prop("checked", true);
+                } else {
+                that.locate("selectMessage").removeAttr("checked");
+                }
+            }
+
+            that.toggleSelectAndHideToolbar = function() {
+                that.locate("selectMessage").removeAttr("checked");
+                that.locate("selectAll").removeAttr("checked");
+                that.container.find(".toolbar-middle").hide();
+                hideSupressToolbar();  
             }
 
             that.locate("refreshLink").click(that.refresh);
@@ -489,39 +823,58 @@ var jasig = jasig || {};
                 anchor.attr("title", that.options.jsMessages['deleteNotAvailableTitle']);
                 that.locate("deleteMessageButton").hide();
             }
-            that.locate("returnLink").click(function(){ showEmailList(that); });
+
+            that.locate("returnLink").click(function(){ 
+                that.toggleSelectAndHideToolbar;
+                removeActiveClassOnEmailList(); 
+                showEmailList(that);
+                setTimeout(function(){ $('#content-middle-area').focus(); }, 200); 
+            });
             that.locate("previousMsg").click(function(){ displayMessage(that, this); });
             that.locate("nextMsg").click(function(){ displayMessage(that, this); });
             that.locate("markMessageReadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'true'); });
             that.locate("markMessageUnreadButton").click(function(){ doToggleSeen(that.locate("messageForm").serializeArray(), 'false'); });
             that.locate("allFolders").ready(function(){ getFoldersList();});
-            that.locate("allFolders").change(
-            	function(){
+            that.locate("allFolders").on("selected:folder:change",
+            	function(event, param1){
+                    //console.log("selectedButton = "+ that.locate("selectedButton").attr("data-quickselect-value"));
+                    //console.log("selectedFolder = "+ param1);
                     clearCache = "true";
-	            	getEmail(that, 0, that.options.batchSize, undefined, undefined,that.locate("allFolders").val());
+	            	getEmail(that, 0, that.options.batchSize, undefined, undefined, param1);
 	            	location.reload();
-            	});             
+            	});
             that.locate("inboxLink").attr("href", account.inboxUrl);
-            //Mobile view          
-            that.locate("mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
-            that.locate("selectAll").live("click", that.toggleSelectAll);
+            $("#right-content-email").addClass( "min-height-"+ that.options.pageSize );
+            /**
+             * Mobile view fixes
+             */
+            $("#mobileSelect").find("span.ui-btn-text").html(that.options.pageSize);
+            //console.log(that.pager);
+            $("#results").change(function(){
+                that.pager.pager.model.pageSize=$("#results option:selected").val();
+                $.post(that.options.updatePageSizeUrl, {"newPageSize": that.pager.pager.model.pageSize});
+                that.pager.refreshView();
+            });
+            $(document).on("click", ".select-all", that.toggleSelectAll);
+            $(document).on("click", ".hide-toolbar-middle", that.toggleSelectAndHideToolbar);
 
             that.locate("unreadMessageCount").html(account.accountSummary.unreadMessageCount);
-            if(account.spaceUsed=="-1"){
+            if (account.spaceUsed=="-1"){
             	that.locate("stats").remove();
             }
             if (account.emailQuotaUsage <= 0 || account.emailQuotaLimit <= 0) {
 	            that.locate("stats").remove();
             } else {
                 that.locate("emailQuotaUsage").html(account.emailQuotaUsage);
+                if (account.emailQuotaUsage.split('%', 1)[0] <= 90) {
+                that.locate("emailQuotaUsage").addClass("green");
+                } else { that.locate("emailQuotaUsage").addClass("red");
+                }
                 that.locate("emailQuotaLimit").html(account.emailQuotaLimit);
             }
             showEmailList(that);
-
         }
-
         return that;
-
     };
 
     fluid.defaults("jasig.EmailBrowser", {
@@ -538,7 +891,9 @@ var jasig = jasig || {};
             returnLink: ".return-link",
             inboxForm: "form[name='inboxForm']",
             messageForm: "form[name='messageForm']",
-            allFolders: "#allFolders",            
+            allFolders: "#allFolders",
+            selectedButton: ".quickselect__btn.active",
+            hideSuppressToolbar: ".hide-toolbar-middle",           
             deleteMessageButton: ".delete-message-button",
             markMessageReadButton: ".mark-read-button",
             markMessageUnreadButton: ".mark-unread-button",
@@ -556,16 +911,19 @@ var jasig = jasig || {};
             emailQuotaUsage: ".email-quota-usage",
             emailQuotaLimit: ".email-quota-limit",
             stats: ".stats",
+            spinner: ".outer-spinner",
             bccRecipients: ".bcc-recipients",
             ccRecipients: ".cc-recipients",
             toRecipients: ".to-recipients",
             previousMsg: ".previous-msg",
             nextMsg: ".next-msg",
+            wrapper: "#outer-wrapper",
             mobileSelect: "#mobileSelect"
         },
         listeners: {},
         jsErrorMessages: {'default': 'Server Error'},
-        markMessagesAsRead: true
+        markMessagesAsRead: true,
+        fluidPagerSummaryOverride:"Page %currentPage. Viewing emails %first to %last of %total emails."
     });
 
 })(jQuery, fluid);

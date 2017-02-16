@@ -16,79 +16,1572 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/* Theme overrides */
 
-.no-col-padding {
-    padding: 0;
-}
 
-.email-preview-portlet-toolbar {
-    border-bottom: 1px solid @grayD;
+.email-container {
     height: 100%;
+    width: @width100;
+
+    .state-indicator {
+        left: -999em;
+        position: absolute;
+        top: -999em;
+
+        &:before {
+            content: 'mobile';
+        }
+    }
+
+    #outer-wrapper {
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        -webkit-transition: all 0.3s ease-in-out;
+        height: auto;
+        position: relative;
+        transition: all 0.3s ease-in-out;
+        width: @width100;
+    }
+
+    #inner-wrapper {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        background-color: @white;
+        box-sizing: border-box;
+        min-height: 100%;
+        overflow: hidden;
+    }
+
+    #envelope {
+        color: @grayscale7;
+        -webkit-box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 5px 15px 5px 0 rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        font-size: 50px;
+        opacity: 50;
+        position: absolute;
+        right: 25%;
+        top: 175px;
+    }
+
+    .loading-message {
+        /**
+         * do not change: background's height for initial spinner see comments around the invisible span in a block in preview.jsp
+         */
+        height: 500px;
+        position: relative;
+        width: 95%;
+        z-index: inherit;
+    }
+
+    .outer-spinner {
+        position: absolute;
+        top: 55px;
+        width: 95%;
+        z-index: 500;
+
+        .spinner-container {
+            background-color: transparent;
+            margin-left: 30%;
+            margin-top: 20%;
+            width: 92%;
+            z-index: 100;
+
+            .spinner {
+                .keyframes(spin;{0% {transform: rotate(3turn);} 
+		});
+
+	        .animation(spin 1s linear infinite)
+            }
+            .spinner.swoosh {
+                background-color: transparent;
+                border-left: .8em solid @color1;
+                border-radius: 50%;
+                border-top: .8em solid transparent;
+                -webkit-box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
+                -moz-box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
+                box-shadow: 0 16px 10px 0 rgba(0, 0, 0, 0.04);
+                height: 4em;
+                margin: 0 auto 0 auto;
+                position: absolute;
+                width: 4em;
+                z-index: 6;
+            }
+        }
+    }
+
+    .off-canvas-menu {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        background: #333333;
+        box-sizing: border-box;
+        height: 100%;
+        position: relative;
+        top: 0;
+        width: 365px;
+    }
+
+    .text-align-right {
+        text-align: right;
+    }
+
+    .text-align-left {
+        text-align: left;
+    }
+
+    .inbox-link {
+       line-height: 2.5 !important;
+       margin-left: 2px;
+       margin-right: 2px;
+       margin-top: 4px;
+
+       .unread-message-count {
+           background-color: @color1;
+           border-radius: 5px;
+           padding: 5px;
+       }
+    }
+
+    .btn-xs-rounded {
+       /**
+        * Rounded button inspired by Material Design
+        * try to fit 3.2 Touch Target Size and Spacing so 40px height and 40px width
+        * (https://www.w3.org/TR/mobile-accessibility-mapping/#touch-target-size-and-spacing)
+        */
+       border-radius: 50%;
+       -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+       cursor: pointer;
+       height: 40px;
+       margin: 0 !important;
+       padding: 0 !important;
+       position: relative;
+       text-align: center;
+       top: 4px;
+       -moz-transition: box-shadow 0.1s;
+       -o-transition: box-shadow 0.1s;
+       -webkit-transition: box-shadow 0.1s;
+       transition: box-shadow 0.1s;
+       width: 40px;
+       /**
+        * Important the link with .btn-xs-rounded needs to have a z-index > than the z-index
+        * of its inner hidden or visible content for IOS VoiceOver
+        */
+       z-index: 20;
+
+       &:hover {
+          -webkit-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          -moz-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+       }
+
+       &:focus {
+          -webkit-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          -moz-box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          box-shadow: 0 7px 15px 1px rgba(0, 0, 0, 0.19);
+          outline: 1px solid;
+          .touch-sr-only {
+              /**
+               * On focus .touch-sr-only box will be displayed and outlined but its text remained invisible because of its relative font-size very small 
+               *
+               * Fix visual rotor Touch areas on a elements (rounded buttons) for IOS ScreenReaders VoiceOver
+               * Tested on IOS voiceOver, Android Talkback
+               */
+              clip: auto;
+              /**
+               * Give the layout to touch-sr-only when the link is focused so IOS Voiceover Rotor apply width & height rules. "On having layout"
+               */
+              display: block;
+              outline: 0 solid @black;
+              opacity: 0;
+              overflow: hidden;
+           }
+       }
+
+       &:active {
+          -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          
+          .touch-sr-only {
+              /**
+               * On active state .touch-sr-only box won't be displayed and outlined but its text remained invisible because of its relative font-size very small 
+               *
+               * Fix visual rotor Touch areas on a elements (rounded buttons) for IOS ScreenReaders VoiceOver
+               * Tested on IOS voiceOver, Android Talkback
+               */
+              clip: rect(0,0,0,0);
+              outline: 0 solid rgba(0, 0, 0, 0);
+              visibility: hidden;
+           }
+       }
+       .glyphicon {
+          line-height: 40px;
+          font-size: 16px;
+          outline: 0 solid rgba(0, 0, 0, 0) !important;
+          top: 0;
+          z-index: 2;
+       }
+       .touch-sr-only {
+          /**
+           * touch-sr-only is a rewrite of Bootstrap 3.5 Class .sr-only
+           * because .sr-only was written to display a skip to nav menu
+           * here it is another use case, because the hidden label of a glyphicon link or button is hightlighted by IOS VoiceOver Rotor
+           *
+           * Fix focus (keyboard navigation) & touch areas on a elements for keyboard and ScreenReaders (VoiceOver, Talkback, etc.)
+           * Tested on IOS voiceOver, Android Talkback
+           */
+           // 
+           background-color: transparent;
+           border: 0 !important;
+           /**
+            * display none with clip propertie
+            */
+           clip: rect(0,0,0,0);
+           color: transparent !important;
+           
+           /**
+            * Important the font-size needs to be in relative units
+            * very very small transparent text
+            */
+           font-size: 0.1em !important;
+           height: 40px;
+           margin: -1px;
+           max-height: 40px;
+           max-width: 40px;
+           min-height: 40px;
+           min-width: 40px;
+           /**
+            * no overflow so always 40px width and height
+            */
+           overflow: hidden !important;
+           padding: 0;
+           /**
+            * Important absolute position to fit with link box and enable z-index propertie
+            */
+           position: absolute !important;
+           right: 0;
+           top: 0;
+           width: 40px;
+           /**
+            * Important the label with .touch-sr-only needs to have a z-index < than the z-index
+            * of its wrapper link for IOS VoiceOver
+            */
+           z-index: -20;
+       }
+    }
+
+    
+
+    .close-preview-link, .btn-message-previous, .btn-message-next, .right-content-email-scroll-up a {
+        font-size: 14.5px;
+        line-height: 1.5;
+        margin-top: 4px;
+        position: relative;
+        z-index: 20;
+
+        .glyphicon {
+            outline: 0 solid rgba(0, 0, 0, 0) !important;
+            z-index: 2;
+        }
+
+        &:focus {
+            outline: 1px solid;
+            .touch-sr-only {
+                clip: auto;
+                display: block;
+                outline: 0 solid @black;
+                opacity: 0;
+                overflow: hidden;              
+           }
+        }
+
+        &:active {
+           
+            .touch-sr-only {
+                clip: rect(0,0,0,0);
+                outline: 0 solid rgba(0, 0, 0, 0);
+           }
+        }
+
+        .touch-sr-only {
+           background-color: transparent !important;
+           border: 0 !important;
+           clip: rect(0,0,0,0);
+           color: transparent !important;
+           font-size: 0.1em !important;
+           height: 40px;
+           margin-left: -27px;
+           margin-top: -7px;
+           max-height: 40px;
+           max-width: 40px;
+           min-height: 40px;
+           min-width: 40px;
+           overflow: hidden !important;
+           position: absolute !important;
+           padding: 0;
+           width: 40px;
+           z-index: -10;
+           
+       }
+    }
+    .btn-inverse {}
+
+    #collapse-preferences {
+        margin-top: 15px;
+        position: relative;
+        width: @width100;
+    }
 
     .alert-quota {
-        padding: 6px 12px;
-        margin-bottom: 10px;
+        color: @white;
+        height: 200px;
+    }
+
+    .bd-top {
+        border-top: 1px solid #444444;
+    }
+
+    .bd-bottom {
+        border-bottom: 1px solid #444444;
+    }
+
+    .space-used-label {
+        font-size: 13px;
+        padding: 10px 5px;
+    }
+
+    .quota-label {
+        font-size: 13px;
+        padding: 10px 5px;
+    }
+
+    .space-used-value {
+        font-size: 13px;
+        padding: 10px 5px;
         text-align: center;
     }
-}
 
-.fl-pager {
-    margin-top: 10px;
+    .email-quota-limit {
+        font-size: 13px;
+        padding: 10px 5px;
+        text-align: center;
+    }
 
-    #allFolders {
-        margin-top: 0 !important;
-        width: auto !important;
+    .email-select {
+        font-size: 13px;
+        margin-top: 1px;
+        max-width: 220px;
+        padding: 10px 5px;
+        text-align: center;
+    }
+
+    .email-per-page {
+        padding: 14px 5px;
+    }
+
+    .preference-button {
+        margin-bottom: 3px;
+        margin-left: 10px;
+        margin-top: 12px;
+    }
+
+    .red {
+        // when storage greater than 80%
+        background: #f15854;
+    }
+
+    .green {
+        // when storage less than 80%
+        background: #007700 !important;
+    }
+
+    .pager-page-size {
+        display: inline-block;
+        float: right;
+        font-size: 16px !important;
+        // should be 70px for firefox on windows
+        width: 70px !important;
+
+        &:focus {
+            // prevent auto-zoom on IOS
+            font-size: 16px !important;
+        }
+    }
+
+    .email-message {
+        background-color: @white !important;
+        width: @width100;
+    }
+
+    nav#left-menu {
+        background: #444444;
+        height: 100%;
+        left: -365px;
+        position: absolute;
+        width: 350px;
+    }
+
+    #left-menu {
+        .quickselect__wrapper {
+            .btn {
+                border-radius: 0 !important;
+                text-align: left !important;
+                vertical-align: middle;
+            }
+
+            .btn-default {
+                &:active {
+                    background-color: @color1;
+                    border-color: #adadad;
+                    color: white;
+                }
+            }
+
+            .btn-default.active {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white;
+            }
+        }
+    }
+
+    .navbar {
+        &.navbar-inverse {
+            .vertical-gradient (@grayscale10, @grayscale8);
+            border-color: @black;
+            padding-top:4px;
+            a.btn-inverse {
+                border-color: @grayscale8;
+                color: @white;
+                right: 2px;
+                top: 0;
+                
+                &:focus {
+                    outline: 1px solid @white;
+                }
+                
+            }
+        }
+    }
+
+    .navbar-middle {
+        .vertical-gradient (@color1-dark, @color1);
+        border-color: @color1;
+        -webkit-box-shadow:2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
+        -moz-box-shadow: 2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
+        box-shadow: 2px 10px 7px 0 fade(@color1, 30%), 5px 1px 5px 0 rgba(0,0,0,0.2);
+        position: absolute;
+        -moz-transform: translate3d(15px, 0, 0);
+        -ms-transform: translate3d(15px, 0, 0);
+        -o-transform: translate3d(15px, 0, 0);
+        -webkit-transform: translate3d(15px, 0, 0);
+        transform: translate3d(15px, 0, 0);
+        width: @width100;
+        z-index: 2;
+
+        a.btn-default {
+            margin-left: 2px;
+            margin-right: 3px;
+            z-index: 500;
+        }
+
+        a.btn-primary {
+            background-color: @color1;
+            border-color: @color1;
+            margin-left: 2px !important;
+            margin-right: 3px !important;
+            z-index: 500;
+            &:hover {
+               border-color: @color1;
+            }
+            &:focus {
+               border-color: @color1;
+               outline: 1px solid @white;
+            }
+            &:active {
+               outline: 0 solid rgba(0, 0, 0, 0) !important;
+            }
+        }
+
+        .btn-success {
+            margin-left: 2px !important;
+            margin-right: 3px !important;
+            z-index: 500;
+            
+            &:focus {
+               outline: 1px solid @white;
+            }
+            &:active {
+                outline: 0 solid rgba(0, 0, 0, 0) !important;
+            }
+        }
+
+        a.left-menu-toggle {
+            margin-left: -10px !important;
+
+            &:link,  {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:visited,  {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:hover,  {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:active {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 0 solid rgba(0, 0, 0, 0);
+            }
+            &:focus {
+                background-color: @grayscale1;
+                border-color: @grayscale1;
+                color: @grayscale10;
+                outline: 1px solid @white;
+            }
+        }
+        
+        a.refresh-link {
+            right:-6px;
+        }
+    }
+    .toolbar-middle {
+        -webkit-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        -moz-transform: translate3d(15px, 0, 0);
+        -ms-transform: translate3d(15px, 0, 0);
+        -o-transform: translate3d(15px, 0, 0);
+        -webkit-transform: translate3d(15px, 0, 0);
+        min-height: 50.9px;
+        position: absolute;
+        top: 0;
+        transform: translate3d(15px, 0, 0);
+        width: @width100;
+        z-index: 150;
+
+        .btn-danger {
+            margin-left: 2px;
+            margin-right: 3px;
+            margin-top: 4px;
+            padding: 0;
+            z-index: 500;
+
+            &:focus {
+               outline: 1px solid @black;
+            }
+
+        }
+
+        .hide-toolbar-middle {
+            line-height: 1.8;
+            position: relative;
+            top: -4px;
+            z-index: 500;
+
+            &:focus {
+               outline: 1px solid @black;
+            }
+
+        }
+
+        .select-all {
+            margin-left: 7px !important;
+            margin-top: 18px !important;
+            position: relative;
+            top: -2px;
+        }
+    }
+
+    #right-content-email>.navbar {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    #right-content-email {
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+        left: 100%;
+        min-height: 1250px;
+        // do not change fix scrolling effect on chrome and safari when openning a message
+        margin-top: -65px;
+        // do not change fix scrolling effect on chrome and safari when openning a message
+        padding-top: 65px;
+        width: @width100;
+        z-index: 150;
+
+        .navbar {
+            a {
+                line-height: 1.8;
+                margin-top: 8px;
+            }
+
+            button {
+                margin-left: 2px;
+                margin-right: 2px;
+                margin-top: 4px;
+                padding:0;
+                
+                &:focus {
+                    outline: 1px solid @black;
+                }
+            }
+            
+            .return-link {
+                &:hover {
+                    background-color: @white;
+                }
+                
+                &:focus {
+                    background-color: @white;
+                }
+                
+                &:active {
+                    background-color: @white;
+                }
+                
+            }
+        }
+
+        .un-row {
+           margin-bottom: 10px;
+           margin-left: -13px !important;
+           margin-right: -13px !important;
+           margin-top: 0;
+        }
+
+        .message-content>div {
+            font-size: 12.8px;
+        }
+
+        .message-content {
+            position: relative;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: overlay;
+
+            blockquote {
+                font-size: 12.8px !important;
+            }
+
+            p, div {
+                max-width: 100% !important;
+                font-size: 12.8px !important;
+            }
+
+            table, table table {
+               display: block !important;
+               min-width: @width100 !important;
+               width: @width100 !important;
+
+               tbody {
+                  display: block !important;
+                  min-width: @width100 !important;
+                  width: @width100 !important;
+               }
+
+               tr {
+                  width: @width100 !important;
+                  display: block !important;
+               }
+
+               td {
+                  display: inline-block !important;
+                  font-size: 12.8px !important;
+                  div, span, p {
+                     font-size: 12.8px !important;
+                  }
+               }
+            }
+        }
+        .right-content-email-scroll-up {
+            bottom: 0;
+            position: absolute;
+            a {
+               line-height: 1.8;
+            } 
+        }
+    }
+    /*
+      The contents of the preview consists of three blocks aligned horizontally (left, middle, right) in a Container.
+      The minimum height of the wrapper Container is determined by the min-height of the last block (right).
+      These three classes set the min height for the wrapper container depending on pageSize : 5 messages, 10 messages, 20 messages.
+    */
+    #right-content-email.min-height-5 {
+        min-height:660px !important;
+    }
+
+    #right-content-email.min-height-10 {
+        min-height:810px !important;
+    }
+
+    #right-content-email.min-height-20 {
+        min-height:1250px !important;
     }
 
     .pager {
-        margin: 0;
-        li {
-            float: left;
-            margin-left: 6px;
-            ul {
-                float: left;
+        li>a {
+            border-radius: 0 !important;
+            padding: 5px 10px !important;
+        }
+
+        li>span {
+            border-radius: 0 !important;
+            padding: 5px 10px !important;
+        }
+    }
+
+    .fl-pager {
+        .pager {
+            li {
+                margin-left: 0 !important;
             }
+        }
+    }
+    .email-list {
+        .flc-pager-links {
+            .flc-pager-pageLink {
+                a {
+                    color: @color1 !important;
+                    text-decoration: none !important;
+                }
+
+                a.fl-pager-currentPage {
+                    color: @white !important;
+                }
+            }
+        }
+    }
+    .container-list {
+        -moz-transform: translate3d(15px, 0, 0);
+        -ms-transform: translate3d(15px, 0, 0);
+        -o-transform: translate3d(15px, 0, 0);
+        -webkit-transform: translate3d(15px, 0, 0);
+        background: @white;
+        -webkit-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 5px 6px 10px 0 rgba(0, 0, 0, 0.3), 0 2px 0 rgba(0, 0, 0, 0.2);
+        min-height: 100%;
+        padding-right: .2em;
+        position: absolute;
+        top: 50px;
+        transform: translate3d(15px, 0, 0);
+        width: @width100;
+        z-index: 1;
+
+        .pagination>li>a {
+            color: @color1 !important;
+        }
+
+        .pagination>li>span {
+            color: @color1 !important;
+        }
+
+        .pagination>.active>a {
+            background-color: @color1;
+            border-color: @color1;
+            color: @white !important;
+            cursor: default;
+            z-index: 2;
+
+            &:hover {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+
+            &:focus {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+        }
+
+        .pagination>.active>span {
+            background-color: @color1;
+            border-color: @color1;
+            color: @white !important;
+            cursor: default;
+            z-index: 2;
+
+            &:hover {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+
+            &:focus {
+                background-color: @color1;
+                border-color: @color1;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+        }
+        .pagination>.flc-pager-pageLink>.fl-pager-currentPage {
+            background-color: @color1 !important;
+            border-color: @color1 !important;
+            color: @white !important;
+            cursor: default;
+            z-index: 2;
+
+            &:hover {
+                background-color: @color1 !important;
+                border-color: @color1 !important;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+
+            &:focus {
+                background-color: @color1 !important;
+                border-color: @color1 !important;
+                color: @white !important;
+                cursor: default;
+                z-index: 2;
+            }
+        }
+
+        .flc-pager-summary {
+            font-size: 12px;
+        }
+
+        .email-pager {
+            margin-bottom: 15px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .list-group-item {
+            line-height: 1.3;
+            min-height: 50px;
+            min-width: @width100;
+            overflow: hidden;
+            padding: 7px 10px !important;
+            
+            &.uni-list-group-square {
+                // Material Design for list-group-item
+                border-radius: 0;
+                border-top: 1px solid @grayscale3;
+                -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+                -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+            }
+
+            &:hover {
+                -webkit-box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+                -moz-box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+                box-shadow: 5px 6px 7px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+                -moz-transition: all 0.5s ease-in-out;
+                -o-transition: all 0.5s ease-in-out;
+                -webkit-transition: all 0.5s ease-in-out;
+                transition: all 0.5s ease-in-out;
+                z-index: 5;
+            }
+        }
+
+        table {
+            display: block;
+            min-width: @width100;
+            width: @width100;
+
+            tbody {
+                display: block;
+                min-width: @width100;
+                width: @width100;
+            }
+
+            tr {
+                width: @width100;
+            }
+
+            td {
+                max-width: 960px;
+                min-width: 200px;
+                overflow-x: hidden !important;
+                width: @width100;
+            }
+        }
+
+        .sentDate {
+            background-color: @white;
+            clear: both;
+            color: @grayscale7;
+            display: block;
+            float: right;
+            font-size: 11px;
+            margin-top: -14px;
+            padding-left: 5px;
+            position: absolute;
+            right: 5px;
+            top: 43px;
+        }
+
+        .list-group-item.active {
+            background-color: lighten(@color1, 40%);
+            border-color: lighten(@color1, 40%);
+            color: @grayscale10;
+
+            &:hover {
+                background-color: lighten(@color1, 40%);
+                border-color: lighten(@color1, 40%);
+                color: @grayscale10;
+            }
+
+            &:focus {
+                background-color: lighten(@color1, 40%);
+                border-color: lighten(@color1, 40%);
+                color: @grayscale10;
+            }
+
+            a {
+                color: @grayscale10 !important;
+
+                &:hover {
+                    color: @grayscale10 !important;
+                }
+
+                &:focus {
+                    color: @grayscale10 !important;
+                }
+            }
+
+            .sentDate {
+                background-color: lighten(@color1, 40%);
+                color: @color1-dark;
+            }
+
+            span.attached-span {
+                background-color: lighten(@color1, 40%);
+                color: @color1-dark;
+
+                &:before {
+                    background-color: lighten(@color1, 40%);
+                    color: @color1-dark;
+                }
+            }
+
+            .sender {
+                color: @color1-dark;
+                opacity: 1;
+            }
+
+            .sender.read {
+                color: @color1-dark;
+                opacity: 1;
+            }
+        }
+    }
+
+    .btn.btn-navbar.off-canvas-menu-toggle {
+        background: @grayscale6;
+        border-radius: 0;
+        border-right: 1px solid @black;
+        display: block;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .navbar-brand {
+        margin: 0;
+        padding: 0;
+        max-width: 114px;
+        position: relative;
+        z-index: 0;
+        span {
+            color: @white;
+            float: left;
+            font-size: 13px;
+            margin-left: 8px;
+            margin-top: 13px;
+        }
+    }
+
+    label.checkbox {
+        display: block;
+        float: left;
+        height: 0px;
+        margin-left: 25px;
+        position: relative;
+        width: .001em;
+    }
+
+    .select {
+        display: block;
+        float: left;
+        height: 0px;
+        margin-left: 1px;
+        padding-top: 10px;
+        position: absolute;
+        width: 0px;
+    }
+
+    .right-content-email-toggle {
+        div {
+            input {
+                display: block;
+                position: relative;
+            }
+        }
+    }
+
+    .email-row {
+        .sender {
+            clear: right;
+            display: block;
+            filter: ~"alpha(opacity =55)";
+            float: left;
+            margin-left: 25px;
+            margin-top: -20px;
+            max-height: 19px;
+            min-width: @width100;
+            opacity: 0.55;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sender.unread {
+            filter: ~"alpha(opacity =100)";
+            opacity: 1 !important;
+        }
+
+        .subject {
+            clear: both;
+            color: @grayscale7;
+            display: block;
+            float: left;
+            font-size: 12px;
+            line-height: 1.4em;
+            margin-left: 25px;
+            margin-top: 0;
+            max-height: 18px;
+            overflow: hidden;
+
+            &::after {
+                bottom: 0;
+                content: '';
+                cursor: pointer;
+                left: 30px;
+                position: absolute;
+                right: 30px;
+                top: 3px;
+            }
+        }
+    }
+
+    .attached-span {
+        background-color: @white;
+        display: none;
+
+        &:before {
+            background-color: @white;
+            display: block;
+            height: 20px;
+            padding: 4px;
+            width: 20px;
+        }
+    }
+
+    .attached {
+        span.attached-span {
+            -ms-transform: rotate(-135deg);
+            -webkit-transform: rotate(-135deg);
+            background-color: @white;
+            clear: both;
+            color: @grayscale7;
+            display: block;
+            float: right;
+            font-size: 12px;
+            position: absolute;
+            right: 5px;
+            top:7px;
+            transform: rotate(-135deg);
+            width: 12px;
+        }
+    }
+
+    div>.answered-span {
+        position: relative;
+        width: 15px;
+    }
+
+    .sender.read {
+        color: @grayscale7;
+    }
+
+    .read {
+        opacity: 0.7;
+    }
+
+    .message-headers {
+        margin-right: -5px;
+
+        td {
+            font-size: 12px;
         }
     }
 }
 
-.email-message {
-    .email-message-toolbar {
-        padding-bottom: 6px;
-        border-bottom: 1px solid @grayD;
+.email-container.show-left-menu {
+    #outer-wrapper {
+        -moz-transform: translate3d(75%, 0, 0);
+        -ms-transform: translate3d(75%, 0, 0);
+        -o-transform: translate3d(75%, 0, 0);
+        -webkit-transform: translate3d(75%, 0, 0);
+        transform: translate3d(75%, 0, 0);
+    }
+
+    nav#left-menu.off-canvas-menu {
+        background: @grayscale10;
+        height: 100%;
+        left: -75%;
+        width: 87%;
+    }
+
+    .navbar-middle {
+        -moz-transform: translate3d(20%, 0, 0);
+        -ms-transform: translate3d(20%, 0, 0);
+        -o-transform: translate3d(20%, 0, 0);
+        -webkit-transform: translate3d(20%, 0, 0);
+        transform: translate3d(20%, 0, 0);
+    }
+
+    .toolbar-middle {
+        -moz-transform: translate3d(20%, 0, 0);
+        -ms-transform: translate3d(20%, 0, 0);
+        -o-transform: translate3d(20%, 0, 0);
+        -webkit-transform: translate3d(20%, 0, 0);
+        transform: translate3d(20%, 0, 0);
+    }
+
+    .container-list {
+        -moz-transform: translate3d(20%, 0, 0);
+        -ms-transform: translate3d(20%, 0, 0);
+        -o-transform: translate3d(20%, 0, 0);
+        -webkit-transform: translate3d(20%, 0, 0);
+        transform: translate3d(20%, 0, 0);
+    }
+}
+
+/*
+    When a user clicks to see a message, #right-content-email (the Selected Message)
+    moves from the right to the left over email-list on small devices.
+    due to inconstitancy with assistives technologies (embedded Screen Readers like Voiceover on IOS or talkback on android)
+    it is just assumptions: those stuffs seems to use CSS graphical layer to show the focused current element chrome by adding
+    extra layers in the z-index layers.
+    in short: they put the mess in the stacking context with the GPU accelerated CSS transformations properties.
+    Do-it-yourself: So I give a try to artificially increase the regular z-index spaces and translateZ axis layers (without assistive technologies)
+    to give more space to these Assistive Technologies...
+*/
+.email-container.show-right-menu {
+    #right-content-email {
+        -moz-transform: translate3d(-100%, 0, 10px);
+        -ms-transform: translate3d(-100%, 0, 10px);
+        -o-transform: translate3d(-100%, 0, 10px);
+        -webkit-transform: translate3d(-100%, 0, 10px);
+        transform: translate3d(-100%, 0, 10px);
+        z-index: 200;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .email-container {
+        .state-indicator {
+            &:before {
+                content: 'tablet';
+            }
+        }
+
+        nav#left-menu {
+            background: @grayscale10 !important;
+            color: @black;
+            left: -385px;
+            width: 365px;
+            z-index: 400;
+        }
+
+        .navbar-brand {
+            margin-left: 1px !important;
+            max-width: 180px;
+        }
+
+        .form-inline {
+            .form-group {
+                margin-bottom: 13px;
+             }
+
+            .container-list {
+                .checkbox {
+                    input[type=checkbox] {
+                        margin-left: -20px;
+                        margin-top: 12px;
+                    }
+                }
+            }
+        }
+
+        label.checkbox {
+            margin-left: 25px;
+        }
+
+        .email-row {
+            .sender {
+                margin-top: 0;
+            }
+            .subject {
+                margin-top: 2px;
+            }
+        }
+
+        .navbar-middle {
+            width: @width50;
+        }
+
+        .toolbar-middle {
+            width: @width50;
+            // Should be over .navbar-middle z-index (600) at any time
+            z-index: 700;
+        }
+
+        .navbar-fixed-bottom {
+            width: @width50;
+        }
+
+        .navbar-static-top {
+            width: @width50;
+        }
+
+        .container-list {
+            width: @width50;
+        }
+
+        #right-content-email {
+            left: 0;
+            opacity: 0;
+            width: @width50;
+            z-index: 0;
+        }
+
+        #right-content-email>.navbar {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+
+    .email-container.show-left-menu {
+        nav#left-menu.off-canvas-menu {
+            background: #333333;
+            height: 100%;
+            left: -75%;
+            width: 33.3%;
+        }
+
+        .navbar-middle {
+            -moz-transform: translate3d(-75%, 0, 0);
+            -ms-transform: translate3d(-75%, 0, 0);
+            -o-transform: translate3d(-75%, 0, 0);
+            -webkit-transform: translate3d(-75%, 0, 0);
+            transform: translate3d(-75%, 0, 0);
+            width: @width50;
+        }
+
+        .toolbar-middle {
+            -moz-transform: translate3d(-75%, 0, 0);
+            -ms-transform: translate3d(-75%, 0, 0);
+            -o-transform: translate3d(-75%, 0, 0);
+            -webkit-transform: translate3d(-75%, 0, 0);
+            transform: translate3d(-75%, 0, 0);
+            width: @width50;
+        }
+
+        .container-list {
+            -moz-transform: translate3d(-75%, 0, 0);
+            -ms-transform: translate3d(-75%, 0, 0);
+            -o-transform: translate3d(-75%, 0, 0);
+            -webkit-transform: translate3d(-75%, 0, 0);
+            transform: translate3d(-75%, 0, 0);
+            width: @width50;
+        }
+
+        #right-content-email {
+            -moz-transform: translate3d(-80%, 0, 0);
+            -ms-transform: translate3d(-80%, 0, 0);
+            -o-transform: translate3d(-80%, 0, 0);
+            -webkit-transform: translate3d(-80%, 0, 0);
+            transform: translate3d(-80%, 0, 0);
+            width: @width50;
+        }
+    }
+    /*
+     When a user clicks to see a message on tablet / desktop,
+     this time the Selected Message moves from left to right under the middle blocks
+     (the middle blocks = .navbar-middle && .toolbar-middle && .container-list)
+     giving space vertically to Assistive Technologies. see comment above...
+    */
+    .email-container.show-right-menu {
+        .navbar-middle {
+            width: @width50;
+            z-index: 600;
+        }
+
+        .container-list {
+            width: @width50;
+            z-index: 350;
+        }
+
+        #right-content-email {
+            -moz-transform: translate3d(50%, 0, 0);
+            -ms-transform: translate3d(50%, 0, 0);
+            -o-transform: translate3d(50%, 0, 0);
+            -webkit-transform: translate3d(50%, 0, 0);
+            opacity: 100;
+            transform: translate3d(50%, 0, 0);
+            width: @width50;
+            z-index: 0;
+        }
+    }
+}
+@media screen and (min-width: 992px) {
+    .email-container {
+        .state-indicator {
+            &:before {
+                content: 'desktop';
+            }
+        }
+
+        .outer-spinner {
+            .spinner-container {
+                margin-left: 50%;
+            }
+        }
+
+        #envelope {
+            right: 16.5%;
+        }
+
+        #left-menu-toggle {
+            display: none;
+        }
+
+        nav#left-menu {
+            background: #333333 !important;
+            color: @black;
+            left: 0;
+            width: 30%;
+            z-index: 500;
+        }
+
+        .navbar-middle {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+            .navbar-brand {
+                max-width: 175px;
+            }
+        }
+
+        .toolbar-middle {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+
+        .navbar-static-top {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+
+        .container-list {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+
+        #right-content-email {
+            -moz-transform: translate3d(-5%, 0, 0);
+            -ms-transform: translate3d(-5%, 0, 0);
+            -o-transform: translate3d(-5%, 0, 0);
+            -webkit-transform: translate3d(-5%, 0, 0);
+            transform: translate3d(-5%, 0, 0);
+            width: 34.6%;
+        }
+    }
+    .email-container.show-left-menu {
+        #outer-wrapper {
+            -moz-transform: translate3d(0, 0, 0);
+            -ms-transform: translate3d(0, 0, 0);
+            -o-transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
+        nav#left-menu.off-canvas-menu {
+            left: 0;
+            width: 30%;
+        }
+
+        .navbar-middle {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+
+        .toolbar-middle {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+
+        .container-list {
+            -moz-transform: translate3d(98%, 0, 0);
+            -ms-transform: translate3d(98%, 0, 0);
+            -o-transform: translate3d(98%, 0, 0);
+            -webkit-transform: translate3d(98%, 0, 0);
+            transform: translate3d(98%, 0, 0);
+            width: @width33;
+        }
+    }
+    .email-container.show-right-menu {
+        .navbar-middle {
+            width: @width33;
+        }
+
+        .toolbar-middle {
+            width: @width33;
+        }
+
+        .navbar-static-top {
+            width: @width33;
+        }
+
+        .container-list {
+            width: @width33;
+        }
+
+        #right-content-email {
+            -moz-transform: translate3d(93%, 0, 0);
+            -ms-transform: translate3d(93%, 0, 0);
+            -o-transform: translate3d(93%, 0, 0);
+            -webkit-transform: translate3d(93%, 0, 0);
+            transform: translate3d(93%, 0, 0);
+            width: 35%;
+        }
     }
 }
 
 .email-preview-rollup {
     margin: 0 auto auto 20px;
-    color: @gray8;
+    color: @grayscale7;
     position: relative;
 
     .jumbotron {
-        padding: 10px 20px;
-        margin-bottom: 0;
-
-        h1 {
-            font-size: 32px;
-        }
-        p {
-            font-size: 16px;
-        }
+        margin: 0 -5px 0 -25px;
+        /* Material Design - styles */
+        background-color: @white;
+        border-style: hidden;
+        border-radius: 0;
+        -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 
         .email-animation {
+            position: relative;
+            min-width: 40px;
+            min-height: 40px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            margin-left: auto;
+            margin: 0 auto;
+            text-align: center;
+
+            .glyphicon {
+               font-size: 35px;
+               position: relative;
+            }
+
             .unreadContainer {
-                font-size: 20px;
-                position: relative;
-                float: right;
-                bottom: 25px;
+               position: absolute;
+               font-size: 15px;
+               width: 25px;
+               height: 25px;
+               border-radius: 50%;
+               margin-left: -7px;
+               padding: .3em .1em .1em 0;
+               margin-top: -9px;
+            }
+
+            .unreadContainer.label-primary {
+               background-color: @color1;
             }
         }
+
+        h3 {
+            font-size: 120%;
+            margin-bottom: 20px;
+            word-wrap: break-word;
+        }
+
+        p {
+            font-size: 14px;
+            padding-left: 25px;
+        }
+
+        ul {
+            margin-left: -1.1em;
+        }
+
+        .btn {
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .button-spacer {
+            height: 5px;
+        }       
     }
 }
 
 // Removing jQueryUI Styles
 .ui-corner-all {
-    .rounded(0);
+    .border-radius(0);
 }
 
