@@ -1,5 +1,7 @@
 # Email Preview Portlet
 
+[![Build Status](https://travis-ci.org/Jasig/email-preview.svg?branch=master)](https://travis-ci.org/Jasig/email-preview)
+
 The Email Preview Portlet is a JSR-268 read-only email portlet. This portlet allows a user to connect to an IMAP, POP3, or Exchange Web Services email store and view and manage contents of INBOX and other mail folders.
 
 This is a [Sponsored Portlet](https://wiki.jasig.org/display/PLT/Jasig+Sponsored+Portlets) in the Apereo uPortal project.
