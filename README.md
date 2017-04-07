@@ -1,6 +1,7 @@
 # Email Preview Portlet
 
-[![Build Status](https://travis-ci.org/Jasig/email-preview.svg?branch=master)](https://travis-ci.org/Jasig/email-preview)
+[![Linux Build Status](https://travis-ci.org/Jasig/email-preview.svg?branch=master)](https://travis-ci.org/Jasig/email-preview)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/ehlvw8wivw0k0hea/branch/master?svg=true)](https://ci.appveyor.com/project/ChristianMurphy/email-preview/branch/master)
 
 The Email Preview Portlet is a JSR-268 read-only email portlet. This portlet allows a user to connect to an IMAP, POP3, or Exchange Web Services email store and view and manage contents of INBOX and other mail folders.
 
