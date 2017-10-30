@@ -607,8 +607,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <!-- GMaven plugin for unit tests -->
@@ -797,7 +797,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>1.9</version>
                 <configuration>
-                    <source>1.6</source>
+                    <source>1.8</source>
                     <maxmemory>512m</maxmemory>
                     <links>
                         <link>http://java.sun.com/javase/6/docs/api/</link>
