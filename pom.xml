@@ -47,7 +47,7 @@
         <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
         <logbackVersion>1.1.7</logbackVersion>
         <sl4jVersion>1.7.21</sl4jVersion>
-        <spring.version>4.2.5.RELEASE</spring.version>
+        <spring.version>4.3.12.RELEASE</spring.version>
         <resource-server.version>1.0.43</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
