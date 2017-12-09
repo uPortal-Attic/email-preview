@@ -1,5 +1,6 @@
 # Email Preview Portlet
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jasig.portlet/email-preview/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.jasig.portlet/email-preview)
 [![Linux Build Status](https://travis-ci.org/Jasig/email-preview.svg?branch=master)](https://travis-ci.org/Jasig/email-preview)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/ehlvw8wivw0k0hea/branch/master?svg=true)](https://ci.appveyor.com/project/ChristianMurphy/email-preview/branch/master)
 
