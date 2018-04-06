@@ -51,7 +51,12 @@
     </bean>
 
     <!-- Properties configuration -->
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!--
+     | Supports encrypted properties within the location(s) listed in this
+     | bean.  The password is the environment variable "UP_JASYPT_KEY"
+     | (see http://www.jasypt.org/).
+     +-->
+    <bean id="propertyConfigurer" class="org.springframework.context.support.PortalPropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:configuration.properties</value>

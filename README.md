@@ -59,6 +59,47 @@ These may be set by users if permitted by the administrator. If any field is def
 *   Show rollup (smaller) or preview (larger) on login
 *   Focus on Preview
 
+## Configuration
+
+See also the [legacy documentation in the external wiki][].
+
+### Java Properties
+
+Some configuration settings for the Email Preview portlet are managed in Java properties files that
+are loaded by a Spring `PropertySourcesPlaceholderConfigurer`.  (Other settings are data, managed in
+the "portlet publication record" a.k.a. `portlet-definition.xml` file
+
+The properties files that are sourced by Spring are:
+
+  - `classpath:configuration.properties`
+  - `file:${portal.home}/global.properties`
+  - `file:${portal.home}/email-preview.properties`
+
+For a definitive, comprehensive list of these settings you must look inside `configuration.properties`.
+(This `README` may be incomplete and/or out of date.)
+
+#### The `portal.home` Directory
+
+uPortal version 5 uses a directory called `portal.home` for properties files that live outside of
+-- and have the ability to _override_ properties files within-- the webapp in Tommcat.  Please
+review the [README file for uPortal-Start][] for more information on this sytem.
+
+The Notification portlet sources the shared `global.properties` file, as well as it's own (private)
+file called `email-preview.properties` in the `portal.home` directory.
+
+#### Using Encrypted Property Values
+
+Within the properties files that are sourced by Spring, you may optionally provide sensitive
+configuration items -- such as database passwords -- in encrypted format.  Use the
+[Jasypt CLI Tools][] to encrypt the sensitive value, then include it in a `.properties` file
+like this:
+
+```
+hibernate.connection.password=ENC(9ffpQXJi/EPih9o+Xshm5g==)
+```
+
+Specify the encryption key using the `UP_JASYPT_KEY` environment variable.
+
 ## Contributing
 
 This project follows the [uPortal Contributing Guidelines](https://github.com/Jasig/uPortal/blob/master/CONTRIBUTING.md).
