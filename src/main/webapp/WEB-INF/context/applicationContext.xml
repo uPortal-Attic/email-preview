@@ -20,7 +20,7 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:util="http://www.springframework.org/schema/util"
@@ -32,40 +32,64 @@
     <context:annotation-config />
 
     <bean id="exceptionResolver" class="org.springframework.web.portlet.handler.SimpleMappingExceptionResolver">
-        <!-- 
-         | Always declare an 'exceptionResolver' bean with a 'defaultErrorView' 
-         | because, in addition to other uses, it protects the portlet from 
-         | failing when a bad request (due to a bug or malicious user) doesn't 
-         | match any declared @RequestMapping.  When this happens, the portlet 
-         | throws an Exception and takes itself out of service until a portal 
+        <!--
+         | Always declare an 'exceptionResolver' bean with a 'defaultErrorView'
+         | because, in addition to other uses, it protects the portlet from
+         | failing when a bad request (due to a bug or malicious user) doesn't
+         | match any declared @RequestMapping.  When this happens, the portlet
+         | throws an Exception and takes itself out of service until a portal
          | restart.  THIS CONDITION AFFECTS ALL USERS!
          +-->
          <property name="exceptionMappings">
             <props>
-              <!-- Exception thrown when an error is raised during initialization, such as when 
+              <!-- Exception thrown when an error is raised during initialization, such as when
                    the encryption password is not set for password based encryptor  -->
               <prop key="org.jasig.portlet.emailpreview.security.StringEncryptionException">pswEncError</prop>
             </props>
         </property>
         <property name="defaultErrorView" value="error"/>
     </bean>
-    
+
     <!-- Properties configuration -->
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-          lazy-init="false">
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:configuration.properties</value>
+                <!--
+                 | The following optional files allow deployers to set or override most
+                 | configuration settings in a manner that is outside the footprint of the
+                 | build/deploy cycle and SCM.
+                 |
+                 | Reasons for choosing that may include:
+                 |   - Desire to keep sensitive information out of your Git repository
+                 |   - Ability to change some common settings without a full build and deploy cycle
+                 |   - Building a WAR/EAR that is environment-independent
+                 |
+                 | Any property defined in the above files that is referenced in the Spring context
+                 | may be overridden in one (or both) of these files.  Later files override earlier
+                 | files.
+                 |
+                 | The conventional location of ${portal.home} is ${catalina.base}/portal;  but you
+                 | can (typically) override that location using a PORTAL_HOME environment variable.
+                 | (Ultimately it depends on your setenv.sh or setenv.bat file.)
+                 |
+                 | The first file (global.properties) may contain properties that are shared with
+                 | other modules (e.g. portlets) in Tomcat.  Several Apereo portlets source
+                 | global.properties automatically.  The second file (email-preview.properties) is
+                 | (should be) sourced by this module exclusively.
+                 +-->
+                <value>file:${portal.home}/global.properties</value>
+                <value>file:${portal.home}/email-preview.properties</value>
             </list>
         </property>
+        <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
     <util:list id="linkServices">
         <ref bean="simpleEmailLinkService"/>
     </util:list>
 
-    <!-- 
+    <!--
      | View resolvers, look for a named view bean before going to JSP resolution
      +-->
     <bean class="org.springframework.web.servlet.view.XmlViewResolver"
@@ -82,15 +106,15 @@
         <property name="basename" value="i18n/messages" />
     </bean>
 
-    <!-- 
-     | This bean maps error codes to UI messages that will be shown to users.  
-     | The keys are numeric HTTP codes (e.g. 401 for "not authorized"), and the 
-     | values are used to pull UI strings from the messageSource bean.  This way 
+    <!--
+     | This bean maps error codes to UI messages that will be shown to users.
+     | The keys are numeric HTTP codes (e.g. 401 for "not authorized"), and the
+     | values are used to pull UI strings from the messageSource bean.  This way
      | all UI customization and internationalization can be managed in one place.
      |
-     | In addition to numeric keys, provide also a 'default' key, which will be 
-     | used for any error code that doesn't have it's own entry.  Lastly, the 
-     | controller may also add a custom message by sending an HTTP 200 together 
+     | In addition to numeric keys, provide also a 'default' key, which will be
+     | used for any error code that doesn't have it's own entry.  Lastly, the
+     | controller may also add a custom message by sending an HTTP 200 together
      | with an 'errorMessage' property in the returned JSON.
      +-->
     <util:map id="jsErrorMessages">
@@ -125,7 +149,7 @@
     <!-- For the demo portlet only;  DO NOT USE WITH REAL EMAIL INTEGRATION -->
     <bean id="demoAuthenticationService" class="org.jasig.portlet.emailpreview.service.auth.DemoAuthenticationService"/>
 
-    <bean id="cachedPasswordAuthenticationService" 
+    <bean id="cachedPasswordAuthenticationService"
             class="org.jasig.portlet.emailpreview.service.auth.CachedPasswordAuthenticationService"/>
 
     <bean id="portletPreferencesCredentialsAuthenticationService"
@@ -139,4 +163,3 @@
         </property>
     </bean>
 </beans>
-
