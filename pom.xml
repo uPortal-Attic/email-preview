@@ -43,15 +43,15 @@
   </scm>
 
     <properties>
-        <jackson.version>2.7.3</jackson.version>
+        <jackson.version>2.8.11.1</jackson.version>
         <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
-        <logbackVersion>1.1.7</logbackVersion>
+        <logbackVersion>1.2.0</logbackVersion>
         <sl4jVersion>1.7.21</sl4jVersion>
-        <spring.version>4.3.12.RELEASE</spring.version>
+        <spring.version>4.3.15.RELEASE</spring.version>
         <resource-server.version>1.0.43</resource-server.version>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
-        <cas.version>3.4.1</cas.version>
+        <cas.version>3.5.0</cas.version>
     </properties>
 
     <licenses>
@@ -208,7 +208,7 @@
             <dependency>
                 <groupId>org.jasig.portlet.notification</groupId>
                 <artifactId>notification-portlet-api</artifactId>
-                <version>3.0.0</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jasig.resourceserver</groupId>
@@ -239,7 +239,7 @@
             <dependency>
                 <groupId>org.owasp.antisamy</groupId>
                 <artifactId>antisamy</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.7</version>
             </dependency>
             <dependency>
             <!-- nekohtml is a transitive dependency of antisamy;
@@ -292,12 +292,12 @@
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-core</artifactId>
-                <version>2.2.4.RELEASE</version>
+                <version>2.4.0.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.ws</groupId>
                 <artifactId>spring-ws-security</artifactId>
-                <version>2.2.4.RELEASE</version>
+                <version>3.0.1.RELEASE</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.sun.xml.wss</groupId>
