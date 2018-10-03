@@ -43,15 +43,18 @@
   </scm>
 
     <properties>
+        <filters.file>src/main/filters/email-preview.properties</filters.file>
+
+        <cas.version>3.4.1</cas.version>
+        <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
         <jackson.version>2.7.3</jackson.version>
+        <jasypt.version>1.9.2</jasypt.version>
         <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
         <logbackVersion>1.1.7</logbackVersion>
+        <resource-server.version>1.0.43</resource-server.version>
         <sl4jVersion>1.7.21</sl4jVersion>
         <spring.version>4.3.12.RELEASE</spring.version>
-        <resource-server.version>1.0.43</resource-server.version>
-        <filters.file>src/main/filters/email-preview.properties</filters.file>
-        <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
-        <cas.version>3.4.1</cas.version>
+        <uPortal.version>5.0.6</uPortal.version>
     </properties>
 
     <licenses>
@@ -221,11 +224,16 @@
                 <artifactId>resource-server-utils</artifactId>
                 <version>${resource-server.version}</version>
             </dependency>
-	        <dependency>
-	            <groupId>org.jasypt</groupId>
-	            <artifactId>jasypt</artifactId>
-                <version>1.9.2</version>
-	        </dependency>
+            <dependency>
+                <groupId>org.jasig.portal</groupId>
+                <artifactId>uPortal-spring</artifactId>
+                <version>${uPortal.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jasypt</groupId>
+                <artifactId>jasypt-spring31</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.jvnet.jaxb2_commons</groupId>
                 <artifactId>jaxb2-basics-runtime</artifactId>
@@ -404,7 +412,7 @@
         </dependency>
         <dependency>
             <groupId>org.jasypt</groupId>
-            <artifactId>jasypt</artifactId>
+            <artifactId>jasypt-spring31</artifactId>
         </dependency>
         <dependency>
             <groupId>org.owasp.antisamy</groupId>
@@ -457,6 +465,11 @@
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jasig.portal</groupId>
+            <artifactId>uPortal-spring</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
