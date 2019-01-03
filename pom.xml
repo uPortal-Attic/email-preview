@@ -65,14 +65,6 @@
         </license>
     </licenses>
 
-    <repositories>
-        <repository>
-            <id>jasig-m2</id>
-            <name>JA-SIG Maven2 Repository</name>
-            <url>http://developer.jasig.org/repo/content/repositories/m2</url>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <!-- For sl4j/logback logging, see https://wiki.jasig.org/display/PLT/Logging+Best+Practices -->
