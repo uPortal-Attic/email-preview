@@ -48,7 +48,7 @@
         <cas.version>3.5.1</cas.version>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
         <jackson.version>2.9.9</jackson.version>
-        <jasypt.version>1.9.2</jasypt.version>
+        <jasypt.version>1.9.3</jasypt.version>
         <jaxb2basicsVersion>0.11.0</jaxb2basicsVersion>
         <logbackVersion>1.2.3</logbackVersion>
         <resource-server.version>1.0.43</resource-server.version>
