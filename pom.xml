@@ -239,7 +239,7 @@
             <dependency>
                 <groupId>org.owasp.antisamy</groupId>
                 <artifactId>antisamy</artifactId>
-                <version>1.5.9</version>
+                <version>1.5.10</version>
             </dependency>
             <dependency>
             <!-- nekohtml is a transitive dependency of antisamy;
