@@ -45,7 +45,7 @@
     <properties>
         <filters.file>src/main/filters/email-preview.properties</filters.file>
 
-        <cas.version>3.6.1</cas.version>
+        <cas.version>3.6.2</cas.version>
         <gmaven.runtime>1.5</gmaven.runtime> <!-- read by gmaven -->
         <jackson.version>2.11.3</jackson.version>
         <jasypt.version>1.9.3</jasypt.version>
