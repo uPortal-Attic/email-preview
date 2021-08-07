@@ -1,8 +1,7 @@
 # Email Preview Portlet
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jasig.portlet/email-preview/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.jasig.portlet/email-preview)
-[![Linux Build Status](https://travis-ci.org/Jasig/email-preview.svg?branch=master)](https://travis-ci.org/Jasig/email-preview)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/ehlvw8wivw0k0hea/branch/master?svg=true)](https://ci.appveyor.com/project/ChristianMurphy/email-preview/branch/master)
+[![build status](https://github.com/uPortal-Project/email-preview/workflows/CI/badge.svg?branch=master)](https://github.com/uPortal-Project/email-preview/actions)
 
 The Email Preview Portlet is a JSR-268 read-only email portlet. This portlet allows a user to connect to an IMAP, POP3, or Exchange Web Services email store and view and manage contents of INBOX and other mail folders.
 
@@ -81,8 +80,8 @@ For a definitive, comprehensive list of these settings you must look inside `con
 #### The `portal.home` Directory
 
 uPortal version 5 uses a directory called `portal.home` for properties files that live outside of
--- and have the ability to _override_ properties files within-- the webapp in Tommcat.  Please
-review the [README file for uPortal-Start][] for more information on this sytem.
+-- and have the ability to _override_ properties files within-- the webapp in Tomcat.  Please
+review the [README file for uPortal-Start][] for more information on this system.
 
 The Notification portlet sources the shared `global.properties` file, as well as it's own (private)
 file called `email-preview.properties` in the `portal.home` directory.
