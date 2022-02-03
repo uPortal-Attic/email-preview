@@ -25,8 +25,8 @@ import java.util.List;
 import javax.mail.Folder;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.AccountSummary;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.EmailMessageContent;
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 @Component
 public final class DemoAccountService implements IEmailAccountService {
 
-  private final Log log = LogFactory.getLog(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private static final String ACCOUNT_SUMMARY_KEY = "DemoAccountService.ACCOUNT_SUMMARY_KEY";
   private static final String INBOX_URL = "http://www.jasig.org/";

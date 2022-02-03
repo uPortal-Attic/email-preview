@@ -20,8 +20,8 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +39,7 @@ public class AjaxUpdatePageSizeController {
 
   private static final String STATUS_KEY = "success";
 
-  private final Log log = LogFactory.getLog(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   @ResourceMapping(value = "updatePageSize")
   public ModelAndView updatePageSize(

@@ -25,8 +25,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.service.auth.IAuthenticationService;
@@ -61,7 +61,7 @@ public class EmailSummaryController extends BaseEmailController {
   private static final String DEFAULT_WELCOME_INSTRUCTIONS = "";
   private static final String MSG_CONTAINER = "messagesInfoContainer";
 
-  private final Log log = LogFactory.getLog(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
   private String adminRoleName = "admin";
 
   @Autowired(required = true)

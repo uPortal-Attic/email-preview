@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.EmailMessage;
 import org.jasig.portlet.emailpreview.util.MessageUtils;
 import org.springframework.stereotype.Controller;
@@ -38,7 +38,7 @@ public class EmailMessageController extends BaseEmailController {
 
   private static final String CONTENT_TYPE_TEXT_PREFIX = "text/plain;";
 
-  protected final Log log = LogFactory.getLog(getClass());
+  protected final Logger log = LoggerFactory.getLogger(getClass());
 
   @ResourceMapping(value = "emailMessage")
   public ModelAndView showMessage(

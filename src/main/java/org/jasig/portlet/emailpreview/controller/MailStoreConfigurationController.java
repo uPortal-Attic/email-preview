@@ -30,8 +30,8 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
 import org.jasig.portlet.emailpreview.mvc.Attribute;
@@ -56,7 +56,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("CONFIG")
 public class MailStoreConfigurationController extends BaseEmailController {
 
-  protected final Log log = LogFactory.getLog(getClass());
+  protected final Logger log = LoggerFactory.getLogger(getClass());
 
   @Autowired(required = true)
   private IAuthenticationServiceRegistry authServiceRegistry;

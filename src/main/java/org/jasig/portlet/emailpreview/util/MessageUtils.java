@@ -17,8 +17,8 @@ package org.jasig.portlet.emailpreview.util;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.EmailPreviewException;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
@@ -51,7 +51,7 @@ public final class MessageUtils implements InitializingBean, ApplicationContextA
   /** Replacement to add target to HTML anchors. */
   private static final String ADD_TARGET_TO_ANCHOR_REPLACEMENT = "<a$1 target=\"_new\">";
 
-  private static final Log LOG = LogFactory.getLog(MessageUtils.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MessageUtils.class);
 
   private String filePath = "classpath:antisamy.xml"; // default
   private ApplicationContext ctx;

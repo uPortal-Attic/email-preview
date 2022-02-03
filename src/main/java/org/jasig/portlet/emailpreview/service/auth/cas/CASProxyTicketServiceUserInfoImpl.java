@@ -16,15 +16,15 @@ package org.jasig.portlet.emailpreview.service.auth.cas;
 
 import java.util.Map;
 import javax.portlet.PortletRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.TicketValidationException;
 import org.jasig.cas.client.validation.TicketValidator;
 
 public class CASProxyTicketServiceUserInfoImpl implements ICASProxyTicketService {
 
-  protected final Log log = LogFactory.getLog(this.getClass());
+  protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
   private String serviceUrl;
 
