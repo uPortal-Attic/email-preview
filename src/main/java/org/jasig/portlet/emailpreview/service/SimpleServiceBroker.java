@@ -24,8 +24,8 @@ import java.util.TreeSet;
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.portlet.emailpreview.MailStoreConfiguration;
 import org.jasig.portlet.emailpreview.dao.IEmailAccountService;
 import org.jasig.portlet.emailpreview.dao.MailPreferences;
@@ -45,7 +45,7 @@ public class SimpleServiceBroker implements IServiceBroker {
   private IStringEncryptionService stringEncryptionService;
   private Map<String, IEmailAccountService> services;
   private Set<String> protocols;
-  private final Log log = LogFactory.getLog(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   // Add items to this list if they are enumerated specifically in the code for getConfiguration and saveConfiguration
   protected static final List<String> RESERVED_PROPERTIES =
