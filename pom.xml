@@ -50,7 +50,7 @@
         <jackson.version>2.13.4</jackson.version>
         <jasypt.version>1.9.3</jasypt.version>
         <jaxb2basicsVersion>0.12.0</jaxb2basicsVersion>
-        <logbackVersion>1.4.0</logbackVersion>
+        <logbackVersion>1.4.1</logbackVersion>
         <resource-server.version>1.4.1</resource-server.version>
         <sl4jVersion>1.7.36</sl4jVersion>
         <spring.version>4.3.30.RELEASE</spring.version>
